@@ -1,9 +1,5 @@
-import AuthScreen from "@/components/Auth/Auth";
+import HomeRedirect from "@/components/Auth/HomeRedirect";
 
 export default function Home() {
-  return (
-    <>
-      <AuthScreen />
-    </>
-  );
+  return <HomeRedirect />;
 }
