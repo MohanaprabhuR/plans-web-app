@@ -9,6 +9,7 @@ import { Checkbox } from "../ui/checkbox";
 import { Label } from "../ui/label";
 import { Field, FieldGroup, FieldLabel } from "../ui/field";
 import { supabase } from "@/lib/supabase/client";
+import { isValidEmail } from "@/lib/utils";
 import { toast } from "sonner";
 import { Alert, AlertTitle } from "../ui/alert";
 import { CircleAlert } from "lucide-react";
@@ -62,6 +63,17 @@ export default function SignupScreen({ onSwitchToLogin }: SignupScreenProps) {
       ));
       return;
     }
+
+    if (!isValidEmail(email)) {
+      toast.custom(() => (
+        <Alert variant="error">
+          <CircleAlert className="size-4" />
+          <AlertTitle>Enter a valid email address.</AlertTitle>
+        </Alert>
+      ));
+      return;
+    }
+
     setLoading(true);
     const { data, error } = await supabase.auth.signUp({
       email,
@@ -87,13 +99,19 @@ export default function SignupScreen({ onSwitchToLogin }: SignupScreenProps) {
       ));
       return;
     }
+    const displayName = data?.user?.user_metadata?.full_name ?? fullName;
     toast.custom(() => (
       <Alert variant="success">
         <CircleAlert className="size-4" />
-        <AlertTitle>Account created.</AlertTitle>
+        <AlertTitle>Account created. Welcome, {displayName}!</AlertTitle>
       </Alert>
     ));
-    router.push("/onboarding/step-1");
+    // If the new user somehow already has onboarding_complete, go to dashboard; otherwise onboarding.
+    const { data: sessionData } = await supabase.auth.getSession();
+    const onboardingComplete =
+      sessionData.session?.user.user_metadata?.onboarding_complete === true;
+
+    router.push(onboardingComplete ? "/dashbaord" : "/onboarding");
   };
 
   return (

@@ -8,6 +8,7 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Field, FieldGroup, FieldLabel } from "../ui/field";
 import { supabase } from "@/lib/supabase/client";
+import { isValidEmail } from "@/lib/utils";
 import { toast } from "sonner";
 import { Alert, AlertTitle } from "../ui/alert";
 
@@ -49,8 +50,19 @@ export default function LoginScreen({ onSwitchToSignup }: LoginScreenProps) {
 
   const handleLogIn = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!isValidEmail(email)) {
+      toast.custom(() => (
+        <Alert variant="error">
+          <CircleAlert className="size-4" />
+          <AlertTitle>Enter a valid email address.</AlertTitle>
+        </Alert>
+      ));
+      return;
+    }
+
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
@@ -64,13 +76,21 @@ export default function LoginScreen({ onSwitchToSignup }: LoginScreenProps) {
       ));
       return;
     }
+
+    const onboardingComplete =
+      data.session?.user.user_metadata?.onboarding_complete === true;
+
     toast.custom(() => (
       <Alert variant="success">
         <CircleAlert className="size-4" />
-        <AlertTitle>Logged in successfully.</AlertTitle>
+        <AlertTitle>
+          Logged in successfully. Welcome,
+          {data.session?.user.user_metadata?.full_name}!
+        </AlertTitle>
       </Alert>
     ));
-    router.push("/onboarding/step-1");
+
+    router.push(onboardingComplete ? "/dashbaord" : "/onboarding");
   };
 
   return (
