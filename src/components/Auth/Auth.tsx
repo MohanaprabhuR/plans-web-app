@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import WelcomeScreen from "../common/welcome";
+import WelcomeScreen from "../BaseComponents/common/welcome";
 import SignupScreen from "./Signup";
 import LoginScreen from "./Login";
 

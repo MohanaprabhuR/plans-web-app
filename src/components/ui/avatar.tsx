@@ -184,7 +184,7 @@ interface AvatarProps
     React.ComponentProps<typeof AvatarPrimitive.Root>,
     VariantProps<typeof avatarVariants> {
   shape?: Shape;
-  status?: Status;
+  status?: Status | null;
 }
 
 export function Avatar({
@@ -197,7 +197,7 @@ export function Avatar({
 }: AvatarProps) {
   const radiusClass =
     shape === "square" ? radiusMap[size ?? "sm"] : "rounded-full";
-  const statusIcon = statusIconMap[status];
+  const statusIcon = status != null ? statusIconMap[status] : undefined;
 
   return (
     <AvatarSizeContext.Provider value={{ size, shape }}>

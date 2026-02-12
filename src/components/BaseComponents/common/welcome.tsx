@@ -1,11 +1,11 @@
 import Image from "next/image";
-import PlansLogo from "../../../public/images/svg/plans-logo.svg";
-import WalletImage from "../../../public/images/wallet-image.webp";
-import Framers from "../../../public/images/svg/farmers.svg";
-import Progressive from "../../../public/images/svg/progressive.svg";
-import Geico from "../../../public/images/svg/geico.svg";
-import StateFarm from "../../../public/images/svg/statefarm.svg";
-import Coverage from "../../../public/images/svg/cover-wallet.svg";
+import PlansLogo from "../../../../public/images/svg/plans-logo.svg";
+import WalletImage from "../../../../public/images/wallet-image.webp";
+import Framers from "../../../../public/images/svg/farmers.svg";
+import Progressive from "../../../../public/images/svg/progressive.svg";
+import Geico from "../../../../public/images/svg/geico.svg";
+import StateFarm from "../../../../public/images/svg/statefarm.svg";
+import Coverage from "../../../../public/images/svg/cover-wallet.svg";
 
 const WelcomeScreen = () => {
   return (
