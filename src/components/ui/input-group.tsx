@@ -31,7 +31,7 @@ const inputGroupVariants = cva(
       variant: "default",
       size: "md",
     },
-  }
+  },
 );
 
 type VariantType = "default" | "outline";
@@ -59,8 +59,7 @@ const statusMap: Record<VariantType, Record<StatusType, string>> = {
 };
 
 interface InputGroupProps
-  extends React.ComponentProps<"div">,
-    VariantProps<typeof inputGroupVariants> {
+  extends React.ComponentProps<"div">, VariantProps<typeof inputGroupVariants> {
   status?: StatusType;
 }
 
@@ -71,7 +70,9 @@ function InputGroup({
   size = "md",
   ...props
 }: InputGroupProps) {
-  const statusClasses = statusMap[variant || "default"]?.[status] ?? "";
+  const resolvedVariant: VariantType =
+    variant === "outline" || variant === "default" ? variant : "default";
+  const statusClasses = statusMap[resolvedVariant]?.[status] ?? "";
 
   return (
     <div
@@ -82,7 +83,7 @@ function InputGroup({
         inputGroupVariants({ variant, size }),
         statusClasses,
         "overflow-hidden",
-        className
+        className,
       )}
       {...props}
     />
@@ -114,7 +115,7 @@ const inputGroupAddonVariants = cva(
       align: "inline-start",
       size: "sm",
     },
-  }
+  },
 );
 
 function InputGroupAddon({
@@ -132,9 +133,9 @@ function InputGroupAddon({
       onClick={(e) => {
         if ((e.target as HTMLElement).closest("button")) return;
         const input = e.currentTarget.parentElement?.querySelector(
-          '[data-slot="input-group-control"]'
-        );
-        input?.focus();
+          '[data-slot="input-group-control"]',
+        ) as HTMLInputElement | HTMLTextAreaElement | null;
+        input?.focus?.();
       }}
       {...props}
     />
@@ -156,7 +157,7 @@ const inputGroupButtonVariants = cva(
     defaultVariants: {
       size: "xs",
     },
-  }
+  },
 );
 
 function InputGroupButton({
@@ -175,7 +176,7 @@ function InputGroupButton({
       className={cn(
         inputGroupButtonVariants({ size }),
         "hover:bg-transparent bg-transparent shadow-none ",
-        className
+        className,
       )}
       {...props}
     />
@@ -187,7 +188,7 @@ function InputGroupText({ className, ...props }: React.ComponentProps<"span">) {
     <span
       className={cn(
         "text-muted-foreground flex items-center gap-2 text-sm [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 transition-colors",
-        className
+        className,
       )}
       {...props}
     />
@@ -203,7 +204,7 @@ function InputGroupInput({
   ...props
 }: React.ComponentProps<typeof Input>) {
   const [hasValue, setHasValue] = React.useState(
-    Boolean(value ?? defaultValue ?? "")
+    Boolean(value ?? defaultValue ?? ""),
   );
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -221,7 +222,7 @@ function InputGroupInput({
       onChange={handleChange}
       className={cn(
         "flex-1 rounded-none outline-0 bg-transparent hover:bg-transparent shadow-none focus-visible:ring-0 active:shadow-none active:bg-transparent focus:outline-0 focus:shadow-none",
-        className
+        className,
       )}
       {...props}
     />
@@ -241,7 +242,7 @@ function InputGroupTextarea({
   ...props
 }: InputGroupTextareaProps) {
   const [hasValue, setHasValue] = React.useState(
-    Boolean(value ?? defaultValue ?? "")
+    Boolean(value ?? defaultValue ?? ""),
   );
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -262,7 +263,7 @@ function InputGroupTextarea({
       className={cn(
         "flex-1 resize-none rounded-t  rounded-b-none outline-transparent hover:bg-transparent bg-transparent shadow-none focus-visible:ring-0 active:outline-0 focus:outline-0 active:shadow-none focus:shadow-none",
         sizeClasses[size],
-        className
+        className,
       )}
       value={value}
       defaultValue={defaultValue}
