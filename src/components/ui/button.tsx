@@ -109,8 +109,12 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         icons.length > 1 ? icons[icons.length - 1] : icons[0] || null;
 
       if (React.isValidElement(chosenIcon)) {
-        const { width, height } = iconSizeMap[size];
-        content = React.cloneElement(chosenIcon, { width, height });
+        const safeSize = size ?? "sm";
+        const { width, height } = iconSizeMap[safeSize];
+        content = React.cloneElement(
+          chosenIcon as React.ReactElement<{ width?: number; height?: number }>,
+          { width, height }
+        );
       } else {
         content = null;
       }
