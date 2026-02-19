@@ -2,7 +2,14 @@
 
 import React, { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, Wallet, Shield, Activity, Heart, Check } from "lucide-react";
+import {
+  ChevronLeft,
+  Wallet,
+  Shield,
+  Activity,
+  Heart,
+  Check,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -32,8 +39,8 @@ const CATEGORY_ICONS: Record<string, React.ReactNode> = {
 export function OnboardingStepForm() {
   const router = useRouter();
   const [stepIndex, setStepIndex] = useState(0);
-  const [formData, setFormData] = useState<OnboardingFormData>(() =>
-    getStoredOnboardingData() ?? {}
+  const [formData, setFormData] = useState<OnboardingFormData>(
+    () => getStoredOnboardingData() ?? {},
   );
   const [direction, setDirection] = useState<"next" | "back">("next");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -106,7 +113,7 @@ export function OnboardingStepForm() {
 
       // Confirmation: just go to dashboard (data already saved)
       if (currentStep.id === "confirmation") {
-        router.push("/dashbaord");
+        router.push("/dashboard");
         return;
       }
 
@@ -128,7 +135,10 @@ export function OnboardingStepForm() {
     });
   }, []);
 
-  const isCategoryEndWithAnswer = (s: typeof step, data: OnboardingFormData): boolean => {
+  const isCategoryEndWithAnswer = (
+    s: typeof step,
+    data: OnboardingFormData,
+  ): boolean => {
     if (!s || s.id === "welcome" || s.id === "confirmation") return false;
     if (!s.nextButtonLabel) return false; // only section-end steps have this
     const key = s.id as keyof OnboardingFormData;
@@ -147,7 +157,7 @@ export function OnboardingStepForm() {
   return (
     <div className="min-h-screen bg-background flex flex-col max-w-lg mx-auto">
       {/* Header: back + category title + progress */}
-      {(step.id !== "welcome" && step.id !== "confirmation") && (
+      {step.id !== "welcome" && step.id !== "confirmation" && (
         <header className="flex items-center justify-between gap-2 px-4 py-3 border-b border-border shrink-0">
           <Button
             variant="ghost"
@@ -172,7 +182,10 @@ export function OnboardingStepForm() {
       <div className="flex-1 flex flex-col px-4 py-6 overflow-hidden">
         <div
           key={step.id}
-          className={cn("flex flex-col flex-1 min-h-0", isAnimating && animationClass)}
+          className={cn(
+            "flex flex-col flex-1 min-h-0",
+            isAnimating && animationClass,
+          )}
         >
           {step.id === "welcome" && <WelcomeStep />}
 
@@ -191,7 +204,9 @@ export function OnboardingStepForm() {
         </div>
 
         {/* Bottom CTA: welcome, confirmation, or end-of-section (e.g. "Continue to Lifestyle") */}
-        {(step.id === "welcome" || step.id === "confirmation" || isCategoryEndWithAnswer(step, formData)) && (
+        {(step.id === "welcome" ||
+          step.id === "confirmation" ||
+          isCategoryEndWithAnswer(step, formData)) && (
           <div className="pt-4 shrink-0">
             <Button
               size="lg"
@@ -199,7 +214,9 @@ export function OnboardingStepForm() {
               onClick={goNext}
               disabled={isSubmitting}
             >
-              {isSubmitting ? "Saving…" : (step.nextButtonLabel ?? "Let's Get Started")}
+              {isSubmitting
+                ? "Saving…"
+                : (step.nextButtonLabel ?? "Let's Get Started")}
             </Button>
           </div>
         )}
@@ -228,7 +245,9 @@ function WelcomeStep() {
               className="flex items-center gap-3 p-4 rounded-xl border border-border bg-card"
             >
               <Icon className="size-6 text-primary shrink-0" />
-              <span className="font-medium text-accent-foreground">{label}</span>
+              <span className="font-medium text-accent-foreground">
+                {label}
+              </span>
             </div>
           ))}
         </div>
@@ -250,7 +269,10 @@ function QuestionStep({
 }: {
   step: StepConfig;
   formData: OnboardingFormData;
-  updateField: (field: keyof OnboardingFormData, value: string | string[]) => void;
+  updateField: (
+    field: keyof OnboardingFormData,
+    value: string | string[],
+  ) => void;
   onAutoNext: () => void;
   categoryIcon: React.ReactNode;
   isCategoryEnd: boolean;
@@ -267,27 +289,31 @@ function QuestionStep({
         onAutoNext();
       }, delay);
     },
-    [onAutoNext]
+    [onAutoNext],
   );
 
-  useEffect(() => () => {
-    if (timeoutRef.current) clearTimeout(timeoutRef.current);
-  }, []);
+  useEffect(
+    () => () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    },
+    [],
+  );
 
   const handleSingleChange = useCallback(
     (v: string) => {
       updateField(key, v);
       if (!isCategoryEnd) scheduleAutoNext(AUTO_NEXT_DELAY_SINGLE);
     },
-    [key, updateField, scheduleAutoNext, isCategoryEnd]
+    [key, updateField, scheduleAutoNext, isCategoryEnd],
   );
 
   const handleMultipleChange = useCallback(
     (next: string[]) => {
       updateField(key, next);
-      if (next.length > 0 && !isCategoryEnd) scheduleAutoNext(AUTO_NEXT_DELAY_MULTIPLE);
+      if (next.length > 0 && !isCategoryEnd)
+        scheduleAutoNext(AUTO_NEXT_DELAY_MULTIPLE);
     },
-    [key, updateField, scheduleAutoNext, isCategoryEnd]
+    [key, updateField, scheduleAutoNext, isCategoryEnd],
   );
 
   const currentSingle = (value as string | undefined) ?? "";
@@ -369,10 +395,22 @@ function QuestionStep({
 function ConfirmationStep() {
   const features = [
     { icon: Wallet, label: "Wallet", desc: "Manage all policies in one place" },
-    { icon: Shield, label: "Premium", desc: "Manage all policies in one place" },
-    { icon: Activity, label: "Risk Profile", desc: "Manage all policies in one place" },
+    {
+      icon: Shield,
+      label: "Premium",
+      desc: "Manage all policies in one place",
+    },
+    {
+      icon: Activity,
+      label: "Risk Profile",
+      desc: "Manage all policies in one place",
+    },
     { icon: Heart, label: "Claims", desc: "Manage all policies in one place" },
-    { icon: Check, label: "Quick Actions", desc: "Manage all policies in one place" },
+    {
+      icon: Check,
+      label: "Quick Actions",
+      desc: "Manage all policies in one place",
+    },
   ];
 
   return (
@@ -390,7 +428,9 @@ function ConfirmationStep() {
           <li key={label} className="flex items-center gap-3">
             <Icon className="size-5 text-primary shrink-0" />
             <div>
-              <span className="font-medium text-accent-foreground">{label}</span>
+              <span className="font-medium text-accent-foreground">
+                {label}
+              </span>
               <span className="text-muted-foreground text-sm ml-2">{desc}</span>
             </div>
           </li>

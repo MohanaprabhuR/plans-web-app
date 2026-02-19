@@ -90,7 +90,7 @@ export default function LoginScreen({ onSwitchToSignup }: LoginScreenProps) {
       </Alert>
     ));
 
-    router.push(onboardingComplete ? "/dashbaord" : "/onboarding");
+    router.push(onboardingComplete ? "/dashboard" : "/onboarding");
   };
 
   return (

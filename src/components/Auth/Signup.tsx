@@ -111,7 +111,7 @@ export default function SignupScreen({ onSwitchToLogin }: SignupScreenProps) {
     const onboardingComplete =
       sessionData.session?.user.user_metadata?.onboarding_complete === true;
 
-    router.push(onboardingComplete ? "/dashbaord" : "/onboarding");
+    router.push(onboardingComplete ? "/dashboard" : "/onboarding");
   };
 
   return (

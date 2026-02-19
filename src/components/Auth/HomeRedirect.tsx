@@ -11,14 +11,16 @@ export default function HomeRedirect() {
 
   useEffect(() => {
     const run = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (!session?.user) {
         setChecking(false);
         return;
       }
       const complete = session.user.user_metadata?.onboarding_complete === true;
       if (complete) {
-        router.replace("/dashbaord");
+        router.replace("/dashboard");
         return;
       }
       router.replace("/onboarding");
