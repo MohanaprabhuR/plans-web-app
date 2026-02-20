@@ -65,6 +65,7 @@ const MyProfilePage = () => {
                       placeholder="Enter first Name"
                       variant="outline"
                       size="lg"
+                      value={user?.user_metadata?.full_name}
                     />
                   </Field>
                 </FieldGroup>
@@ -91,6 +92,7 @@ const MyProfilePage = () => {
                       placeholder="Enter email address"
                       variant="outline"
                       size="lg"
+                      value={user?.user_metadata?.email}
                     />
                   </Field>
                 </FieldGroup>
