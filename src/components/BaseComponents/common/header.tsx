@@ -16,7 +16,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
-import { User, LogOut, ChevronDown, CircleAlert } from "lucide-react";
+import {
+  User,
+  LogOut,
+  ChevronDown,
+  CircleAlert,
+  SquareChartGantt,
+} from "lucide-react";
 import { Alert, AlertTitle } from "@/components/ui/alert";
 
 const HeaderLayout = () => {
@@ -98,6 +104,10 @@ const HeaderLayout = () => {
               <DropdownMenuContent>
                 <DropdownMenuItem onClick={() => router.push("/my-profile")}>
                   <User className="w-6 h-6" /> Profile
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <SquareChartGantt className="w-6 h-6" />
+                  My Claims
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={handleSignOut}>
                   <LogOut className="w-6 h-6" /> Log out
