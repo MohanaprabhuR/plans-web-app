@@ -7,12 +7,156 @@ import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Camera } from "lucide-react";
+import { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+} from "@/components/ui/dialog";
+import Image from "next/image";
+import client from "@/api/client";
+import { toast } from "sonner";
+
+const AVATAR_BUCKET = "avatars";
 
 const MyProfilePage = () => {
   const { user } = useAuth();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) return;
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    setSelectedFile(file);
+    setPreviewUrl(URL.createObjectURL(file));
+  };
+
+  const handleModalClose = (open: boolean) => {
+    if (!open) {
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+      setPreviewUrl(null);
+      setSelectedFile(null);
+    }
+    setIsModalOpen(open);
+  };
+
+  const handleUploadProfileImage = async () => {
+    if (!user?.id || !selectedFile) return;
+    setUploading(true);
+    try {
+      const ext = selectedFile.name.split(".").pop() || "jpg";
+      const path = `${user.id}/avatar.${ext}`;
+
+      const { error: uploadError } = await client.storage
+        .from(AVATAR_BUCKET)
+        .upload(path, selectedFile, { upsert: true });
+
+      if (uploadError) {
+        if (uploadError.message?.includes("Bucket not found")) {
+          toast.error(
+            "Avatar storage is not set up. Create an 'avatars' bucket in Supabase Storage with public read access.",
+          );
+        } else {
+          toast.error(uploadError.message || "Upload failed.");
+        }
+        return;
+      }
+
+      const {
+        data: { publicUrl },
+      } = client.storage.from(AVATAR_BUCKET).getPublicUrl(path);
+      const avatarUrl = `${publicUrl}?t=${Date.now()}`;
+
+      const { error: updateError } = await client.auth.updateUser({
+        data: { avatar_url: avatarUrl },
+      });
+
+      if (updateError) {
+        toast.error(updateError.message || "Failed to update profile.");
+        return;
+      }
+
+      await client.auth.refreshSession();
+      toast.success("Profile picture updated.");
+      handleModalClose(false);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const currentAvatarUrl =
+    user?.user_metadata?.avatar_url ||
+    "https://mockmind-api.uifaces.co/content/human/80.jpg";
+  const displaySrc = previewUrl || currentAvatarUrl;
 
   return (
     <>
+      <Dialog open={isModalOpen} onOpenChange={handleModalClose}>
+        <DialogContent size="lg">
+          <DialogHeader>Change Profile Picture</DialogHeader>
+          <FieldGroup>
+            <Field>
+              <FieldLabel>Profile Picture</FieldLabel>
+              <div className="flex flex-col gap-4">
+                <Input
+                  type="file"
+                  accept="image/*"
+                  variant="outline"
+                  size="lg"
+                  onChange={handleFileChange}
+                  className="flex-1"
+                />
+                {displaySrc ? (
+                  previewUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <Image
+                      src={previewUrl}
+                      alt="Selected"
+                      className=" rounded-full object-cover"
+                      width={100}
+                      height={100}
+                    />
+                  ) : (
+                    ""
+                  )
+                ) : (
+                  <span className="text-muted-foreground text-sm">
+                    No image
+                  </span>
+                )}
+                {selectedFile && (
+                  <p className="text-sm text-muted-foreground">
+                    {selectedFile.name}
+                  </p>
+                )}
+              </div>
+            </Field>
+          </FieldGroup>
+
+          <DialogFooter className="flex justify-end">
+            <Button
+              variant="outline"
+              size="md"
+              onClick={() => handleModalClose(false)}
+              disabled={uploading}
+            >
+              Cancel
+            </Button>
+            <Button
+              size="md"
+              onClick={handleUploadProfileImage}
+              disabled={!selectedFile || uploading}
+            >
+              {uploading ? "Uploading…" : "Change Profile Picture"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       <h1 className="font-medium text-3xl leading-8 tracking-4 text-accent-foreground">
         My Profile
       </h1>
@@ -25,9 +169,14 @@ const MyProfilePage = () => {
                 {user?.user_metadata?.full_name?.charAt(0)}
               </AvatarFallback>
             </Avatar>
-            <div className="absolute -bottom-0.5 right-1.5 bg-white rounded-full flex items-center justify-center size-8">
+            <Button
+              iconOnly
+              size="lg"
+              className="absolute -bottom-0.5 right-1.5  rounded-full flex items-center justify-center size-8"
+              onClick={() => setIsModalOpen(true)}
+            >
               <Camera className="size-5" />
-            </div>
+            </Button>
           </div>
 
           <div>
