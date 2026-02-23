@@ -1,6 +1,15 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { CircleAlert, PlusIcon } from "lucide-react";
+import {
+  ArrowDownToLine,
+  Ban,
+  CircleAlert,
+  MessageSquareText,
+  Plus,
+  PlusIcon,
+  XIcon,
+  Zap,
+} from "lucide-react";
 import { useCallback, useEffect, useState, useMemo } from "react";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
@@ -16,6 +25,17 @@ import {
 import PolicyCard from "@/components/BaseComponents/common/policyCard";
 import useAuth from "@/hooks/useAuth";
 import { Alert, AlertTitle } from "@/components/ui/alert";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import QuickActionCard from "@/components/BaseComponents/common/quickActionCard";
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
+import HealthCard from "@/components/BaseComponents/common/healthCard";
+import Link from "next/link";
 
 interface Policy {
   policyId: string;
@@ -41,6 +61,65 @@ interface ApiResponse {
   };
 }
 
+const healthCards = [
+  {
+    id: "1",
+    policy_number: "4080254058",
+    full_name: "Herman Mavoe",
+    relationship: "self",
+    dob: "25-05-1996",
+    can_download: true,
+    avatar: "https://mockmind-api.uifaces.co/content/human/80.jpg",
+  },
+  {
+    id: "2",
+    policy_number: "4080254059",
+    full_name: "Emily Davis",
+    relationship: "spouse",
+    dob: "15-09-2009",
+    can_download: true,
+    avatar: "https://mockmind-api.uifaces.co/content/human/81.jpg",
+  },
+  {
+    id: "3",
+    policy_number: "4080254060",
+    full_name: "Liam Carter",
+    relationship: "child",
+    dob: "03-03-2022",
+    can_download: true,
+    avatar: "https://mockmind-api.uifaces.co/content/human/82.jpg",
+  },
+];
+
+const quickActions = [
+  {
+    id: 1,
+    name: "Download Policy",
+    icon: <ArrowDownToLine className="size-6 text-[#FF5E00]" />,
+    type: "drawer",
+  },
+  {
+    id: 2,
+    name: "Network Hospitals",
+    icon: <Plus className="size-6 text-[#FF5E00]" />,
+    type: "link",
+    href: "/network-hospital",
+  },
+  {
+    id: 3,
+    name: "Blacklisted Hospitals",
+    icon: <Ban className="size-6 text-[#FF5E00]" />,
+    type: "link",
+    href: "/block-list-hospital",
+  },
+  {
+    id: 4,
+    name: "Policy AI Chat",
+    icon: <MessageSquareText className="size-6 text-[#FF5E00]" />,
+    type: "link",
+    href: "/policy-ai",
+  },
+];
 const DashboardPage = () => {
   const { user } = useAuth();
   const userId = user?.id ?? "";
@@ -88,19 +167,6 @@ const DashboardPage = () => {
         prev.members[i] ? { ...prev.members[i] } : { name: "", avatar: "" },
       );
       return { ...prev, memberCount: n, members };
-    });
-  };
-
-  const setMember = (
-    index: number,
-    field: "name" | "avatar",
-    value: string,
-  ) => {
-    setFormData((prev) => {
-      const members = [...prev.members];
-      if (!members[index]) members[index] = { name: "", avatar: "" };
-      members[index] = { ...members[index], [field]: value };
-      return { ...prev, members };
     });
   };
 
@@ -465,12 +531,78 @@ const DashboardPage = () => {
           </div>
         )}
         {!loading && !error && policies.length > 0 && (
-          <div className="flex gap-4 overflow-x-auto">
+          <div className="flex gap-6 overflow-x-auto">
             {policies.map((policy) => (
               <PolicyCard key={policy.policyId} policy={policy} />
             ))}
           </div>
         )}
+      </div>
+      <div className="w-full pt-12 flex gap-x-6">
+        <div className="w-full">
+          <div className="w-full flex items-center justify-between">
+            <div className="flex flex-col  gap-x-2">
+              <h3 className="font-semibold text-3xl leading-8 tracking-4">
+                Hello! {user?.user_metadata?.full_name || ""}
+              </h3>
+              <p className="text-accent-foreground font-medium text-xl leading-6 tracking-4">
+                Age:32, Male
+              </p>
+            </div>
+            <Button variant="outline" size="md">
+              Check Risk Coverage
+            </Button>
+          </div>
+        </div>
+        <div className="w-full max-w-[354px]">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-x-2">
+                <Zap className="size-5" /> Quick Actions
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="flex gap-[15px]">
+              {quickActions.map((action) => {
+                if (action.type === "drawer") {
+                  return (
+                    <Drawer key={action.id} direction="right">
+                      <DrawerTrigger asChild>
+                        <QuickActionCard
+                          name={action.name}
+                          icon={action.icon}
+                        />
+                      </DrawerTrigger>
+
+                      <DrawerContent className="space-y-[36px] p-6">
+                        <DrawerHeader className="flex flex-row items-center justify-between w-full p-0 mb-[44px]">
+                          Download Health Cards
+                          <DrawerClose>
+                            <XIcon className="size-4" />
+                          </DrawerClose>
+                        </DrawerHeader>
+
+                        <div className="space-y-[36px]">
+                          {healthCards.map((card) => (
+                            <HealthCard key={card.id} card={card} />
+                          ))}
+                        </div>
+                      </DrawerContent>
+                    </Drawer>
+                  );
+                }
+
+                if (action.type === "link" && action.href) {
+                  return (
+                    <Link key={action.id} href={action.href}>
+                      <QuickActionCard name={action.name} icon={action.icon} />
+                    </Link>
+                  );
+                }
+                return null;
+              })}
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </>
   );

@@ -1,0 +1,383 @@
+"use client";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
+import {
+  ChevronDown,
+  ChevronLeft,
+  MapPin,
+  Navigation,
+  Route,
+  Search,
+  Star,
+} from "lucide-react";
+import { useRouter } from "next/navigation";
+import React from "react";
+
+const hospitals = [
+  {
+    id: 1,
+    name: "Methodist Hospital",
+    city: "Houston",
+    state: "TX",
+    rating: 4.9,
+    distance: "2.5 Miles",
+  },
+  {
+    id: 2,
+    name: "UT Medical Center",
+    city: "Dallas",
+    state: "TX",
+    rating: 4.8,
+    distance: "1.5 Miles",
+  },
+  {
+    id: 3,
+    name: "Baylor Medical Center",
+    city: "Austin",
+    state: "TX",
+    rating: 4.5,
+    distance: "10.3 Miles",
+  },
+  {
+    id: 4,
+    name: "Baylor Lukes Medical",
+    city: "Sugarland",
+    state: "TX",
+    rating: 4.4,
+    distance: "11 Miles",
+  },
+
+  {
+    id: 5,
+    name: "Memorial Hospital",
+    city: "San Antonio",
+    state: "TX",
+    rating: 4.1,
+    distance: "12 Miles",
+  },
+  {
+    id: 6,
+    name: "Ascension Seton Center",
+    city: "Temple",
+    state: "TX",
+    rating: 3.8,
+    distance: "1.5 Miles",
+  },
+  {
+    id: 7,
+    name: "Baylor Medical Center",
+    city: "Fortworth",
+    state: "TX",
+    rating: 3.5,
+    distance: "10.3 Miles",
+  },
+  {
+    id: 8,
+    name: "Baylor Lukes Medical",
+    city: "The Woodlands",
+    state: "TX",
+    rating: 3.0,
+    distance: "11 Miles",
+  },
+
+  {
+    id: 9,
+    name: "Medical City Center",
+    city: "Houston",
+    state: "TX",
+    rating: 2.9,
+    distance: "16 Miles",
+  },
+  {
+    id: 10,
+    name: "Baptist Medical Center",
+    city: "Dallas",
+    state: "TX",
+    rating: 2.5,
+    distance: "21 Miles",
+  },
+  {
+    id: 11,
+    name: "Presbyterian Hospital",
+    city: "Austin",
+    state: "TX",
+    rating: 2.7,
+    distance: "25 Miles",
+  },
+  {
+    id: 12,
+    name: "Sugar Land Hospital",
+    city: "Sugarland",
+    state: "TX",
+    rating: 2.1,
+    distance: "30 Miles",
+  },
+
+  {
+    id: 13,
+    name: "Methodist Hospital",
+    city: "Houston",
+    state: "TX",
+    rating: 4.9,
+    distance: "2.5 Miles",
+  },
+  {
+    id: 14,
+    name: "UT Medical Center",
+    city: "Dallas",
+    state: "TX",
+    rating: 4.8,
+    distance: "1.5 Miles",
+  },
+  {
+    id: 15,
+    name: "Baylor Medical Center",
+    city: "Austin",
+    state: "TX",
+    rating: 4.5,
+    distance: "10.3 Miles",
+  },
+  {
+    id: 16,
+    name: "Baylor Lukes Medical",
+    city: "Sugarland",
+    state: "TX",
+    rating: 4.4,
+    distance: "11 Miles",
+  },
+
+  {
+    id: 17,
+    name: "Memorial Hospital",
+    city: "San Antonio",
+    state: "TX",
+    rating: 4.1,
+    distance: "12 Miles",
+  },
+  {
+    id: 18,
+    name: "Ascension Seton Center",
+    city: "Temple",
+    state: "TX",
+    rating: 3.8,
+    distance: "1.5 Miles",
+  },
+  {
+    id: 19,
+    name: "Baylor Medical Center",
+    city: "Fortworth",
+    state: "TX",
+    rating: 3.5,
+    distance: "10.3 Miles",
+  },
+  {
+    id: 20,
+    name: "Baylor Lukes Medical",
+    city: "The Woodlands",
+    state: "TX",
+    rating: 3.0,
+    distance: "11 Miles",
+  },
+
+  {
+    id: 21,
+    name: "Medical City Center",
+    city: "Houston",
+    state: "TX",
+    rating: 2.9,
+    distance: "16 Miles",
+  },
+  {
+    id: 22,
+    name: "Baptist Medical Center",
+    city: "Dallas",
+    state: "TX",
+    rating: 2.5,
+    distance: "21 Miles",
+  },
+  {
+    id: 23,
+    name: "Presbyterian Hospital",
+    city: "Austin",
+    state: "TX",
+    rating: 2.7,
+    distance: "25 Miles",
+  },
+  {
+    id: 24,
+    name: "Sugar Land Hospital",
+    city: "Sugarland",
+    state: "TX",
+    rating: 2.1,
+    distance: "30 Miles",
+  },
+];
+const NetworkHospitalPage = () => {
+  const [selectedValue, setSelectedValue] = React.useState<string>("");
+  const [ratings1, setRatings1] = React.useState<boolean>(false);
+  const [ratings2, setRatings2] = React.useState<boolean>(false);
+  const [ratings3, setRatings3] = React.useState<boolean>(false);
+  const [ratings4, setRatings4] = React.useState<boolean>(false);
+  const [ratings5, setRatings5] = React.useState<boolean>(false);
+
+  const router = useRouter();
+  return (
+    <div className="flex flex-col gap-8 pb-20">
+      <div className="flex items-center gap-2">
+        <Button
+          variant="ghost"
+          size="lg"
+          iconOnly
+          onClick={() => router.back()}
+        >
+          <ChevronLeft />
+        </Button>
+
+        <h3 className="text-2xl font-bold tracking-4 text-foreground">
+          Blacklisted Hospitals
+        </h3>
+      </div>
+      <Input
+        placeholder="Search for a hospital"
+        prefix={<Search />}
+        variant="outline"
+        size="lg"
+      />
+      <div className="flex flex-col gap-6">
+        <div className="flex items-center justify-between">
+          <h4 className="text-base font-bold tracking-4 text-accent-foreground">
+            85 Matches Found in Texas
+          </h4>
+          <div className="flex gap-3 items-center">
+            <p className="text-base font-medium tracking-4 leading-6 text-accent-foreground">
+              Filter by:
+            </p>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline">
+                  Distance
+                  <ChevronDown />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuRadioGroup
+                  value={selectedValue}
+                  onValueChange={setSelectedValue}
+                >
+                  <DropdownMenuRadioItem value="option1">
+                    Within 5 Miles
+                  </DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="option2">
+                    Within 10 Miles
+                  </DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="option3">
+                    Within 25 Miles
+                  </DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="option4">
+                    Within 50 Miles
+                  </DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="option5">
+                    Within 100 Miles
+                  </DropdownMenuRadioItem>
+                </DropdownMenuRadioGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline">
+                  Ratings
+                  <ChevronDown />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuCheckboxItem
+                  checked={ratings1}
+                  onCheckedChange={setRatings1}
+                >
+                  <Star className="size-4 fill-[#FF5E00] text-[#FF5E00]" />
+                </DropdownMenuCheckboxItem>
+                <DropdownMenuCheckboxItem
+                  checked={ratings2}
+                  onCheckedChange={setRatings2}
+                >
+                  <Star className="size-4 fill-[#FF5E00] text-[#FF5E00]" />
+                  <Star className="size-4 fill-[#FF5E00] text-[#FF5E00]" />
+                </DropdownMenuCheckboxItem>
+                <DropdownMenuCheckboxItem
+                  checked={ratings3}
+                  onCheckedChange={setRatings3}
+                >
+                  <Star className="size-4 fill-[#FF5E00] text-[#FF5E00]" />
+                  <Star className="size-4 fill-[#FF5E00] text-[#FF5E00]" />
+                  <Star className="size-4 fill-[#FF5E00] text-[#FF5E00]" />
+                </DropdownMenuCheckboxItem>
+                <DropdownMenuCheckboxItem
+                  checked={ratings4}
+                  onCheckedChange={setRatings4}
+                >
+                  <Star className="size-4 fill-[#FF5E00] text-[#FF5E00]" />
+                  <Star className="size-4 fill-[#FF5E00] text-[#FF5E00]" />
+                  <Star className="size-4 fill-[#FF5E00] text-[#FF5E00]" />
+                  <Star className="size-4 fill-[#FF5E00] text-[#FF5E00]" />
+                </DropdownMenuCheckboxItem>
+                <DropdownMenuCheckboxItem
+                  checked={ratings5}
+                  onCheckedChange={setRatings5}
+                >
+                  <Star className="size-4 fill-[#FF5E00] text-[#FF5E00]" />
+                  <Star className="size-4 fill-[#FF5E00] text-[#FF5E00]" />
+                  <Star className="size-4 fill-[#FF5E00] text-[#FF5E00]" />
+                  <Star className="size-4 fill-[#FF5E00] text-[#FF5E00]" />
+                  <Star className="size-4 fill-[#FF5E00] text-[#FF5E00]" />
+                </DropdownMenuCheckboxItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </div>
+        <div className="flex flex-wrap gap-6">
+          {hospitals.map((hospital) => (
+            <Card key={hospital.name} className="w-full max-w-[354px]">
+              <CardHeader className="flex flex-row items-start justify-between gap-3 ">
+                <div className="flex flex-col gap-0.5">
+                  <CardTitle className="font-semibold">
+                    {hospital.name}
+                  </CardTitle>
+                  <CardDescription className="pt-0">
+                    {hospital.city},{hospital.state}
+                  </CardDescription>
+                </div>
+              </CardHeader>
+              <CardFooter className="flex items-center justify-between ">
+                <Button variant="ghost" size="sm">
+                  <Route className="size-5" />
+                  {hospital.distance}
+                </Button>
+                <Button variant="ghost" size="sm">
+                  <Navigation className="size-5 text-[#FF5E00]" />
+                  Get Directions
+                </Button>
+              </CardFooter>
+            </Card>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default NetworkHospitalPage;
