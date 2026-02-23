@@ -12,7 +12,12 @@ import {
 } from "lucide-react";
 import { useCallback, useEffect, useState, useMemo } from "react";
 import { toast } from "sonner";
-import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import {
@@ -295,7 +300,9 @@ const DashboardPage = () => {
     <>
       <Dialog open={isModalOpen} onOpenChange={handleModalOpenChange}>
         <DialogContent size="lg">
-          <DialogHeader>Enter Policy Details Manually</DialogHeader>
+          <DialogHeader>
+            <DialogTitle>Enter Policy Details Manually</DialogTitle>
+          </DialogHeader>
           <FieldGroup>
             <Field>
               <FieldLabel>Policy Id</FieldLabel>
