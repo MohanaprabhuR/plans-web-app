@@ -517,24 +517,49 @@ const DashboardPage = () => {
           </div>
         )}
 
-        {!loading && !error && policies.length === 0 && (
-          <div className="flex items-center justify-center py-12">
-            <div className="text-center">
-              <p className="text-muted-foreground mb-4">No policies found.</p>
-              <Button
-                className="gap-0.5"
-                onClick={() => handleModalOpenChange(true)}
-              >
-                <PlusIcon className="size-5" /> Add Your First Policy
-              </Button>
-            </div>
-          </div>
-        )}
-        {!loading && !error && policies.length > 0 && (
+        {!loading && !error && (
           <div className="flex gap-6 overflow-x-auto">
-            {policies.map((policy) => (
-              <PolicyCard key={policy.policyId} policy={policy} />
-            ))}
+            {policies.length === 0 ? (
+              <Card
+                className="min-w-[354px] border-2 border-dashed border-muted-foreground/25 bg-muted/30 flex flex-col items-center justify-center py-16 px-6 cursor-pointer hover:bg-muted/50 transition-colors"
+                onClick={() => handleModalOpenChange(true)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    handleModalOpenChange(true);
+                  }
+                }}
+              >
+                <div className="flex flex-col items-center gap-4 text-center cursor-pointer">
+                  <div className="size-12 rounded-full bg-muted flex items-center justify-center">
+                    <PlusIcon className="size-6 text-muted-foreground" />
+                  </div>
+                  <div className="space-y-1">
+                    <p className="font-medium text-accent-foreground">
+                      No policies yet
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Add your first policy to get started
+                    </p>
+                  </div>
+                  <Button
+                    className="gap-0.5"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleModalOpenChange(true);
+                    }}
+                  >
+                    <PlusIcon className="size-5" /> Add Policy
+                  </Button>
+                </div>
+              </Card>
+            ) : (
+              policies.map((policy) => (
+                <PolicyCard key={policy.policyId} policy={policy} />
+              ))
+            )}
           </div>
         )}
       </div>
