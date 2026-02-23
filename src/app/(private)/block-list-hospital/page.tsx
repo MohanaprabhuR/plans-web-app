@@ -243,7 +243,7 @@ const NetworkHospitalPage = () => {
           variant="ghost"
           size="lg"
           iconOnly
-          onClick={() => router.back()}
+          onClick={() => router.push("/dashboard")}
         >
           <ChevronLeft />
         </Button>
@@ -363,14 +363,18 @@ const NetworkHospitalPage = () => {
                 </div>
               </CardHeader>
               <CardFooter className="flex items-center justify-between ">
-                <Button variant="ghost" size="sm">
-                  <Route className="size-5" />
-                  {hospital.distance}
-                </Button>
-                <Button variant="ghost" size="sm">
-                  <Navigation className="size-5 text-[#FF5E00]" />
-                  Get Directions
-                </Button>
+                <div className="flex gap-x-1 items-center">
+                  <Route className="size-4" />
+                  <p className="text-base font-medium tracking-4 leading-6 text-accent-foreground">
+                    {hospital.distance}
+                  </p>
+                </div>
+                <div className="flex gap-x-1 items-center">
+                  <Navigation className="size-4 text-[#FF5E00]" />
+                  <p className="text-base font-medium tracking-4 leading-6 text-accent-foreground">
+                    Get Directions
+                  </p>
+                </div>
               </CardFooter>
             </Card>
           ))}

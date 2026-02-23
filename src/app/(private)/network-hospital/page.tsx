@@ -51,7 +51,7 @@ const hospitals = [
     city: "Austin",
     state: "TX",
     rating: 4.5,
-    distance_miles: 10.3,
+    distance_miles: "10.3 Miles",
   },
   {
     id: 4,
@@ -59,7 +59,7 @@ const hospitals = [
     city: "Sugarland",
     state: "TX",
     rating: 4.4,
-    distance_miles: 11,
+    distance_miles: "11 Miles",
   },
 
   {
@@ -68,7 +68,7 @@ const hospitals = [
     city: "San Antonio",
     state: "TX",
     rating: 4.1,
-    distance_miles: 12,
+    distance_miles: "12 Miles",
   },
   {
     id: 6,
@@ -76,7 +76,7 @@ const hospitals = [
     city: "Temple",
     state: "TX",
     rating: 3.8,
-    distance_miles: 1.5,
+    distance_miles: "1.5 Miles",
   },
   {
     id: 7,
@@ -84,7 +84,7 @@ const hospitals = [
     city: "Fortworth",
     state: "TX",
     rating: 3.5,
-    distance_miles: 10.3,
+    distance_miles: "10.3 Miles",
   },
   {
     id: 8,
@@ -92,7 +92,7 @@ const hospitals = [
     city: "The Woodlands",
     state: "TX",
     rating: 3.0,
-    distance_miles: 11,
+    distance_miles: "11 Miles",
   },
 
   {
@@ -101,7 +101,7 @@ const hospitals = [
     city: "Houston",
     state: "TX",
     rating: 2.9,
-    distance_miles: 16,
+    distance_miles: "16 Miles",
   },
   {
     id: 10,
@@ -109,7 +109,7 @@ const hospitals = [
     city: "Dallas",
     state: "TX",
     rating: 2.5,
-    distance_miles: 21,
+    distance_miles: "21 Miles",
   },
   {
     id: 11,
@@ -117,7 +117,7 @@ const hospitals = [
     city: "Austin",
     state: "TX",
     rating: 2.7,
-    distance_miles: 25,
+    distance_miles: "25 Miles",
   },
   {
     id: 12,
@@ -125,7 +125,7 @@ const hospitals = [
     city: "Sugarland",
     state: "TX",
     rating: 2.1,
-    distance_miles: 30,
+    distance_miles: "30 Miles",
   },
 
   {
@@ -134,7 +134,7 @@ const hospitals = [
     city: "Houston",
     state: "TX",
     rating: 4.9,
-    distance_miles: 2.5,
+    distance_miles: "2.5 Miles",
   },
   {
     id: 14,
@@ -142,7 +142,7 @@ const hospitals = [
     city: "Dallas",
     state: "TX",
     rating: 4.8,
-    distance_miles: 1.5,
+    distance_miles: "1.5 Miles",
   },
   {
     id: 15,
@@ -150,7 +150,7 @@ const hospitals = [
     city: "Austin",
     state: "TX",
     rating: 4.5,
-    distance_miles: 10.3,
+    distance_miles: "10.3 Miles",
   },
   {
     id: 16,
@@ -158,7 +158,7 @@ const hospitals = [
     city: "Sugarland",
     state: "TX",
     rating: 4.4,
-    distance_miles: 11,
+    distance_miles: "11 Miles",
   },
 
   {
@@ -167,7 +167,7 @@ const hospitals = [
     city: "San Antonio",
     state: "TX",
     rating: 4.1,
-    distance_miles: 12,
+    distance_miles: "12 Miles",
   },
   {
     id: 18,
@@ -175,7 +175,7 @@ const hospitals = [
     city: "Temple",
     state: "TX",
     rating: 3.8,
-    distance_miles: 1.5,
+    distance_miles: "1.5 Miles",
   },
   {
     id: 19,
@@ -183,7 +183,7 @@ const hospitals = [
     city: "Fortworth",
     state: "TX",
     rating: 3.5,
-    distance_miles: 10.3,
+    distance_miles: "10.3 Miles",
   },
   {
     id: 20,
@@ -191,7 +191,7 @@ const hospitals = [
     city: "The Woodlands",
     state: "TX",
     rating: 3.0,
-    distance_miles: 11,
+    distance_miles: "11 Miles",
   },
 
   {
@@ -200,7 +200,7 @@ const hospitals = [
     city: "Houston",
     state: "TX",
     rating: 2.9,
-    distance_miles: 16,
+    distance_miles: "16 Miles",
   },
   {
     id: 22,
@@ -208,7 +208,7 @@ const hospitals = [
     city: "Dallas",
     state: "TX",
     rating: 2.5,
-    distance_miles: 21,
+    distance_miles: "21 Miles",
   },
   {
     id: 23,
@@ -216,7 +216,7 @@ const hospitals = [
     city: "Austin",
     state: "TX",
     rating: 2.7,
-    distance_miles: 25,
+    distance_miles: "25 Miles",
   },
   {
     id: 24,
@@ -224,7 +224,7 @@ const hospitals = [
     city: "Sugarland",
     state: "TX",
     rating: 2.1,
-    distance_miles: 30,
+    distance_miles: "30 Miles",
   },
 ];
 const NetworkHospitalPage = () => {
@@ -243,7 +243,7 @@ const NetworkHospitalPage = () => {
           variant="ghost"
           size="lg"
           iconOnly
-          onClick={() => router.back()}
+          onClick={() => router.push("/dashboard")}
         >
           <ChevronLeft />
         </Button>
@@ -362,15 +362,20 @@ const NetworkHospitalPage = () => {
                   </CardDescription>
                 </div>
               </CardHeader>
+
               <CardFooter className="flex items-center justify-between ">
-                <Button variant="ghost" size="sm">
-                  <Route className="size-5" />
-                  {hospital.distance_miles} Miles
-                </Button>
-                <Button variant="ghost" size="sm">
-                  <Navigation className="size-5 text-[#FF5E00]" />
-                  Get Directions
-                </Button>
+                <div className="flex gap-x-1 items-center">
+                  <Route className="size-4" />
+                  <p className="text-base font-medium tracking-4 leading-6 text-accent-foreground">
+                    {hospital.distance_miles}
+                  </p>
+                </div>
+                <div className="flex gap-x-1 items-center">
+                  <Navigation className="size-4 text-[#FF5E00]" />
+                  <p className="text-base font-medium tracking-4 leading-6 text-accent-foreground">
+                    Get Directions
+                  </p>
+                </div>
               </CardFooter>
             </Card>
           ))}
