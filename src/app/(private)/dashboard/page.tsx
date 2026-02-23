@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { PlusIcon } from "lucide-react";
+import { CircleAlert, PlusIcon } from "lucide-react";
 import React, { useCallback, useEffect, useState, useMemo } from "react";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/select";
 import PolicyCard from "@/components/BaseComponents/common/policyCard";
 import useAuth from "@/hooks/useAuth";
+import { Alert, AlertTitle } from "@/components/ui/alert";
 
 interface Policy {
   policyId: string;
@@ -125,7 +126,13 @@ const DashboardPage = () => {
       const errorMessage =
         err instanceof Error ? err.message : "An error occurred";
       setError(errorMessage);
-      toast.error(`Failed to load policies: ${errorMessage}`);
+
+      toast.custom(() => (
+        <Alert variant="error">
+          <CircleAlert className="size-4" />
+          <AlertTitle>Failed to load policies: {errorMessage}</AlertTitle>
+        </Alert>
+      ));
     } finally {
       setLoading(false);
     }
@@ -150,7 +157,14 @@ const DashboardPage = () => {
         !formData.policyStatus ||
         !formData.policyProvider
       ) {
-        toast.error("Please fill Policy Name, Status, and Provider.");
+        toast.custom(() => (
+          <Alert variant="error">
+            <CircleAlert className="size-4" />
+            <AlertTitle>
+              Please fill Policy Name, Status, and Provider.
+            </AlertTitle>
+          </Alert>
+        ));
         return;
       }
 
@@ -189,13 +203,23 @@ const DashboardPage = () => {
         const msg = await response.text();
         throw new Error(msg || "Failed to add policy");
       }
+      toast.custom(() => (
+        <Alert variant="success">
+          <CircleAlert className="size-4" />
+          <AlertTitle>Policy added</AlertTitle>
+        </Alert>
+      ));
 
-      toast.success("Policy added");
       handleModalOpenChange(false);
       await fetchPolicies();
     } catch (error) {
       console.error("Error adding policy:", error);
-      toast.error("Failed to add policy");
+      toast.custom(() => (
+        <Alert variant="error">
+          <CircleAlert className="size-4" />
+          <AlertTitle>Failed to add policy</AlertTitle>
+        </Alert>
+      ));
     } finally {
       setSubmitting(false);
     }
