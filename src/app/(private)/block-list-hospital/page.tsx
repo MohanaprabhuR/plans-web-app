@@ -19,7 +19,6 @@ import { Input } from "@/components/ui/input";
 import {
   ChevronDown,
   ChevronLeft,
-  MapPin,
   Navigation,
   Route,
   Search,
@@ -360,6 +359,10 @@ const NetworkHospitalPage = () => {
                   <CardDescription className="pt-0">
                     {hospital.city},{hospital.state}
                   </CardDescription>
+                </div>
+                <div className="bg-accent flex rounded-full px-2 py-1 items-center gap-1 text-base font-medium tracking-4 leading-6 text-accent-foreground">
+                  <Star className="size-4 fill-[#ff5e00]  text-[#FF5E00]" />
+                  {hospital.rating}
                 </div>
               </CardHeader>
               <CardFooter className="flex items-center justify-between ">
