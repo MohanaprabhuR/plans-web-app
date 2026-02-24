@@ -525,7 +525,7 @@ const DashboardPage = () => {
         )}
 
         {!loading && !error && (
-          <div className="flex gap-6 overflow-x-auto">
+          <div className="flex gap-6 overflow-x-auto scrollbar-hide">
             {policies.length === 0 ? (
               <Card
                 className="min-w-[354px] border  bg-muted/30 flex flex-col items-center justify-center py-16 px-6 cursor-pointer hover:bg-muted/50 transition-colors"
