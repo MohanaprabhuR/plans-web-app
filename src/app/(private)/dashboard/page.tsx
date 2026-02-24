@@ -528,7 +528,7 @@ const DashboardPage = () => {
           <div className="flex gap-6 overflow-x-auto">
             {policies.length === 0 ? (
               <Card
-                className="min-w-[354px] border-2 border-dashed border-muted-foreground/25 bg-muted/30 flex flex-col items-center justify-center py-16 px-6 cursor-pointer hover:bg-muted/50 transition-colors"
+                className="min-w-[354px] border  bg-muted/30 flex flex-col items-center justify-center py-16 px-6 cursor-pointer hover:bg-muted/50 transition-colors"
                 onClick={() => handleModalOpenChange(true)}
                 role="button"
                 tabIndex={0}
