@@ -19,7 +19,6 @@ import { Input } from "@/components/ui/input";
 import {
   ChevronDown,
   ChevronLeft,
-  MapPin,
   Navigation,
   Route,
   Search,
