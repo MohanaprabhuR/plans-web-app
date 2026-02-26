@@ -61,8 +61,11 @@ import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import Image from "next/image";
 import { StaticImport } from "next/dist/shared/lib/get-img-props";
-import { GaugeComponent } from "react-gauge-component";
 import dynamic from "next/dynamic";
+
+const GaugeComponent = dynamic(() => import("react-gauge-component"), {
+  ssr: false,
+});
 interface Policy {
   policyId: string;
   type: string;
@@ -393,9 +396,6 @@ const DashboardPage = () => {
       setSubmitting(false);
     }
   };
-  const GaugeComponent = dynamic(() => import("react-gauge-component"), {
-    ssr: false,
-  });
 
   return (
     <>
@@ -726,6 +726,7 @@ const DashboardPage = () => {
               maxFps: 60,
               animationThreshold: 0.0096,
               color: "#5be12c",
+              arrowOffset: 0.9,
             }}
             labels={{
               valueLabel: {
