@@ -121,6 +121,8 @@ interface ApiResponse {
     claims?: {
       getAllClaims?: {
         response?: Array<{
+          amount: ReactNode;
+          claimAmount: ReactNode;
           submittedDate: ReactNode;
           provider: ReactNode;
           title: ReactNode;
@@ -766,7 +768,7 @@ const DashboardPage = () => {
               <div className="flex flex-col gap-y-6">
                 {personalFactorsList.map((list, index) => {
                   return (
-                    <Card className="w-full p-1 pt-4" key={index}>
+                    <Card className="w-full p-1 pt-4 gap-6" key={index}>
                       <CardHeader className="flex items-center justify-between px-3">
                         <CardTitle className="flex items-center gap-x-2">
                           {list.name === "Health" ? (
@@ -851,7 +853,7 @@ const DashboardPage = () => {
               <div className="flex flex-col gap-y-6">
                 {assetFactorList.map((list, index) => {
                   return (
-                    <Card className="w-full p-1 pt-4" key={index}>
+                    <Card className="w-full p-1 pt-4 gap-6" key={index}>
                       <CardHeader className="flex items-center justify-between px-3">
                         <CardTitle className="flex items-center gap-x-2">
                           {list.name === "Health" ? (
@@ -932,7 +934,7 @@ const DashboardPage = () => {
           </div>
         </div>
         <div className="w-full max-w-[354px] flex flex-col gap-y-6">
-          <Card>
+          <Card className="gap-4">
             <CardHeader>
               <CardTitle className="flex items-center gap-x-2 font-semibold">
                 <Zap className="size-5" /> Quick Actions
@@ -979,7 +981,7 @@ const DashboardPage = () => {
               })}
             </CardContent>
           </Card>
-          <Card>
+          <Card className="gap-4">
             <CardHeader className="gap-0">
               <CardTitle className="flex items-center gap-x-2 font-semibold">
                 <ShieldCheck className="size-5" /> Premium Overview
@@ -1034,8 +1036,8 @@ const DashboardPage = () => {
               </div>
             </CardContent>
           </Card>
-          <Card>
-            <CardHeader className="flex items-start justify-between">
+          <Card className="gap-4">
+            <CardHeader className="flex items-start justify-between ">
               <CardTitle className="flex items-center gap-x-2 font-semibold">
                 <SquareChartGantt className="size-5" /> Claims
               </CardTitle>
@@ -1084,7 +1086,7 @@ const DashboardPage = () => {
                           {claim.title}
                         </p>
                         <p className="font-medium text-6xl leading-12 text-accent-foreground tracking-4">
-                          $250
+                          ${claim.amount}
                         </p>
                       </div>
                       <div className="flex items-center justify-between bg-accent p-1.5 rounded-lg">
