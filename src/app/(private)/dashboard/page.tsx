@@ -61,7 +61,8 @@ import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import Image from "next/image";
 import { StaticImport } from "next/dist/shared/lib/get-img-props";
-
+import { GaugeComponent } from "react-gauge-component";
+import dynamic from "next/dynamic";
 interface Policy {
   policyId: string;
   type: string;
@@ -129,6 +130,8 @@ interface ApiResponse {
     riskAssessment?: {
       getRiskScore?: {
         response?: {
+          overallScore?: number;
+          riskLevel?: string;
           assetFactors?: Array<Record<string, unknown>>;
           personalFactors?:
             | Array<Record<string, unknown>>
@@ -390,6 +393,9 @@ const DashboardPage = () => {
       setSubmitting(false);
     }
   };
+  const GaugeComponent = dynamic(() => import("react-gauge-component"), {
+    ssr: false,
+  });
 
   return (
     <>
@@ -680,7 +686,77 @@ const DashboardPage = () => {
               Check Risk Coverage
             </Button>
           </div>
-          <div className="flex gap-6 justify-between pt-6">
+
+          <GaugeComponent
+            className="!max-w-[460px] !w-full mx-auto !h-[380px] max-h-[380px] min-h-[380px]"
+            value={
+              apiData?.endpoints?.riskAssessment?.getRiskScore?.response
+                ?.overallScore
+            }
+            type="semicircle"
+            minValue={0}
+            maxValue={100}
+            arc={{
+              width: 0.43,
+              cornerRadius: 7,
+              nbSubArcs: 100,
+              colorArray: [
+                "#FF6467",
+                "#FF8A8D",
+                "#FDC700",
+                "#9AE600",
+                "#cccccc",
+              ],
+              padding: 0.015,
+              subArcsStrokeWidth: 0,
+              subArcsStrokeColor: "#000000",
+              effects: { glow: true, glowBlur: 1, glowSpread: 2 },
+              subArcs: [],
+            }}
+            pointer={{
+              type: "arrow",
+              elastic: false,
+              animationDelay: 200,
+              animationDuration: 1400,
+              length: 0.87,
+              width: 24,
+              baseColor: "#ffffff",
+              strokeWidth: 0,
+              strokeColor: "#000000",
+              maxFps: 60,
+              animationThreshold: 0.0096,
+              color: "#5be12c",
+            }}
+            labels={{
+              valueLabel: {
+                matchColorWithArc: true,
+                style: {
+                  fontSize: "17px",
+                  fontWeight: "bold",
+                  textShadow: "none",
+                },
+                offsetY: 25,
+                animateValue: true,
+              },
+              tickLabels: {
+                type: "outer",
+                hideMinMax: true,
+                autoSpaceTickLabels: false,
+                ticks: [],
+                defaultTickLineConfig: {
+                  length: 5,
+                  hide: true,
+                  color: "#a95b82",
+                  width: 2,
+                },
+                defaultTickValueConfig: {
+                  hide: true,
+                  style: { fill: "#b30059" },
+                },
+              },
+            }}
+          />
+          <div className="flex gap-6 justify-between">
             <div className="flex flex-col gap-y-4 w-full">
               <p className="text-base leading-6 font-medium text-muted-foreground flex items-center gap-x-1">
                 Personal Factors

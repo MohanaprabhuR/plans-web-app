@@ -28,6 +28,7 @@
     "react-aria-components": "^1.15.1",
     "react-day-picker": "^9.13.2",
     "react-dom": "19.2.3",
+    "react-gauge-component": "^2.0.26",
     "react-hook-form": "^7.71.1",
     "recharts": "^3.7.0",
     "sonner": "^2.0.7",
