@@ -1,5 +1,6 @@
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
+import { createClient } from "@supabase/supabase-js";
 
 type Policy = {
   policyId: string;
@@ -15,15 +16,82 @@ type Policy = {
   renewalDate: string; // YYYY-MM-DD
 };
 
-// Per-user in-memory store: each user only sees their own policies. New users start with no policies.
+const supabaseUrl = (
+  process.env.NEXT_PUBLIC_SUPABASE_URL || ""
+).trim();
+const supabaseAnonKey = (
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+  process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY ||
+  ""
+).trim();
+const supabaseConfigured =
+  supabaseUrl.length > 0 &&
+  supabaseAnonKey.length > 0 &&
+  !supabaseUrl.includes("placeholder");
+
+function getSupabase() {
+  if (!supabaseConfigured) return null;
+  return createClient(supabaseUrl, supabaseAnonKey);
+}
+
+function rowToPolicy(row: Record<string, unknown>): Policy {
+  return {
+    policyId: String(row.policy_id ?? ""),
+    type: String(row.type ?? ""),
+    status: String(row.status ?? ""),
+    provider: String(row.provider ?? ""),
+    providerLogo: String(row.provider_logo ?? ""),
+    coverage: String(row.coverage ?? "-"),
+    premium: String(row.premium ?? "-"),
+    claimAmount: String(row.claim_amount ?? "None"),
+    members: Array.isArray(row.members)
+      ? (row.members as Array<{ name: string; avatar: string }>)
+      : [],
+    daysLeft: Number(row.days_left ?? 0),
+    renewalDate: String(row.renewal_date ?? ""),
+  };
+}
+
+async function getPoliciesFromSupabase(userId: string): Promise<Policy[] | null> {
+  const supabase = getSupabase();
+  if (!supabase) return null;
+  const { data, error } = await supabase
+    .from("policies")
+    .select("*")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false });
+  if (error) return null;
+  return (data ?? []).map((row) => rowToPolicy(row as Record<string, unknown>));
+}
+
+async function addPolicyToSupabase(userId: string, policy: Policy): Promise<boolean> {
+  const supabase = getSupabase();
+  if (!supabase) return false;
+  const { error } = await supabase.from("policies").insert({
+    user_id: userId,
+    policy_id: policy.policyId,
+    type: policy.type,
+    status: policy.status,
+    provider: policy.provider,
+    provider_logo: policy.providerLogo,
+    coverage: policy.coverage,
+    premium: policy.premium,
+    claim_amount: policy.claimAmount,
+    members: policy.members,
+    days_left: policy.daysLeft,
+    renewal_date: policy.renewalDate,
+  });
+  return !error;
+}
+
+// In-memory fallback when Supabase is not configured (e.g. local dev without env)
 const policiesStore: Record<string, Policy[]> = {};
 
-function getPoliciesForUser(userId: string): Policy[] {
+async function getPoliciesForUser(userId: string): Promise<Policy[]> {
   if (!userId) return [];
-  if (!policiesStore[userId]) {
-    // New user: no default policies, only show "Add policy" empty state
-    policiesStore[userId] = [];
-  }
+  const fromDb = await getPoliciesFromSupabase(userId);
+  if (fromDb !== null) return fromDb;
+  if (!policiesStore[userId]) policiesStore[userId] = [];
   return policiesStore[userId];
 }
 
@@ -31,7 +99,7 @@ export async function GET(req: Request) {
   const headersList = await headers();
   const userId =
     headersList.get("X-User-Id") ?? req.headers.get("X-User-Id") ?? "";
-  const userPolicies = getPoliciesForUser(userId);
+  const userPolicies = await getPoliciesForUser(userId);
   const apiDocumentation = {
     apiVersion: "1.0.0",
     baseUrl: "https://api.plans.com/v1",
@@ -431,7 +499,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const userPolicies = getPoliciesForUser(userId);
+    const userPolicies = await getPoliciesForUser(userId);
     if (userPolicies.some((p) => p.policyId === policyId)) {
       return NextResponse.json(
         { error: "Policy with this ID already exists" },
@@ -458,12 +526,23 @@ export async function POST(req: Request) {
       renewalDate: body.renewalDate?.toString().trim() || "2026-02-11",
     };
 
-    policiesStore[userId] = [newPolicy, ...userPolicies];
+    if (supabaseConfigured) {
+      const inserted = await addPolicyToSupabase(userId, newPolicy);
+      if (!inserted) {
+        return NextResponse.json(
+          { error: "Failed to save policy" },
+          { status: 500 },
+        );
+      }
+    } else {
+      policiesStore[userId] = [newPolicy, ...userPolicies];
+    }
 
+    const updatedList = await getPoliciesForUser(userId);
     return NextResponse.json({
       ok: true,
       policy: newPolicy,
-      policies: policiesStore[userId],
+      policies: updatedList,
     });
   } catch (e) {
     const message = e instanceof Error ? e.message : "Invalid JSON";
