@@ -3,14 +3,25 @@ import { Button } from "@/components/ui/button";
 import {
   ArrowDownToLine,
   Ban,
+  BriefcaseMedical,
+  CarFront,
+  ChevronRight,
   CircleAlert,
+  CircleCheck,
+  CircleX,
+  CornerRightDown,
+  Heart,
+  House,
   MessageSquareText,
+  PlaneTakeoff,
   Plus,
   PlusIcon,
+  ShieldCheck,
+  SquareChartGantt,
   XIcon,
   Zap,
 } from "lucide-react";
-import { useCallback, useEffect, useState, useMemo } from "react";
+import { useCallback, useEffect, useState, useMemo, ReactNode } from "react";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -30,7 +41,13 @@ import {
 import PolicyCard from "@/components/BaseComponents/common/policyCard";
 import useAuth from "@/hooks/useAuth";
 import { Alert, AlertTitle } from "@/components/ui/alert";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import QuickActionCard from "@/components/BaseComponents/common/quickActionCard";
 import {
   Drawer,
@@ -40,7 +57,10 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import HealthCard from "@/components/BaseComponents/common/healthCard";
+import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
+import Image from "next/image";
+import { StaticImport } from "next/dist/shared/lib/get-img-props";
 
 interface Policy {
   policyId: string;
@@ -56,11 +76,64 @@ interface Policy {
   renewalDate: string;
 }
 
+interface RiskFactorEntry {
+  name?: string;
+  status?: string;
+  risk?: string;
+  level?: string;
+  factors?: RiskFactorEntry[];
+}
+
+interface RiskFactorItem {
+  providerLogo: string | StaticImport;
+  name?: string;
+  score?: number;
+  level?: string;
+  coveredBy?: string;
+  factors?: RiskFactorEntry[];
+  risk?: string;
+}
+
 interface ApiResponse {
   endpoints: {
     policies: {
       getAllPolicies: {
         response: Policy[];
+      };
+    };
+    premiumOverview?: {
+      getPremiumSummary?: {
+        response?: {
+          totalYearlyPremium?: number;
+          totalPolicies?: number;
+          breakdown?: {
+            category: string;
+            yearlyPremium: number;
+            policyCount: number;
+          }[];
+        };
+      };
+    };
+    claims?: {
+      getAllClaims?: {
+        response?: Array<{
+          submittedDate: ReactNode;
+          provider: ReactNode;
+          title: ReactNode;
+          status: ReactNode;
+          type: ReactNode;
+          claimId: string;
+        }>;
+      };
+    };
+    riskAssessment?: {
+      getRiskScore?: {
+        response?: {
+          assetFactors?: Array<Record<string, unknown>>;
+          personalFactors?:
+            | Array<Record<string, unknown>>
+            | Record<string, unknown>;
+        };
       };
     };
   };
@@ -155,6 +228,9 @@ const DashboardPage = () => {
       avatar: string;
     }>,
   });
+  useEffect(() => {
+    console.log("apiData", apiData);
+  }, [apiData]);
 
   const handleModalOpenChange = (open: boolean) => {
     setIsModalOpen(open);
@@ -216,6 +292,25 @@ const DashboardPage = () => {
 
   const policies: Policy[] = useMemo(() => {
     return apiData?.endpoints?.policies?.getAllPolicies?.response ?? [];
+  }, [apiData]);
+
+  const assetFactorList = useMemo((): RiskFactorItem[] => {
+    const raw =
+      apiData?.endpoints?.riskAssessment?.getRiskScore?.response?.assetFactors;
+    if (Array.isArray(raw)) return raw as unknown as RiskFactorItem[];
+    if (raw && typeof raw === "object")
+      return Object.values(raw) as RiskFactorItem[];
+    return [];
+  }, [apiData]);
+
+  const personalFactorsList = useMemo((): RiskFactorItem[] => {
+    const raw =
+      apiData?.endpoints?.riskAssessment?.getRiskScore?.response
+        ?.personalFactors;
+    if (Array.isArray(raw)) return raw as unknown as RiskFactorItem[];
+    if (raw && typeof raw === "object")
+      return Object.values(raw) as RiskFactorItem[];
+    return [];
   }, [apiData]);
 
   const handleAddPolicy = async () => {
@@ -476,7 +571,7 @@ const DashboardPage = () => {
       </Dialog>
       <div className="w-full space-y-6">
         <div className="flex justify-between w-full items-center">
-          <h3 className="font-medium text-3xl leading-8 tracking-4">
+          <h3 className="font-semibold text-3xl leading-8 tracking-4">
             My Policies
           </h3>
           <Button
@@ -585,11 +680,184 @@ const DashboardPage = () => {
               Check Risk Coverage
             </Button>
           </div>
+          <div className="flex gap-6 justify-between pt-6">
+            <div className="flex flex-col gap-y-4 w-full">
+              <p className="text-base leading-6 font-medium text-muted-foreground flex items-center gap-x-1">
+                Personal Factors
+                <CornerRightDown className="size-4 relative top-1.5" />
+              </p>
+              <div className="flex flex-col gap-y-6">
+                {personalFactorsList.map((list, index) => {
+                  return (
+                    <Card className="w-full p-1 pt-4" key={index}>
+                      <CardHeader className="flex items-center justify-between px-3">
+                        <CardTitle className="flex items-center gap-x-2">
+                          {list.name === "Health" ? (
+                            <BriefcaseMedical />
+                          ) : list.name === "Auto" ? (
+                            <CarFront />
+                          ) : list.name === "Life" ? (
+                            <Heart />
+                          ) : list.name === "Home" ? (
+                            <House />
+                          ) : list.name === "Travel" ? (
+                            <PlaneTakeoff />
+                          ) : (
+                            ""
+                          )}
+                          {list.name}
+                        </CardTitle>
+                        <Button variant="outline">
+                          {list.level} <ChevronRight />
+                        </Button>
+                      </CardHeader>
+                      <CardContent className="flex justify-between items-start px-3">
+                        <div className="flex flex-col gap-y-2.5">
+                          {list.factors
+                            ?.filter((factor) => factor.risk === "low")
+                            .map((factor, index) => (
+                              <div
+                                key={`low-${index}`}
+                                className="flex items-center gap-x-1.5"
+                              >
+                                <CircleCheck className="size-4 text-white fill-green-600" />
+                                <p className="text-base font-medium leading-5 text-foreground">
+                                  {factor.name}
+                                </p>
+                              </div>
+                            ))}
+                        </div>
+
+                        <div className="flex flex-col gap-y-2.5">
+                          {list.factors
+                            ?.filter((factor) => factor.risk !== "low")
+                            .map((factor, index) => (
+                              <div
+                                key={`low-${index}`}
+                                className="flex items-center gap-x-1.5"
+                              >
+                                <CircleX className="size-4 text-white fill-red-600" />
+                                <p className="text-base font-medium leading-5 text-foreground">
+                                  {factor.name}
+                                </p>
+                              </div>
+                            ))}
+                        </div>
+                      </CardContent>
+                      <CardFooter className="flex items-center justify-between bg-muted p-1.5 rounded-b-lg ">
+                        <p className="max-w-[200px] text-base leading-6 font-medium text-muted-foreground">
+                          Covered by <br />
+                          <span className="text-accent-foreground flex-1 font-semibold">
+                            {list.coveredBy}
+                          </span>
+                        </p>
+                        <div className="bg-white size-12 p-0.5 rounded-lg">
+                          <Image
+                            src={list.providerLogo}
+                            alt="Care Health Supreme"
+                            width={44}
+                            height={44}
+                            className="object-cover rounded-md overflow-hidden"
+                          />
+                        </div>
+                      </CardFooter>
+                    </Card>
+                  );
+                })}
+              </div>
+            </div>
+            <div className="flex flex-col gap-y-4 w-full">
+              <p className="text-base leading-6 font-medium text-muted-foreground flex items-center gap-x-1">
+                Asset Factors
+                <CornerRightDown className="size-4 relative top-1.5 " />
+              </p>
+              <div className="flex flex-col gap-y-6">
+                {assetFactorList.map((list, index) => {
+                  return (
+                    <Card className="w-full p-1 pt-4" key={index}>
+                      <CardHeader className="flex items-center justify-between px-3">
+                        <CardTitle className="flex items-center gap-x-2">
+                          {list.name === "Health" ? (
+                            <BriefcaseMedical />
+                          ) : list.name === "Auto" ? (
+                            <CarFront />
+                          ) : list.name === "Life" ? (
+                            <Heart />
+                          ) : list.name === "Home" ? (
+                            <House />
+                          ) : list.name === "Travel" ? (
+                            <PlaneTakeoff />
+                          ) : (
+                            ""
+                          )}
+                          {list.name}
+                        </CardTitle>
+                        <Button variant="outline">
+                          {list.level} <ChevronRight />
+                        </Button>
+                      </CardHeader>
+
+                      <CardContent className="flex justify-between items-start px-3">
+                        <div className="flex flex-col gap-y-2.5">
+                          {list.factors
+                            ?.filter((factor) => factor.risk === "low")
+                            .map((factor, index) => (
+                              <div
+                                key={`low-${index}`}
+                                className="flex items-center gap-x-1.5"
+                              >
+                                <CircleCheck className="size-4 text-white fill-green-600" />
+                                <p className="text-base font-medium leading-5 text-foreground">
+                                  {factor.name}
+                                </p>
+                              </div>
+                            ))}
+                        </div>
+
+                        <div className="flex flex-col gap-y-2.5">
+                          {list.factors
+                            ?.filter((factor) => factor.risk !== "low")
+                            .map((factor, index) => (
+                              <div
+                                key={`low-${index}`}
+                                className="flex items-center gap-x-1.5"
+                              >
+                                <CircleX className="size-4 text-white fill-red-600" />
+                                <p className="text-base font-medium leading-5 text-foreground">
+                                  {factor.name}
+                                </p>
+                              </div>
+                            ))}
+                        </div>
+                      </CardContent>
+                      <CardFooter className="flex items-center justify-between bg-muted p-1.5 rounded-b-lg ">
+                        <p className="max-w-[200px] text-base leading-6 font-medium text-muted-foreground">
+                          Covered by <br />
+                          <span className="text-accent-foreground flex-1 font-semibold">
+                            {list.coveredBy}
+                          </span>
+                        </p>
+                        <div className="bg-white size-12 p-0.5 rounded-lg">
+                          <Image
+                            src={list.providerLogo}
+                            alt="Care Health Supreme"
+                            width={44}
+                            height={44}
+                            className="object-cover rounded-md overflow-hidden"
+                          />
+                        </div>
+                      </CardFooter>
+                    </Card>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="w-full max-w-[354px]">
+        <div className="w-full max-w-[354px] flex flex-col gap-y-6">
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-x-2">
+              <CardTitle className="flex items-center gap-x-2 font-semibold">
                 <Zap className="size-5" /> Quick Actions
               </CardTitle>
             </CardHeader>
@@ -632,6 +900,128 @@ const DashboardPage = () => {
                 }
                 return null;
               })}
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="gap-0">
+              <CardTitle className="flex items-center gap-x-2 font-semibold">
+                <ShieldCheck className="size-5" /> Premium Overview
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="gap-4 flex flex-col">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-base leading-6  font-medium text-muted-foreground">
+                    Total Coverage
+                  </p>
+                  <p className="text-3xl font-medium leading-8  text-accent-foreground">
+                    $
+                    {
+                      apiData?.endpoints?.premiumOverview?.getPremiumSummary
+                        ?.response?.totalYearlyPremium
+                    }
+                  </p>
+                </div>
+                <div className="bg-accent size-14 rounded-lg flex items-center justify-center text-center p-2">
+                  <p className="text-[8px] leading-3  font-semibold text-muted-foreground uppercase flex flex-col items-center justify-center">
+                    <span className="text-accent-foreground font-medium text-3xl">
+                      {
+                        apiData?.endpoints?.premiumOverview?.getPremiumSummary
+                          ?.response?.totalPolicies
+                      }
+                    </span>
+                    policies
+                  </p>
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-3">
+                {apiData?.endpoints?.premiumOverview?.getPremiumSummary?.response?.breakdown?.map(
+                  (item) => {
+                    return (
+                      <Card
+                        key={item.category}
+                        className={`w-full max-w-[154px] p-4 overflow-hidden  bg-no-repeat bg-right ${item.category === "Health" ? "bg-[url(/images/health.png)]" : item.category === "Auto" ? "bg-[url(/images/auto.png)]" : item.category === "Life" ? "bg-[url(/images/life.png)]" : item.category === "Home" ? "bg-[url(/images/home.png)]" : "bg-accent"}`}
+                      >
+                        <CardContent>
+                          <p className="text-base leading-6 font-medium text-muted-foreground">
+                            {item.category}
+                          </p>
+                          <p className="text-base font-medium leading-6 tracking-4 text-accent-foreground">
+                            ${item.yearlyPremium}/year
+                          </p>
+                        </CardContent>
+                      </Card>
+                    );
+                  },
+                )}
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex items-start justify-between">
+              <CardTitle className="flex items-center gap-x-2 font-semibold">
+                <SquareChartGantt className="size-5" /> Claims
+              </CardTitle>
+              <Button variant="ghost">View All</Button>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-y-4">
+              {apiData?.endpoints?.claims?.getAllClaims?.response?.map(
+                (claim) => (
+                  <Card className="relative" key={claim.claimId}>
+                    <CardContent className="flex flex-col gap-y-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-x-1.5">
+                          <div className="flex items-center gap-x-1.5">
+                            {claim.type === "Health" ? (
+                              <BriefcaseMedical className="size-5" />
+                            ) : claim.type === "Auto" ? (
+                              <CarFront className="size-5" />
+                            ) : claim.type === "Life" ? (
+                              <Heart className="size-5" />
+                            ) : claim.type === "Home" ? (
+                              <House className="size-5" />
+                            ) : claim.type === "Travel" ? (
+                              <PlaneTakeoff className="size-5" />
+                            ) : (
+                              <></>
+                            )}
+                            <p className="text-base leading-6 font-medium text-accent-foreground">
+                              {claim.type}
+                            </p>
+                          </div>
+                          <div className="bg-accent-foreground size-1 rounded-full"></div>
+                          <p className="text-base leading-6 font-medium text-accent-foreground">
+                            {claim.claimId}
+                          </p>
+                        </div>
+                        <Badge
+                          theme="amber"
+                          size="md"
+                          className="rounded-r-none absolute top-4 right-0"
+                        >
+                          {claim.status}
+                        </Badge>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <p className="font-medium text-xl leading-6 text-accent-foreground tracking-4 max-w-[140px]">
+                          {claim.title}
+                        </p>
+                        <p className="font-medium text-6xl leading-12 text-accent-foreground tracking-4">
+                          $250
+                        </p>
+                      </div>
+                      <div className="flex items-center justify-between bg-accent p-1.5 rounded-lg">
+                        <p className="font-medium text-base leading-5 text-accent-foreground tracking-4 max-w-[130px]">
+                          {claim.provider}
+                        </p>
+                        <p className="font-medium text-base leading-5 text-accent-foreground tracking-4">
+                          {claim.submittedDate}
+                        </p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ),
+              )}
             </CardContent>
           </Card>
         </div>

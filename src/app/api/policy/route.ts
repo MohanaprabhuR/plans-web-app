@@ -98,8 +98,11 @@ export async function GET(req: Request) {
             riskLevel: "Medium",
             personalFactors: {
               health: {
+                name: "Health",
                 score: 65,
                 level: "Mitigate Your Risks",
+                providerLogo:
+                  "https://img.freepik.com/free-vector/insurance-policy-shield_603843-179.jpg",
                 factors: [
                   { name: "Hospitalization", status: "covered", risk: "low" },
                   { name: "Daycare", status: "covered", risk: "low" },
@@ -115,8 +118,11 @@ export async function GET(req: Request) {
                 coveredBy: "Care Health Supreme",
               },
               life: {
+                name: "Life",
                 score: 80,
                 level: "Good",
+                providerLogo:
+                  "https://img.freepik.com/free-vector/insurance-policy-shield_603843-179.jpg",
                 factors: [
                   { name: "Death benefit", status: "covered", risk: "low" },
                   { name: "Accidental death", status: "covered", risk: "low" },
@@ -138,8 +144,11 @@ export async function GET(req: Request) {
             },
             assetFactors: {
               home: {
+                name: "Home",
                 score: 70,
                 level: "Mitigate Your Risks",
+                providerLogo:
+                  "https://img.freepik.com/free-vector/insurance-policy-shield_603843-179.jpg",
                 factors: [
                   { name: "Fire damage", status: "covered", risk: "low" },
                   { name: "Flood/Earthquake", status: "covered", risk: "low" },
@@ -154,8 +163,11 @@ export async function GET(req: Request) {
                 coveredBy: "Smart Home Shield",
               },
               auto: {
+                name: "Auto",
                 score: 85,
                 level: "Excellent",
+                providerLogo:
+                  "https://img.freepik.com/free-vector/insurance-policy-shield_603843-179.jpg",
                 factors: [
                   { name: "Theft protection", status: "covered", risk: "low" },
                   { name: "Personal accident", status: "covered", risk: "low" },

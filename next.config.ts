@@ -14,6 +14,15 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "mockmind-api.uifaces.co",
       },
+      {
+        protocol: "https",
+        hostname: "plans.com",
+      },
+      {
+        protocol: "https",
+        hostname: "img.freepik.com",
+        pathname: "/**",
+      },
     ],
   },
 };

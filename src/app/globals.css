@@ -12,18 +12,18 @@
 }
 
 @font-face {
-  font-family: "Inter-V";
+  font-family: "Timeless-sans";
   font-weight: 100 900;
   font-display: block;
   font-style: normal;
   font-named-instance: "Regular";
-  src: url("../../public/fonts/Inter-V.woff2") format("woff2");
+  src: url("../../public/fonts/timeless-sans.woff2") format("woff2");
 }
 
 @theme inline {
   --tw-leading: 1rem;
   /* Fonts */
-  --font-sans: "Inter-V", sans-serif;
+  --font-sans: "Timeless-sans", sans-serif;
 
   /* Variations Fonts */
   --font-sans--font-variation-settings: "opsz" 24, "wght" 420;
