@@ -61,9 +61,9 @@ const HeaderLayout = () => {
               Dashboard
             </Link>
             <Link
-              href="/policies"
+              href="/your-policy"
               className={`font-medium text-base leading-6 tracking-none hover:text-orange-500 transition-all duration-300 delay-100 ${
-                isActive("/policies")
+                isActive("/your-policy")
                   ? "text-orange-500"
                   : "text-light-gray-800"
               }`}
