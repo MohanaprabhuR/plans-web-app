@@ -522,7 +522,7 @@ export async function POST(req: Request) {
       provider,
       providerLogo:
         body.providerLogo?.toString().trim() ||
-        "https://mockmind-api.uifaces.co/content/human/188.jpg",
+        "https://img.freepik.com/free-vector/insurance-policy-shield_603843-179.jpg",
       coverage: body.coverage?.toString().trim() || "-",
       premium: body.premium?.toString().trim() || "-",
       claimAmount: body.claimAmount?.toString().trim() || "None",
