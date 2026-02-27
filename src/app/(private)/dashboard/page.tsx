@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/button";
 import {
   ArrowDownToLine,
+  BadgePercent,
   Ban,
   BriefcaseMedical,
   CarFront,
@@ -99,6 +100,19 @@ interface RiskFactorItem {
   risk?: string;
 }
 
+interface ExclusiveOffer {
+  offerId: string;
+  type: string;
+  provider: string;
+  discount: string;
+  discountType: string;
+  price: number;
+  priceType: string;
+  offerEnds: string;
+  description: string;
+  image: string;
+}
+
 interface ApiResponse {
   endpoints: {
     policies: {
@@ -143,6 +157,11 @@ interface ApiResponse {
             | Array<Record<string, unknown>>
             | Record<string, unknown>;
         };
+      };
+    };
+    offers?: {
+      getExclusiveOffers?: {
+        response?: ExclusiveOffer[];
       };
     };
   };
@@ -401,7 +420,7 @@ const DashboardPage = () => {
   };
 
   return (
-    <>
+    <div className="space-y-12">
       <Dialog open={isModalOpen} onOpenChange={handleModalOpenChange}>
         <DialogContent size="lg">
           <DialogHeader>
@@ -674,7 +693,7 @@ const DashboardPage = () => {
           </div>
         )}
       </div>
-      <div className="w-full pt-12 flex gap-x-6">
+      <div className="w-full flex gap-x-6">
         <div className="w-full">
           <div className="w-full flex items-center justify-between">
             <div className="flex flex-col  gap-x-2">
@@ -1154,7 +1173,78 @@ const DashboardPage = () => {
           </Card>
         </div>
       </div>
-    </>
+      <div className="w-full p-6 border rounded-2xl flex items-center justify-between bg-[linear-gradient(60deg,#FFF3EB_0%,rgba(255,243,235,0)_50%)]">
+        <div className="flex flex-col gap-y-2 max-w-[265px]">
+          <Badge variant="secondary" size="md" theme="blue">
+            <BadgePercent className="size-4" />
+            Exclusive Offers
+          </Badge>
+          <p className="text-3xl leading-8 font-semibold text-accent-foreground -tracking-4 ">
+            Get Customized Offers Handpicked For You
+          </p>
+        </div>
+        <div className="flex gap-x-6 flex-wrap">
+          {loading ? (
+            Array.from({ length: 2 }).map((_, index) => (
+              <Skeleton
+                key={index}
+                className="w-[344px] min-w-[344px] h-20 rounded-xl"
+              />
+            ))
+          ) : apiData?.endpoints?.offers?.getExclusiveOffers?.response
+              ?.length ? (
+            apiData.endpoints.offers.getExclusiveOffers.response.map(
+              (offer, index) => (
+                <Card key={index} className="w-[344px] min-w-[344px]">
+                  <CardContent>
+                    <Badge theme="amber">Save {offer.discount} Yearly</Badge>
+
+                    <div className="flex items-center justify-between py-4 border-b border-dashed">
+                      <div className="flex gap-x-2.5">
+                        <Image
+                          src={offer.image}
+                          alt={offer.type}
+                          width={40}
+                          height={40}
+                          className="object-cover rounded-md"
+                        />
+                        <div>
+                          <p className="text-accent-foreground text-base leading-6 font-semibold">
+                            {offer.type}
+                          </p>
+                          <p className="text-muted-foreground text-xs leading-4 font-medium">
+                            {offer.provider}
+                          </p>
+                        </div>
+                      </div>
+
+                      <p className="text-accent-foreground text-3xl leading-4 font-semibold -tracking-4 max-w-[70px] text-right">
+                        ${offer.price}
+                        <br />
+                        <span className="text-muted-foreground text-[10px] uppercase font-medium">
+                          {offer.priceType}
+                        </span>
+                      </p>
+                    </div>
+
+                    <div className="flex items-center justify-between pt-2">
+                      <p className="text-muted-foreground text-xs leading-4 font-medium">
+                        Offer Ends: {offer.offerEnds}
+                      </p>
+                      <Button variant="ghost">View Quotes</Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ),
+            )
+          ) : (
+            <p className="text-muted-foreground text-sm">
+              No offers available.
+            </p>
+          )}
+        </div>
+      </div>
+    </div>
   );
 };
 

@@ -16,9 +16,7 @@ type Policy = {
   renewalDate: string; // YYYY-MM-DD
 };
 
-const supabaseUrl = (
-  process.env.NEXT_PUBLIC_SUPABASE_URL || ""
-).trim();
+const supabaseUrl = (process.env.NEXT_PUBLIC_SUPABASE_URL || "").trim();
 const supabaseAnonKey = (
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
   process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY ||
@@ -52,7 +50,9 @@ function rowToPolicy(row: Record<string, unknown>): Policy {
   };
 }
 
-async function getPoliciesFromSupabase(userId: string): Promise<Policy[] | null> {
+async function getPoliciesFromSupabase(
+  userId: string,
+): Promise<Policy[] | null> {
   const supabase = getSupabase();
   if (!supabase) return null;
   const { data, error } = await supabase
@@ -64,7 +64,10 @@ async function getPoliciesFromSupabase(userId: string): Promise<Policy[] | null>
   return (data ?? []).map((row) => rowToPolicy(row as Record<string, unknown>));
 }
 
-async function addPolicyToSupabase(userId: string, policy: Policy): Promise<boolean> {
+async function addPolicyToSupabase(
+  userId: string,
+  policy: Policy,
+): Promise<boolean> {
   const supabase = getSupabase();
   if (!supabase) return false;
   const { error } = await supabase.from("policies").insert({
@@ -398,7 +401,10 @@ export async function GET(req: Request) {
               offerEnds: "2025-11-10",
               description:
                 "Get customized auto insurance with 20% yearly savings",
+              image:
+                "https://img.freepik.com/free-vector/insurance-policy-shield_603843-179.jpg",
             },
+
             {
               offerId: "off_health_001",
               type: "Health Insurance",
@@ -410,6 +416,8 @@ export async function GET(req: Request) {
               offerEnds: "2025-11-10",
               description:
                 "Comprehensive health coverage with significant savings",
+              image:
+                "https://img.freepik.com/free-vector/insurance-policy-shield_603843-179.jpg",
             },
           ],
         },
