@@ -123,7 +123,7 @@ const PolicyCard: React.FC<PolicyCardProps> = ({ policy }) => {
               <Image
                 src={
                   policy.providerLogo ||
-                  "https://mockmind-api.uifaces.co/content/human/80.jpg"
+                  "https://img.freepik.com/free-vector/insurance-policy-shield_603843-179.jpg"
                 }
                 alt={`${policy.provider}`}
                 width={44}
