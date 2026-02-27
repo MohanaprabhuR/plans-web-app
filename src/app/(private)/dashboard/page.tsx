@@ -62,6 +62,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { StaticImport } from "next/dist/shared/lib/get-img-props";
 import dynamic from "next/dynamic";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const GaugeComponent = dynamic(() => import("react-gauge-component"), {
   ssr: false,
@@ -766,83 +767,91 @@ const DashboardPage = () => {
                 <CornerRightDown className="size-4 relative top-1.5" />
               </p>
               <div className="flex flex-col gap-y-6">
-                {personalFactorsList.map((list, index) => {
-                  return (
-                    <Card className="w-full p-1 pt-4 gap-6" key={index}>
-                      <CardHeader className="flex items-center justify-between px-3">
-                        <CardTitle className="flex items-center gap-x-2">
-                          {list.name === "Health" ? (
-                            <BriefcaseMedical />
-                          ) : list.name === "Auto" ? (
-                            <CarFront />
-                          ) : list.name === "Life" ? (
-                            <Heart />
-                          ) : list.name === "Home" ? (
-                            <House />
-                          ) : list.name === "Travel" ? (
-                            <PlaneTakeoff />
-                          ) : (
-                            ""
-                          )}
-                          {list.name}
-                        </CardTitle>
-                        <Button variant="outline">
-                          {list.level} <ChevronRight />
-                        </Button>
-                      </CardHeader>
-                      <CardContent className="flex justify-between items-start px-3">
-                        <div className="flex flex-col gap-y-2.5">
-                          {list.factors
-                            ?.filter((factor) => factor.risk === "low")
-                            .map((factor, index) => (
-                              <div
-                                key={`low-${index}`}
-                                className="flex items-center gap-x-1.5"
-                              >
-                                <CircleCheck className="size-4 text-white fill-green-600" />
-                                <p className="text-base font-medium leading-5 text-foreground">
-                                  {factor.name}
-                                </p>
-                              </div>
-                            ))}
-                        </div>
+                {loading ? (
+                  Array.from({ length: 2 }).map((_, index) => (
+                    <Skeleton key={index} className="w-full  h-16"></Skeleton>
+                  ))
+                ) : (
+                  <>
+                    {personalFactorsList.map((list, index) => {
+                      return (
+                        <Card className="w-full p-1 pt-4 gap-6" key={index}>
+                          <CardHeader className="flex items-center justify-between px-3">
+                            <CardTitle className="flex items-center gap-x-2">
+                              {list.name === "Health" ? (
+                                <BriefcaseMedical />
+                              ) : list.name === "Auto" ? (
+                                <CarFront />
+                              ) : list.name === "Life" ? (
+                                <Heart />
+                              ) : list.name === "Home" ? (
+                                <House />
+                              ) : list.name === "Travel" ? (
+                                <PlaneTakeoff />
+                              ) : (
+                                ""
+                              )}
+                              {list.name}
+                            </CardTitle>
+                            <Button variant="outline">
+                              {list.level} <ChevronRight />
+                            </Button>
+                          </CardHeader>
+                          <CardContent className="flex justify-between items-start px-3">
+                            <div className="flex flex-col gap-y-2.5">
+                              {list.factors
+                                ?.filter((factor) => factor.risk === "low")
+                                .map((factor, index) => (
+                                  <div
+                                    key={`low-${index}`}
+                                    className="flex items-center gap-x-1.5"
+                                  >
+                                    <CircleCheck className="size-4 text-white fill-green-600" />
+                                    <p className="text-base font-medium leading-5 text-foreground">
+                                      {factor.name}
+                                    </p>
+                                  </div>
+                                ))}
+                            </div>
 
-                        <div className="flex flex-col gap-y-2.5">
-                          {list.factors
-                            ?.filter((factor) => factor.risk !== "low")
-                            .map((factor, index) => (
-                              <div
-                                key={`low-${index}`}
-                                className="flex items-center gap-x-1.5"
-                              >
-                                <CircleX className="size-4 text-white fill-red-600" />
-                                <p className="text-base font-medium leading-5 text-foreground">
-                                  {factor.name}
-                                </p>
-                              </div>
-                            ))}
-                        </div>
-                      </CardContent>
-                      <CardFooter className="flex items-center justify-between bg-muted p-1.5 rounded-b-lg ">
-                        <p className="max-w-[200px] text-base leading-6 font-medium text-muted-foreground">
-                          Covered by <br />
-                          <span className="text-accent-foreground flex-1 font-semibold">
-                            {list.coveredBy}
-                          </span>
-                        </p>
-                        <div className="bg-white size-12 p-0.5 rounded-lg">
-                          <Image
-                            src={list.providerLogo}
-                            alt="Care Health Supreme"
-                            width={44}
-                            height={44}
-                            className="object-cover rounded-md overflow-hidden"
-                          />
-                        </div>
-                      </CardFooter>
-                    </Card>
-                  );
-                })}
+                            <div className="flex flex-col gap-y-2.5">
+                              {list.factors
+                                ?.filter((factor) => factor.risk !== "low")
+                                .map((factor, index) => (
+                                  <div
+                                    key={`low-${index}`}
+                                    className="flex items-center gap-x-1.5"
+                                  >
+                                    <CircleX className="size-4 text-white fill-red-600" />
+                                    <p className="text-base font-medium leading-5 text-foreground">
+                                      {factor.name}
+                                    </p>
+                                  </div>
+                                ))}
+                            </div>
+                          </CardContent>
+                          <CardFooter className="flex items-center justify-between bg-muted p-1.5 rounded-b-lg ">
+                            <p className="max-w-[200px] text-base leading-6 font-medium text-muted-foreground">
+                              Covered by <br />
+                              <span className="text-accent-foreground flex-1 font-semibold">
+                                {list.coveredBy}
+                              </span>
+                            </p>
+                            <div className="bg-white size-12 p-0.5 rounded-lg">
+                              <Image
+                                src={list.providerLogo}
+                                alt="Care Health Supreme"
+                                width={44}
+                                height={44}
+                                className="object-cover rounded-md overflow-hidden"
+                              />
+                            </div>
+                          </CardFooter>
+                        </Card>
+                      );
+                    })}
+                  </>
+                )}
               </div>
             </div>
             <div className="flex flex-col gap-y-4 w-full">
@@ -851,84 +860,92 @@ const DashboardPage = () => {
                 <CornerRightDown className="size-4 relative top-1.5 " />
               </p>
               <div className="flex flex-col gap-y-6">
-                {assetFactorList.map((list, index) => {
-                  return (
-                    <Card className="w-full p-1 pt-4 gap-6" key={index}>
-                      <CardHeader className="flex items-center justify-between px-3">
-                        <CardTitle className="flex items-center gap-x-2">
-                          {list.name === "Health" ? (
-                            <BriefcaseMedical />
-                          ) : list.name === "Auto" ? (
-                            <CarFront />
-                          ) : list.name === "Life" ? (
-                            <Heart />
-                          ) : list.name === "Home" ? (
-                            <House />
-                          ) : list.name === "Travel" ? (
-                            <PlaneTakeoff />
-                          ) : (
-                            ""
-                          )}
-                          {list.name}
-                        </CardTitle>
-                        <Button variant="outline">
-                          {list.level} <ChevronRight />
-                        </Button>
-                      </CardHeader>
+                {loading ? (
+                  Array.from({ length: 2 }).map((_, index) => (
+                    <Skeleton key={index} className="w-full  h-16"></Skeleton>
+                  ))
+                ) : (
+                  <>
+                    {assetFactorList.map((list, index) => {
+                      return (
+                        <Card className="w-full p-1 pt-4 gap-6" key={index}>
+                          <CardHeader className="flex items-center justify-between px-3">
+                            <CardTitle className="flex items-center gap-x-2">
+                              {list.name === "Health" ? (
+                                <BriefcaseMedical />
+                              ) : list.name === "Auto" ? (
+                                <CarFront />
+                              ) : list.name === "Life" ? (
+                                <Heart />
+                              ) : list.name === "Home" ? (
+                                <House />
+                              ) : list.name === "Travel" ? (
+                                <PlaneTakeoff />
+                              ) : (
+                                ""
+                              )}
+                              {list.name}
+                            </CardTitle>
+                            <Button variant="outline">
+                              {list.level} <ChevronRight />
+                            </Button>
+                          </CardHeader>
 
-                      <CardContent className="flex justify-between items-start px-3">
-                        <div className="flex flex-col gap-y-2.5">
-                          {list.factors
-                            ?.filter((factor) => factor.risk === "low")
-                            .map((factor, index) => (
-                              <div
-                                key={`low-${index}`}
-                                className="flex items-center gap-x-1.5"
-                              >
-                                <CircleCheck className="size-4 text-white fill-green-600" />
-                                <p className="text-base font-medium leading-5 text-foreground">
-                                  {factor.name}
-                                </p>
-                              </div>
-                            ))}
-                        </div>
+                          <CardContent className="flex justify-between items-start px-3">
+                            <div className="flex flex-col gap-y-2.5">
+                              {list.factors
+                                ?.filter((factor) => factor.risk === "low")
+                                .map((factor, index) => (
+                                  <div
+                                    key={`low-${index}`}
+                                    className="flex items-center gap-x-1.5"
+                                  >
+                                    <CircleCheck className="size-4 text-white fill-green-600" />
+                                    <p className="text-base font-medium leading-5 text-foreground">
+                                      {factor.name}
+                                    </p>
+                                  </div>
+                                ))}
+                            </div>
 
-                        <div className="flex flex-col gap-y-2.5">
-                          {list.factors
-                            ?.filter((factor) => factor.risk !== "low")
-                            .map((factor, index) => (
-                              <div
-                                key={`low-${index}`}
-                                className="flex items-center gap-x-1.5"
-                              >
-                                <CircleX className="size-4 text-white fill-red-600" />
-                                <p className="text-base font-medium leading-5 text-foreground">
-                                  {factor.name}
-                                </p>
-                              </div>
-                            ))}
-                        </div>
-                      </CardContent>
-                      <CardFooter className="flex items-center justify-between bg-muted p-1.5 rounded-b-lg ">
-                        <p className="max-w-[200px] text-base leading-6 font-medium text-muted-foreground">
-                          Covered by <br />
-                          <span className="text-accent-foreground flex-1 font-semibold">
-                            {list.coveredBy}
-                          </span>
-                        </p>
-                        <div className="bg-white size-12 p-0.5 rounded-lg">
-                          <Image
-                            src={list.providerLogo}
-                            alt="Care Health Supreme"
-                            width={44}
-                            height={44}
-                            className="object-cover rounded-md overflow-hidden"
-                          />
-                        </div>
-                      </CardFooter>
-                    </Card>
-                  );
-                })}
+                            <div className="flex flex-col gap-y-2.5">
+                              {list.factors
+                                ?.filter((factor) => factor.risk !== "low")
+                                .map((factor, index) => (
+                                  <div
+                                    key={`low-${index}`}
+                                    className="flex items-center gap-x-1.5"
+                                  >
+                                    <CircleX className="size-4 text-white fill-red-600" />
+                                    <p className="text-base font-medium leading-5 text-foreground">
+                                      {factor.name}
+                                    </p>
+                                  </div>
+                                ))}
+                            </div>
+                          </CardContent>
+                          <CardFooter className="flex items-center justify-between bg-muted p-1.5 rounded-b-lg ">
+                            <p className="max-w-[200px] text-base leading-6 font-medium text-muted-foreground">
+                              Covered by <br />
+                              <span className="text-accent-foreground flex-1 font-semibold">
+                                {list.coveredBy}
+                              </span>
+                            </p>
+                            <div className="bg-white size-12 p-0.5 rounded-lg">
+                              <Image
+                                src={list.providerLogo}
+                                alt="Care Health Supreme"
+                                width={44}
+                                height={44}
+                                className="object-cover rounded-md overflow-hidden"
+                              />
+                            </div>
+                          </CardFooter>
+                        </Card>
+                      );
+                    })}
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -993,46 +1010,70 @@ const DashboardPage = () => {
                   <p className="text-base leading-6  font-medium text-muted-foreground">
                     Total Coverage
                   </p>
-                  <p className="text-3xl font-medium leading-8  text-accent-foreground">
-                    $
-                    {
-                      apiData?.endpoints?.premiumOverview?.getPremiumSummary
-                        ?.response?.totalYearlyPremium
-                    }
-                  </p>
-                </div>
-                <div className="bg-accent size-14 rounded-lg flex items-center justify-center text-center p-2">
-                  <p className="text-[8px] leading-3  font-semibold text-muted-foreground uppercase flex flex-col items-center justify-center">
-                    <span className="text-accent-foreground font-medium text-3xl">
+                  {loading ? (
+                    <Skeleton className="w-full max-w-[150px] h-4" />
+                  ) : (
+                    <p className="text-3xl font-medium leading-8  text-accent-foreground">
+                      $
                       {
                         apiData?.endpoints?.premiumOverview?.getPremiumSummary
-                          ?.response?.totalPolicies
+                          ?.response?.totalYearlyPremium
                       }
-                    </span>
-                    policies
-                  </p>
+                    </p>
+                  )}
                 </div>
+                {loading ? (
+                  <Skeleton className="w-full max-w-[100px] h-4" />
+                ) : (
+                  <div className="bg-accent size-14 rounded-lg flex items-center justify-center text-center p-2">
+                    <p className="text-[8px] leading-3  font-semibold text-muted-foreground uppercase flex flex-col items-center justify-center">
+                      <span className="text-accent-foreground font-medium text-3xl">
+                        {
+                          apiData?.endpoints?.premiumOverview?.getPremiumSummary
+                            ?.response?.totalPolicies
+                        }
+                      </span>
+                      policies
+                    </p>
+                  </div>
+                )}
               </div>
               <div className="flex flex-wrap gap-3">
-                {apiData?.endpoints?.premiumOverview?.getPremiumSummary?.response?.breakdown?.map(
-                  (item) => {
-                    return (
-                      <Card
-                        key={item.category}
-                        className={`w-full max-w-[154px] p-4 overflow-hidden  bg-no-repeat bg-right ${item.category === "Health" ? "bg-[url(/images/health.png)]" : item.category === "Auto" ? "bg-[url(/images/auto.png)]" : item.category === "Life" ? "bg-[url(/images/life.png)]" : item.category === "Home" ? "bg-[url(/images/home.png)]" : "bg-accent"}`}
-                      >
-                        <CardContent>
-                          <p className="text-base leading-6 font-medium text-muted-foreground">
-                            {item.category}
-                          </p>
-                          <p className="text-base font-medium leading-6 tracking-4 text-accent-foreground">
-                            ${item.yearlyPremium}/year
-                          </p>
-                        </CardContent>
-                      </Card>
-                    );
-                  },
-                )}
+                {loading
+                  ? // Show fixed number of skeletons while loading
+                    Array.from({ length: 4 }).map((_, index) => (
+                      <Skeleton
+                        key={index}
+                        className="w-full max-w-[154px] h-16"
+                      />
+                    ))
+                  : apiData?.endpoints?.premiumOverview?.getPremiumSummary?.response?.breakdown?.map(
+                      (item) => (
+                        <Card
+                          key={item.category}
+                          className={`w-full max-w-[154px] p-4 overflow-hidden bg-no-repeat bg-right ${
+                            item.category === "Health"
+                              ? "bg-[url(/images/health.png)]"
+                              : item.category === "Auto"
+                                ? "bg-[url(/images/auto.png)]"
+                                : item.category === "Life"
+                                  ? "bg-[url(/images/life.png)]"
+                                  : item.category === "Home"
+                                    ? "bg-[url(/images/home.png)]"
+                                    : "bg-accent"
+                          }`}
+                        >
+                          <CardContent>
+                            <p className="text-base leading-6 font-medium text-muted-foreground">
+                              {item.category}
+                            </p>
+                            <p className="text-base font-medium leading-6 tracking-4 text-accent-foreground">
+                              ${item.yearlyPremium}/year
+                            </p>
+                          </CardContent>
+                        </Card>
+                      ),
+                    )}
               </div>
             </CardContent>
           </Card>
@@ -1044,62 +1085,70 @@ const DashboardPage = () => {
               <Button variant="ghost">View All</Button>
             </CardHeader>
             <CardContent className="flex flex-col gap-y-4">
-              {apiData?.endpoints?.claims?.getAllClaims?.response?.map(
-                (claim) => (
-                  <Card className="relative" key={claim.claimId}>
-                    <CardContent className="flex flex-col gap-y-4">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-x-1.5">
-                          <div className="flex items-center gap-x-1.5">
-                            {claim.type === "Health" ? (
-                              <BriefcaseMedical className="size-5" />
-                            ) : claim.type === "Auto" ? (
-                              <CarFront className="size-5" />
-                            ) : claim.type === "Life" ? (
-                              <Heart className="size-5" />
-                            ) : claim.type === "Home" ? (
-                              <House className="size-5" />
-                            ) : claim.type === "Travel" ? (
-                              <PlaneTakeoff className="size-5" />
-                            ) : (
-                              <></>
-                            )}
-                            <p className="text-base leading-6 font-medium text-accent-foreground">
-                              {claim.type}
+              {loading ? (
+                Array.from({ length: 2 }).map((_, index) => (
+                  <Skeleton key={index} className="w-full  h-16" />
+                ))
+              ) : (
+                <>
+                  {apiData?.endpoints?.claims?.getAllClaims?.response?.map(
+                    (claim) => (
+                      <Card className="relative" key={claim.claimId}>
+                        <CardContent className="flex flex-col gap-y-4">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-x-1.5">
+                              <div className="flex items-center gap-x-1.5">
+                                {claim.type === "Health" ? (
+                                  <BriefcaseMedical className="size-5" />
+                                ) : claim.type === "Auto" ? (
+                                  <CarFront className="size-5" />
+                                ) : claim.type === "Life" ? (
+                                  <Heart className="size-5" />
+                                ) : claim.type === "Home" ? (
+                                  <House className="size-5" />
+                                ) : claim.type === "Travel" ? (
+                                  <PlaneTakeoff className="size-5" />
+                                ) : (
+                                  <></>
+                                )}
+                                <p className="text-base leading-6 font-medium text-accent-foreground">
+                                  {claim.type}
+                                </p>
+                              </div>
+                              <div className="bg-accent-foreground size-1 rounded-full"></div>
+                              <p className="text-base leading-6 font-medium text-accent-foreground">
+                                {claim.claimId}
+                              </p>
+                            </div>
+                            <Badge
+                              theme="amber"
+                              size="md"
+                              className="rounded-r-none absolute top-4 right-0"
+                            >
+                              {claim.status}
+                            </Badge>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <p className="font-medium text-xl leading-6 text-accent-foreground tracking-4 max-w-[140px]">
+                              {claim.title}
+                            </p>
+                            <p className="font-medium text-6xl leading-12 text-accent-foreground tracking-4">
+                              ${claim.amount}
                             </p>
                           </div>
-                          <div className="bg-accent-foreground size-1 rounded-full"></div>
-                          <p className="text-base leading-6 font-medium text-accent-foreground">
-                            {claim.claimId}
-                          </p>
-                        </div>
-                        <Badge
-                          theme="amber"
-                          size="md"
-                          className="rounded-r-none absolute top-4 right-0"
-                        >
-                          {claim.status}
-                        </Badge>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <p className="font-medium text-xl leading-6 text-accent-foreground tracking-4 max-w-[140px]">
-                          {claim.title}
-                        </p>
-                        <p className="font-medium text-6xl leading-12 text-accent-foreground tracking-4">
-                          ${claim.amount}
-                        </p>
-                      </div>
-                      <div className="flex items-center justify-between bg-accent p-1.5 rounded-lg">
-                        <p className="font-medium text-base leading-5 text-accent-foreground tracking-4 max-w-[130px]">
-                          {claim.provider}
-                        </p>
-                        <p className="font-medium text-base leading-5 text-accent-foreground tracking-4">
-                          {claim.submittedDate}
-                        </p>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ),
+                          <div className="flex items-center justify-between bg-accent p-1.5 rounded-lg">
+                            <p className="font-medium text-base leading-5 text-accent-foreground tracking-4 max-w-[130px]">
+                              {claim.provider}
+                            </p>
+                            <p className="font-medium text-base leading-5 text-accent-foreground tracking-4">
+                              {claim.submittedDate}
+                            </p>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ),
+                  )}
+                </>
               )}
             </CardContent>
           </Card>
