@@ -80,6 +80,7 @@ interface Policy {
   members: Array<{ name: string; avatar: string }>;
   daysLeft: number;
   renewalDate: string;
+  policyTerm: string;
 }
 
 interface RiskFactorEntry {
@@ -233,6 +234,7 @@ const DashboardPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingPolicy, setEditingPolicy] = useState<Policy | null>(null);
   const [policyId, setPolicyId] = useState("");
   const generatePolicyId = () => {
     const digits = Math.floor(Math.random() * 10 ** 10)
@@ -250,23 +252,62 @@ const DashboardPage = () => {
     policyPremium: "",
     policyClaimAmount: "",
     policyDaysLeft: "",
+    policyTerm: "",
     memberCount: 1,
     members: [{ name: "", avatar: "" }] as Array<{
       name: string;
       avatar: string;
     }>,
   });
-  useEffect(() => {
-    console.log("apiData", apiData);
-  }, [apiData]);
 
   const handleModalOpenChange = (open: boolean) => {
     setIsModalOpen(open);
-    if (open) {
-      const newId = generatePolicyId();
-      setPolicyId(newId);
-      setFormData((prev) => ({ ...prev, policyId: newId }));
+    4;
+    if (!open) {
+      setEditingPolicy(null);
     }
+  };
+
+  const openAddModal = () => {
+    const newId = generatePolicyId();
+    setEditingPolicy(null);
+    setPolicyId(newId);
+    setFormData({
+      policyId: newId,
+      policyName: "",
+      policyStatus: "",
+      policyProvider: "",
+      policyCoverage: "",
+      policyPremium: "",
+      policyClaimAmount: "",
+      policyDaysLeft: "",
+      policyTerm: "",
+      memberCount: 1,
+      members: [{ name: "", avatar: "" }],
+    });
+    setIsModalOpen(true);
+  };
+
+  const openEditModal = (policy: Policy) => {
+    setEditingPolicy(policy);
+    setPolicyId(policy.policyId);
+    setFormData({
+      policyId: policy.policyId,
+      policyName: policy.type,
+      policyStatus: policy.status,
+      policyProvider: policy.provider,
+      policyCoverage: policy.coverage,
+      policyPremium: policy.premium,
+      policyClaimAmount: policy.claimAmount,
+      policyDaysLeft: String(policy.daysLeft ?? ""),
+      policyTerm: policy.policyTerm ?? "",
+      memberCount: Math.max(1, policy.members?.length || 1),
+      members:
+        policy.members && policy.members.length > 0
+          ? policy.members
+          : [{ name: "", avatar: "" }],
+    });
+    setIsModalOpen(true);
   };
 
   const setMemberCount = (count: number) => {
@@ -374,8 +415,10 @@ const DashboardPage = () => {
         }))
         .filter((m) => m.name);
 
+      const isEdit = Boolean(editingPolicy);
+
       const response = await fetch("/api/policy", {
-        method: "POST",
+        method: isEdit ? "PUT" : "POST",
         headers: {
           "Content-Type": "application/json",
           "X-User-Id": userId,
@@ -389,6 +432,7 @@ const DashboardPage = () => {
           premium: formData.policyPremium,
           claimAmount: formData.policyClaimAmount,
           daysLeft: daysLeftNum,
+          policyTerm: formData.policyTerm,
           members,
         }),
       });
@@ -567,33 +611,57 @@ const DashboardPage = () => {
               </Field>
             </FieldGroup>
           </div>
-          <FieldGroup>
-            <Field>
-              <FieldLabel>Number of members</FieldLabel>
-              <Select
-                value={String(formData.memberCount)}
-                onValueChange={(v) => setMemberCount(Number(v))}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select count" />
-                </SelectTrigger>
-                <SelectContent>
-                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
-                    <SelectItem key={n} value={String(n)}>
-                      {n} member{n > 1 ? "s" : ""}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </Field>
-          </FieldGroup>
+          <div className="flex gap-x-4 items-center">
+            <FieldGroup>
+              <Field>
+                <FieldLabel>Policy Term</FieldLabel>
+                <Input
+                  type="text"
+                  placeholder="Enter Policy Term"
+                  value={formData.policyTerm}
+                  onChange={(e) =>
+                    setFormData((p) => ({
+                      ...p,
+                      policyTerm: e.target.value,
+                    }))
+                  }
+                />
+              </Field>
+            </FieldGroup>
+            <FieldGroup>
+              <Field>
+                <FieldLabel>Number of members</FieldLabel>
+                <Select
+                  value={String(formData.memberCount)}
+                  onValueChange={(v) => setMemberCount(Number(v))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select count" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
+                      <SelectItem key={n} value={String(n)}>
+                        {n} member{n > 1 ? "s" : ""}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </Field>
+            </FieldGroup>
+          </div>
           <Button
             type="button"
             className="justify-self-end"
             onClick={handleAddPolicy}
             disabled={submitting}
           >
-            {submitting ? "Adding..." : "Add Policy"}
+            {submitting
+              ? editingPolicy
+                ? "Updating..."
+                : "Adding..."
+              : editingPolicy
+                ? "Update Policy"
+                : "Add Policy"}
           </Button>
         </DialogContent>
       </Dialog>
@@ -602,10 +670,7 @@ const DashboardPage = () => {
           <h3 className="font-semibold text-3xl leading-8 tracking-4">
             My Policies
           </h3>
-          <Button
-            className="gap-0.5"
-            onClick={() => handleModalOpenChange(true)}
-          >
+          <Button className="gap-0.5" onClick={openAddModal}>
             <PlusIcon className="size-5" /> Add
           </Button>
         </div>
@@ -652,7 +717,7 @@ const DashboardPage = () => {
             {policies.length === 0 ? (
               <Card
                 className="min-w-[354px] border  bg-muted/30 flex flex-col items-center justify-center py-16 px-6 cursor-pointer hover:bg-muted/50 transition-colors"
-                onClick={() => handleModalOpenChange(true)}
+                onClick={openAddModal}
                 role="button"
                 tabIndex={0}
                 onKeyDown={(e) => {
@@ -678,7 +743,7 @@ const DashboardPage = () => {
                     className="gap-0.5"
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleModalOpenChange(true);
+                      openAddModal();
                     }}
                   >
                     <PlusIcon className="size-5" /> Add Policy
@@ -687,7 +752,11 @@ const DashboardPage = () => {
               </Card>
             ) : (
               policies.map((policy) => (
-                <PolicyCard key={policy.policyId} policy={policy} />
+                <PolicyCard
+                  key={policy.policyId}
+                  policy={policy}
+                  onClick={() => openEditModal(policy)}
+                />
               ))
             )}
           </div>

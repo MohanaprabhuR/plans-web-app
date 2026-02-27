@@ -119,8 +119,6 @@ const page = () => {
     return apiData?.endpoints?.policies?.getAllPolicies?.response ?? [];
   }, [apiData]);
 
-  console.log(policies, "policies");
-
   return (
     <>
       <h3 className="font-semibold text-3xl leading-8 tracking-4 text-accent-foreground">
