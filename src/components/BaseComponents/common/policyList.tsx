@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Avatar,
   AvatarFallback,
@@ -15,7 +15,7 @@ import {
   LifeBuoy,
   PlaneTakeoff,
 } from "lucide-react";
-
+import { useRouter } from "next/navigation";
 interface Policy {
   policyId: string;
   type: string;
@@ -53,6 +53,7 @@ const PolicyListCard: React.FC<PolicyCardProps> = ({ policy }) => {
     }
   };
 
+  const router = useRouter();
   return (
     <Card className={`bg-white min-w-[354px] `}>
       <CardContent>
@@ -88,7 +89,14 @@ const PolicyListCard: React.FC<PolicyCardProps> = ({ policy }) => {
               </div>
             </div>
           </div>
-          <Button variant="outline" size="lg">
+
+          <Button
+            variant="outline"
+            size="lg"
+            onClick={() =>
+              router.push(`/your-policy/${encodeURIComponent(policy.policyId)}`)
+            }
+          >
             View Details
           </Button>
         </div>
