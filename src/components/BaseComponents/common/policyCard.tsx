@@ -33,9 +33,10 @@ interface Policy {
 
 interface PolicyCardProps {
   policy: Policy;
+  onClick?: () => void;
 }
 
-const PolicyCard: React.FC<PolicyCardProps> = ({ policy }) => {
+const PolicyCard: React.FC<PolicyCardProps> = ({ policy, onClick }) => {
   const getBackgroundClass = () => {
     switch (policy.type) {
       case "Health":
@@ -88,7 +89,10 @@ const PolicyCard: React.FC<PolicyCardProps> = ({ policy }) => {
   };
 
   return (
-    <Card className={`bg-white min-w-[354px] ${getBackgroundClass()}`}>
+    <Card
+      className={`bg-white min-w-[354px] ${getBackgroundClass()} ${onClick ? "cursor-pointer" : ""}`}
+      onClick={onClick}
+    >
       <CardHeader>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-x-1.5">
