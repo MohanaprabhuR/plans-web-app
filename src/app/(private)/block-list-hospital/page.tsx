@@ -226,7 +226,23 @@ const hospitals = [
     distance: "30 Miles",
   },
 ];
+
+function parseDistanceMiles(d: number | string): number {
+  if (typeof d === "number") return d;
+  const match = String(d).match(/[\d.]+/);
+  return match ? parseFloat(match[0]) : Infinity;
+}
+
+const DISTANCE_LIMITS: Record<string, number> = {
+  option1: 5,
+  option2: 10,
+  option3: 25,
+  option4: 50,
+  option5: 100,
+};
+
 const NetworkHospitalPage = () => {
+  const [searchQuery, setSearchQuery] = React.useState("");
   const [selectedValue, setSelectedValue] = React.useState<string>("");
   const [ratings1, setRatings1] = React.useState<boolean>(false);
   const [ratings2, setRatings2] = React.useState<boolean>(false);
@@ -235,6 +251,46 @@ const NetworkHospitalPage = () => {
   const [ratings5, setRatings5] = React.useState<boolean>(false);
 
   const router = useRouter();
+
+  const filteredHospitals = React.useMemo(() => {
+    let result = [...hospitals];
+
+    if (searchQuery.trim()) {
+      const q = searchQuery.trim().toLowerCase();
+      result = result.filter(
+        (h) =>
+          h.name.toLowerCase().includes(q) ||
+          h.city.toLowerCase().includes(q) ||
+          h.state.toLowerCase().includes(q)
+      );
+    }
+
+    if (selectedValue && DISTANCE_LIMITS[selectedValue] != null) {
+      const maxMiles = DISTANCE_LIMITS[selectedValue];
+      result = result.filter(
+        (h) => parseDistanceMiles(h.distance) <= maxMiles
+      );
+    }
+
+    const selectedRatings = [ratings1, ratings2, ratings3, ratings4, ratings5]
+      .map((checked, i) => (checked ? i + 1 : 0))
+      .filter((r) => r > 0);
+    if (selectedRatings.length > 0) {
+      const minRating = Math.min(...selectedRatings);
+      result = result.filter((h) => h.rating >= minRating);
+    }
+
+    return result;
+  }, [
+    searchQuery,
+    selectedValue,
+    ratings1,
+    ratings2,
+    ratings3,
+    ratings4,
+    ratings5,
+  ]);
+
   return (
     <div className="flex flex-col gap-8">
       <div className="flex items-center gap-2">
@@ -256,11 +312,13 @@ const NetworkHospitalPage = () => {
         prefix={<Search />}
         variant="outline"
         size="lg"
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
       />
       <div className="flex flex-col gap-6">
         <div className="flex items-center justify-between">
           <h4 className="text-base font-bold tracking-4 text-accent-foreground">
-            85 Matches Found in Texas
+            {filteredHospitals.length} Matches Found in Texas
           </h4>
           <div className="flex gap-3 items-center">
             <p className="text-base font-medium tracking-4 leading-6 text-accent-foreground">
@@ -349,8 +407,8 @@ const NetworkHospitalPage = () => {
           </div>
         </div>
         <div className="flex flex-wrap gap-6">
-          {hospitals.map((hospital) => (
-            <Card key={hospital.name} className="w-full max-w-[354px]">
+          {filteredHospitals.map((hospital) => (
+            <Card key={hospital.id} className="w-full max-w-[354px]">
               <CardHeader className="flex flex-row items-start justify-between gap-3 ">
                 <div className="flex flex-col gap-0.5">
                   <CardTitle className="font-semibold">
