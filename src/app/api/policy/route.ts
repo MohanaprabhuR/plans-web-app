@@ -448,6 +448,44 @@ export async function GET(req: Request) {
           ],
         },
       },
+      expiry: {
+        getExpiry: {
+          method: "GET",
+          path: "/users/{userId}/expiry",
+          response: [
+            {
+              policyId: "#0239886484",
+              type: "Auto",
+              dueDate: "2026-02-11",
+              daysLeft: 2,
+            },
+            {
+              policyId: "#0239886484",
+              type: "Health",
+              dueDate: "2026-02-11",
+              daysLeft: 8,
+            },
+            {
+              policyId: "#0239886484",
+              type: "Life",
+              dueDate: "2026-02-11",
+              daysLeft: 7,
+            },
+            {
+              policyId: "#0239886484",
+              type: "travel",
+              dueDate: "2026-02-11",
+              daysLeft: 6,
+            },
+            {
+              policyId: "#0239886484",
+              type: "Home",
+              dueDate: "2026-02-11",
+              daysLeft: 5,
+            },
+          ],
+        },
+      },
     },
     authentication: {
       login: {
