@@ -473,7 +473,7 @@ export async function GET(req: Request) {
             },
             {
               policyId: "#0239886484",
-              type: "travel",
+              type: "Travel",
               dueDate: "2026-02-11",
               daysLeft: 6,
             },

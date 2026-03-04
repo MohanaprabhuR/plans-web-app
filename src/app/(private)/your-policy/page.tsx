@@ -27,7 +27,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import useEmblaCarousel from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
-import Fade from "embla-carousel-fade";
 
 interface Policy {
   policyId: string;
@@ -119,7 +118,6 @@ const page = () => {
 
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true }, [
     autoplay.current,
-    Fade(),
   ]);
 
   useEffect(() => {
@@ -222,7 +220,17 @@ const page = () => {
                       <CardContent className="flex items-center justify-between">
                         <div className="flex items-center gap-x-4">
                           <div className="size-12 rounded-full bg-accent flex items-center justify-center">
-                            <BriefcaseMedical className="size-5.5" />
+                            {expiry.type === "Health" ? (
+                              <BriefcaseMedical className="size-5.5 stroke-[#8E51FF]" />
+                            ) : expiry.type === "Home" ? (
+                              <House className="size-5.5 stroke-[#FE9A00]" />
+                            ) : expiry.type === "Life" ? (
+                              <Heart className="size-5.5 stroke-[#FF5255]" />
+                            ) : expiry.type === "Travel" ? (
+                              <PlaneTakeoff className="size-5.5 stroke-[#00D3F2]" />
+                            ) : expiry.type === "Auto" ? (
+                              <CarFront className="size-5.5 stroke-[#E12AFB]" />
+                            ) : null}
                           </div>
                           <div className="flex flex-col">
                             <p className="text-base leading-6 font-medium text-foreground">
