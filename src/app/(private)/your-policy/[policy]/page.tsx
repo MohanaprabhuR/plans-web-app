@@ -31,6 +31,7 @@ import {
   SearchCodeIcon,
   SearchIcon,
   ShieldCheck,
+  SquareChartGantt,
   User,
 } from "lucide-react";
 import Image from "next/image";
@@ -540,10 +541,76 @@ const policyIndividualPage = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-x-2 font-semibold">
                 <User className="size-5" /> Insured Members
-                <Badge variant="secondary">3</Badge>
+                <Badge variant="secondary">{policy?.members.length}</Badge>
               </CardTitle>
             </CardHeader>
-            <CardContent></CardContent>
+            <CardContent>
+              {policy?.members.map((member, idx) => (
+                <div
+                  key={`${member.name}-${idx}`}
+                  className="flex gap-x-3 border-b py-4 first:border-t-0 last:border-b-0 first:pt-0 last:pb-0"
+                >
+                  <Image
+                    src={
+                      member.avatar ||
+                      "https://mockmind-api.uifaces.co/content/human/185.jpg"
+                    }
+                    alt={member.name || "avatar"}
+                    width={42}
+                    height={42}
+                    className="object-cover w-[42px] h-[42px] min-w-[42px] min-h-[42px] rounded-full overflow-hidden"
+                  />
+                  <div>
+                    <p className="text-xl font-semibold leading-6 tracking-4 text-accent-foreground">
+                      {member.name}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+          <Card className="gap-4">
+            <CardHeader className="flex items-start justify-between ">
+              <CardTitle className="flex items-center gap-x-2 font-semibold">
+                <SquareChartGantt className="size-5" /> Recent Claims
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="flex  flex-col gap-3">
+              {apiData?.endpoints?.claims?.getAllClaims?.response?.map(
+                (claim) => (
+                  <div
+                    key={claim.claimId}
+                    className="flex items-center first:pt-2 gap-x-3 pb-4 border-b border-border last:border-b-0 last:pb-0"
+                  >
+                    <div className="w-14 min-w-14 max-w-14 min-h-14 max-h-14 p-2.5 h-14 bg-accent rounded-lg flex flex-col items-center justify-center">
+                      <p className="text-base leading-none font-medium text-accent-foreground text-center">
+                        {claim.submittedDate}
+                      </p>
+                    </div>
+                    <div className="flex flex-col gap-y-2 w-full">
+                      <p className="font-semibold text-xl leading-6 text-accent-foreground tracking-4">
+                        {claim.title}
+                      </p>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-x-1.5">
+                          <p className="text-base leading-6 font-medium text-accent-foreground">
+                            {claim.type}
+                          </p>
+
+                          <div className="bg-accent-foreground size-1 rounded-full"></div>
+                          <p className="text-base leading-6 font-medium text-accent-foreground">
+                            {claim.claimId}
+                          </p>
+                        </div>
+                        <Badge theme="amber" size="md">
+                          {claim.status}
+                        </Badge>
+                      </div>
+                    </div>
+                  </div>
+                ),
+              )}
+            </CardContent>
           </Card>
         </div>
       </div>

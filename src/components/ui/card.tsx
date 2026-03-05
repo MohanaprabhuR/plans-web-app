@@ -16,7 +16,7 @@ const cardVariants = cva(
     defaultVariants: {
       size: "md",
     },
-  }
+  },
 );
 
 function Card({
@@ -27,7 +27,7 @@ function Card({
   return (
     <div
       data-slot="card"
-      className={cn(cardVariants({ size }), className)}
+      className={cn(cardVariants({ size }), "bg-white", className)}
       {...props}
     />
   );
@@ -39,7 +39,7 @@ function CardHeader({ className, ...props }: React.ComponentProps<"div">) {
       data-slot="card-header"
       className={cn(
         "@container/card-header grid auto-rows-min leading-normal tracking-4 grid-rows-[auto_auto] items-start gap-1.5  has-data-[slot=card-action]:grid-cols-[1fr_auto] [.border-b]:pb-6",
-        className
+        className,
       )}
       {...props}
     />
@@ -52,7 +52,7 @@ function CardTitle({ className, ...props }: React.ComponentProps<"div">) {
       data-slot="card-title"
       className={cn(
         "font-normal text-foreground leading-tight tracking-4 text-base  w-full truncate",
-        className
+        className,
       )}
       {...props}
     />
@@ -65,7 +65,7 @@ function CardDescription({ className, ...props }: React.ComponentProps<"div">) {
       data-slot="card-description"
       className={cn(
         "text-muted-foreground pt-1 text-xs leading-tight tracking-4 font-normal",
-        className
+        className,
       )}
       {...props}
     />
@@ -78,7 +78,7 @@ function CardAction({ className, ...props }: React.ComponentProps<"div">) {
       data-slot="card-action"
       className={cn(
         "col-start-2 row-span-2 row-start-1 self-start justify-self-end",
-        className
+        className,
       )}
       {...props}
     />
@@ -101,7 +101,7 @@ function CardFooter({ className, ...props }: React.ComponentProps<"div">) {
       data-slot="card-footer"
       className={cn(
         "flex items-center  [.border-t]:pt-6 leading-normal tracking-4 font-normal",
-        className
+        className,
       )}
       {...props}
     />
