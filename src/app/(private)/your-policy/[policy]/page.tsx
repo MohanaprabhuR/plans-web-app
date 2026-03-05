@@ -389,7 +389,7 @@ const policyIndividualPage = () => {
                       />
                     </div>
                     <div className="flex flex-col">
-                      <span className="font-medium text-xl leading-6 tracking-4 text-accent-foreground">
+                      <span className="font-semibold text-3xl leading-6 tracking-4 text-accent-foreground">
                         {policy.provider}
                       </span>
                       <div className="flex items-center gap-x-1.5 pt-1.5">
