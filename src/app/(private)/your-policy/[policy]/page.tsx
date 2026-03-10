@@ -1,7 +1,5 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 "use client";
-
-import PolicyListCard from "@/components/BaseComponents/common/policyList";
 import { Alert, AlertTitle } from "@/components/ui/alert";
 import {
   Avatar,
@@ -25,12 +23,9 @@ import {
   Download,
   Hospital,
   House,
-  Icon,
   LifeBuoy,
   PlaneTakeoff,
-  SearchCodeIcon,
   SearchIcon,
-  ShieldCheck,
   SquareChartGantt,
   User,
 } from "lucide-react";
