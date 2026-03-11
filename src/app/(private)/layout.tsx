@@ -14,6 +14,7 @@ export default function PrivateLayout({
   const pathname = usePathname();
   const [checking, setChecking] = useState(true);
   const isOnboarding = pathname?.startsWith("/onboarding");
+  const isBuyInsurance = pathname?.startsWith("/buy-insurance");
 
   useEffect(() => {
     const run = async () => {
@@ -45,8 +46,8 @@ export default function PrivateLayout({
 
   return (
     <>
-      {isOnboarding && <div>{children}</div>}
-      {!isOnboarding && (
+      {(isOnboarding || isBuyInsurance) && <div>{children}</div>}
+      {!isOnboarding && !isBuyInsurance && (
         <>
           <HeaderLayout />
           <div className="flex items-center justify-center h-full  relative pb-12">

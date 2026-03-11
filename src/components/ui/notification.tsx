@@ -22,7 +22,7 @@ function Notification({
       data-slot="notification"
       role="alert"
       className={cn(
-        "relative shadow-2xl bg-white rounded-xl dark:bg-[var(--color-dark-gray-100)]  flex w-full  flex-1 has-[>svg]:grid-cols-[calc(var(--spacing)*4)_1fr] grid-cols-[0_1fr] has-[>svg]:gap-x-2.5 gap-x-2.5 gap-y-0.5 [&>svg]:size-4 [&>svg]:text-current",
+        "relative shadow-2xl bg-white rounded-xl dark:bg-[var(--color-dark-gray-100)]  flex w-full  flex-1 has-[>svg]:grid-cols-[calc(var(--spacing)*4)_1fr] grid-cols-[0_1fr] has-[>svg]:gap-x-2.5 gap-x-2.5 gap-y-0.5 [&>svg]:w-4 [&>svg]:h-4 [&>svg]:shrink-0 [&>svg]:text-current",
         action && "pl-3 pr-1 py-1.5 items-center rounded-xl",
         longText &&
           "py-3 px-3.5  items-start [&>svg]:mt-0.75 [&>svg]:mb-0.75 [&>img]:mt-0.75 [&>img]:mb-0.75 rounded-2xl",
@@ -30,7 +30,7 @@ function Notification({
         notificationPanel && "items-start p-3 rounded-2xl gap-y-3",
         modal &&
           "flex-col items-center justify-center text-center py-4 px-3  gap-y-4.5 rounded-2xl",
-        className
+        className,
       )}
       {...props}
     >
@@ -48,7 +48,7 @@ function NotificationTitle({
       data-slot="notification-title"
       className={cn(
         "font-medium text-base tracking-4 leading-normal text-foreground w-full",
-        className
+        className,
       )}
       {...props}
     />
@@ -64,7 +64,7 @@ function NotificationDescription({
       data-slot="notification-description"
       className={cn(
         "text-secondary-foreground font-normal tracking-4 grid justify-items-start gap-1 text-base leading-normal",
-        className
+        className,
       )}
       {...props}
     />
@@ -80,7 +80,7 @@ function NotificationTimeStamp({
       data-slot="notification-timestamp"
       className={cn(
         "text-muted-foreground font-normal pt-1.5 -tracking-1 grid justify-items-start gap-1 text-sm leading-normal",
-        className
+        className,
       )}
       {...props}
     />

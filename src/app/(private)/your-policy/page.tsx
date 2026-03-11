@@ -27,6 +27,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import useEmblaCarousel from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
+import { useRouter } from "next/navigation";
 
 interface Policy {
   policyId: string;
@@ -108,6 +109,7 @@ const page = () => {
   const [apiData, setApiData] = useState<ApiResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   const autoplay = useRef(
     Autoplay({
@@ -270,6 +272,7 @@ const page = () => {
             </CardHeader>
             <CardContent className=" flex flex-wrap gap-4">
               <Button
+                onClick={() => router.push("/buy-insurance")}
                 className="w-full max-w-[150px] justify-start"
                 variant="shadow"
                 size="lg"
@@ -278,6 +281,7 @@ const page = () => {
                 Health
               </Button>
               <Button
+                onClick={() => router.push("/buy-insurance")}
                 className="w-full max-w-[150px] justify-start"
                 variant="shadow"
                 size="lg"
@@ -286,6 +290,7 @@ const page = () => {
                 Home
               </Button>
               <Button
+                onClick={() => router.push("/buy-insurance")}
                 className="w-full max-w-[150px] justify-start"
                 variant="shadow"
                 size="lg"
@@ -294,6 +299,7 @@ const page = () => {
                 Life
               </Button>
               <Button
+                onClick={() => router.push("/buy-insurance")}
                 className="w-full max-w-[150px] justify-start"
                 variant="shadow"
                 size="lg"
@@ -302,6 +308,7 @@ const page = () => {
                 Travel
               </Button>
               <Button
+                onClick={() => router.push("/buy-insurance")}
                 className="w-full max-w-[150px] justify-start"
                 variant="shadow"
                 size="lg"
