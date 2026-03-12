@@ -6,7 +6,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Alert, AlertTitle } from "@/components/ui/alert";
-import { Check, CircleAlert, MoveLeft } from "lucide-react";
+import { Check, CheckCircle, CircleAlert, MoveLeft } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
@@ -20,7 +20,6 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import useAuth from "@/hooks/useAuth";
 import Link from "next/link";
-
 const ALLOWED_TYPES = ["Health", "Home", "Life", "Travel", "Auto"] as const;
 type InsuranceType = (typeof ALLOWED_TYPES)[number];
 
@@ -29,7 +28,6 @@ type Answers = {
   relationship: string[];
   age: string;
   city: string;
-  pincode: string;
   fullName: string;
   lastName: string;
   mobileNumber: string;
@@ -40,7 +38,6 @@ type Answers = {
   hasAsthma: boolean;
   hasOthers: boolean;
   hasNone: boolean;
-  coverageAmount: string;
   hasExistingInsurance: "" | "yes" | "no";
 };
 
@@ -144,9 +141,8 @@ export default function BuyInsurancePage() {
   const [answers, setAnswers] = useState<Answers>({
     relationship: [],
     age: "",
-    spouseAge: undefined,
+    spouseAge: "",
     city: "",
-    pincode: "",
     mobileNumber: "",
     fullName: "",
     lastName: "",
@@ -157,7 +153,6 @@ export default function BuyInsurancePage() {
     hasAsthma: false,
     hasOthers: false,
     hasNone: false,
-    coverageAmount: "",
     hasExistingInsurance: "",
   });
   const [, setError] = useState<string | null>(null);
@@ -245,25 +240,20 @@ export default function BuyInsurancePage() {
 
   const next = async () => {
     if (mode !== "questions") return;
-    const msg = validate(step.id, answers);
-    if (msg) {
-      if (
-        step.id === "age" &&
-        msg === "Select your spouse's age." &&
-        answers.relationship.includes("Spouse")
-      ) {
-        setSpouseAgeOpen(true);
-      }
-      showError(msg);
-      return;
-    }
+
     setError(null);
     if (stepIndex < STEPS.length - 1) {
       setStepIndex((s) => s + 1);
       return;
     }
 
-    router.push(`/buy-insurance/plans?type=${encodeURIComponent(type)}`);
+    toast.custom(() => (
+      <Alert variant="success">
+        <CheckCircle className="size-4" />
+        <AlertTitle>Your details have been submitted.</AlertTitle>
+      </Alert>
+    ));
+    router.push("/plans");
   };
 
   const back = () => {
@@ -407,14 +397,14 @@ export default function BuyInsurancePage() {
                       <SelectValue placeholder="Select Your Age" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="18">18-25</SelectItem>
-                      <SelectItem value="19">26-35</SelectItem>
-                      <SelectItem value="20">36-45</SelectItem>
-                      <SelectItem value="21">46-55</SelectItem>
-                      <SelectItem value="22">56-65</SelectItem>
-                      <SelectItem value="23">66-75</SelectItem>
-                      <SelectItem value="24">76-85</SelectItem>
-                      <SelectItem value="25">86+</SelectItem>
+                      <SelectItem value="18-25">18-25</SelectItem>
+                      <SelectItem value="26-35">26-35</SelectItem>
+                      <SelectItem value="36-45">36-45</SelectItem>
+                      <SelectItem value="46-55">46-55</SelectItem>
+                      <SelectItem value="56-65">56-65</SelectItem>
+                      <SelectItem value="66-75">66-75</SelectItem>
+                      <SelectItem value="76-85">76-85</SelectItem>
+                      <SelectItem value="86+">86+</SelectItem>
                     </SelectContent>
                   </Select>
 
@@ -434,14 +424,14 @@ export default function BuyInsurancePage() {
                       <SelectValue placeholder="Select Spouse Age" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="18">18-25</SelectItem>
-                      <SelectItem value="19">26-35</SelectItem>
-                      <SelectItem value="20">36-45</SelectItem>
-                      <SelectItem value="21">46-55</SelectItem>
-                      <SelectItem value="22">56-65</SelectItem>
-                      <SelectItem value="23">66-75</SelectItem>
-                      <SelectItem value="24">76-85</SelectItem>
-                      <SelectItem value="25">86+</SelectItem>
+                      <SelectItem value="18-25">18-25</SelectItem>
+                      <SelectItem value="26-35">26-35</SelectItem>
+                      <SelectItem value="36-45">36-45</SelectItem>
+                      <SelectItem value="46-55">46-55</SelectItem>
+                      <SelectItem value="56-65">56-65</SelectItem>
+                      <SelectItem value="66-75">66-75</SelectItem>
+                      <SelectItem value="76-85">76-85</SelectItem>
+                      <SelectItem value="86+">86+</SelectItem>
                     </SelectContent>
                   </Select>
                 </>

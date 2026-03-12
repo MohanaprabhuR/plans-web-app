@@ -426,7 +426,6 @@ export async function GET(req: Request) {
           path: "/offers/{offerId}/quote",
           body: {
             userId: "string",
-            coverageAmount: "number",
             duration: "string",
           },
         },
