@@ -60,11 +60,28 @@ export default function BuyInsurancePlansPage() {
         });
         const progressJson = progressRes.ok
           ? ((await progressRes.json()) as {
-              progress: { answers?: Answers } | null;
+              progress:
+                | {
+                    step_index?: number;
+                    answers?: Answers;
+                  }
+                | null;
             })
           : null;
 
-        const progressAnswers = progressJson?.progress?.answers ?? null;
+        const progress = progressJson?.progress ?? null;
+        const stepIndex = progress?.step_index ?? -1;
+        const completedStepIndex = 4; // last step index in buy-insurance flow
+
+        if (stepIndex < completedStepIndex) {
+          showError("Please complete all steps before viewing plans.");
+          if (!cancelled) {
+            router.push(`/buy-insurance?type=${encodeURIComponent(type)}`);
+          }
+          return;
+        }
+
+        const progressAnswers = progress?.answers ?? null;
         if (!cancelled) setAnswers(progressAnswers);
 
         const res = await fetch("/api/insurance/plans", {
