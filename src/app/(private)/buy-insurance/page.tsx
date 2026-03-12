@@ -1,29 +1,47 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import Logo from "../../../../public/images/svg/plans-logo.svg";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertTitle } from "@/components/ui/alert";
-import { CircleAlert, MoveLeft } from "lucide-react";
+import { Check, CircleAlert, MoveLeft } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import useAuth from "@/hooks/useAuth";
+import Link from "next/link";
 
 const ALLOWED_TYPES = ["Health", "Home", "Life", "Travel", "Auto"] as const;
 type InsuranceType = (typeof ALLOWED_TYPES)[number];
 
 type Answers = {
-  relationship: string;
+  spouseAge: string | undefined;
+  relationship: string[];
   age: string;
   city: string;
   pincode: string;
   fullName: string;
+  lastName: string;
+  mobileNumber: string;
   hasDiabetes: boolean;
   hasBp: boolean;
+  hasHeartDisease: boolean;
+  hasThyroid: boolean;
+  hasAsthma: boolean;
+  hasOthers: boolean;
+  hasNone: boolean;
   coverageAmount: string;
+  hasExistingInsurance: "" | "yes" | "no";
 };
 
 type StepId =
@@ -40,33 +58,32 @@ type Step = {
   subtitle: string;
 };
 
-type Plan = {
-  planId: string;
-  name: string;
-  provider: string;
-  monthlyPrice: number;
-  yearlyPrice: number;
-  highlights: string[];
-};
-
 const STEPS: Step[] = [
   {
     id: "member",
     title: "Member Details",
     subtitle: "Who would you like to insure?",
   },
-  { id: "age", title: "Age", subtitle: "Tell us the age" },
-  { id: "location", title: "Location", subtitle: "Where do you live?" },
+  {
+    id: "age",
+    title: "Age",
+    subtitle: "What’s the age of the Covered Members?",
+  },
+  { id: "location", title: "Location", subtitle: "What’s Your Current City?" },
   {
     id: "personal",
     title: "Personal Details",
-    subtitle: "Basic personal info",
+    subtitle: "Tell Us Few More Details",
   },
-  { id: "medical", title: "Medical History", subtitle: "Health conditions" },
+  {
+    id: "medical",
+    title: "Medical History",
+    subtitle: "Any Pre-Existing Conditions?",
+  },
   {
     id: "insurance",
     title: "Insurance Details",
-    subtitle: "Coverage preferences",
+    subtitle: "Do You Have Any Health Insurance?",
   },
 ];
 
@@ -79,18 +96,40 @@ function normalizeType(raw: string | null): InsuranceType {
 }
 
 function validate(step: StepId, a: Answers): string | null {
-  if (step === "member" && !a.relationship) return "Select who to insure.";
-  if (step === "age" && (!a.age || Number(a.age) <= 0))
-    return "Enter a valid age.";
-  if (step === "location" && (!a.city || !a.pincode))
-    return "Enter city and pincode.";
-  if (step === "personal" && !a.fullName) return "Enter full name.";
-  if (step === "insurance" && !a.coverageAmount)
-    return "Enter coverage amount.";
+  if (step === "member" && a.relationship.length === 0)
+    return "Select who to insure.";
+  if (step === "age") {
+    if (!a.age || Number(a.age) <= 0) return "Select your age.";
+    if (a.relationship.includes("Spouse") && !a.spouseAge)
+      return "Select your spouse's age.";
+  }
+  if (step === "location" && !a.city) return "Select your city.";
+  if (step === "personal") {
+    if (!a.fullName) return "Enter first name.";
+    if (!a.lastName) return "Enter last name.";
+    if (!a.mobileNumber) return "Enter mobile number.";
+    if (!/^\d{10}$/.test(a.mobileNumber.replace(/\D/g, "")))
+      return "Enter a valid 10-digit mobile number.";
+  }
+  if (step === "medical") {
+    const anySelected =
+      a.hasDiabetes ||
+      a.hasBp ||
+      a.hasHeartDisease ||
+      a.hasThyroid ||
+      a.hasAsthma ||
+      a.hasOthers ||
+      a.hasNone;
+    if (!anySelected) return "Select at least one option.";
+  }
+  if (step === "insurance") {
+    if (!a.hasExistingInsurance) return "Select Yes or No.";
+  }
   return null;
 }
 
 export default function BuyInsurancePage() {
+  const { user } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
   const type = useMemo(
@@ -98,25 +137,96 @@ export default function BuyInsurancePage() {
     [searchParams],
   );
 
+  const [spouseAgeOpen, setSpouseAgeOpen] = useState(false);
+
   const [stepIndex, setStepIndex] = useState(0);
   const step = STEPS[stepIndex];
   const [answers, setAnswers] = useState<Answers>({
-    relationship: "",
+    relationship: [],
     age: "",
+    spouseAge: undefined,
     city: "",
     pincode: "",
+    mobileNumber: "",
     fullName: "",
+    lastName: "",
     hasDiabetes: false,
     hasBp: false,
+    hasHeartDisease: false,
+    hasThyroid: false,
+    hasAsthma: false,
+    hasOthers: false,
+    hasNone: false,
     coverageAmount: "",
+    hasExistingInsurance: "",
   });
   const [, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [plans, setPlans] = useState<Plan[]>([]);
-  const [selectedPlanId, setSelectedPlanId] = useState<string>("");
+  const [loading] = useState(false);
   const [mode, setMode] = useState<"questions" | "plans" | "success">(
     "questions",
   );
+
+  const hydratedRef = useRef(false);
+
+  useEffect(() => {
+    if (!user?.id || hydratedRef.current) return;
+    hydratedRef.current = true;
+
+    (async () => {
+      const res = await fetch("/api/insurance/progress", {
+        headers: { "X-User-Id": user.id },
+      });
+      if (!res.ok) return;
+      const data = (await res.json()) as {
+        ok: boolean;
+        progress: {
+          step_index?: number;
+          mode?: "questions" | "plans" | "success";
+          answers?: Partial<Answers>;
+        } | null;
+      };
+      if (!data.progress) return;
+
+      if (typeof data.progress.step_index === "number") {
+        setStepIndex(
+          Math.max(0, Math.min(STEPS.length - 1, data.progress.step_index)),
+        );
+      }
+      if (
+        data.progress.mode === "questions" ||
+        data.progress.mode === "plans" ||
+        data.progress.mode === "success"
+      ) {
+        setMode(data.progress.mode);
+      }
+      if (data.progress.answers && typeof data.progress.answers === "object") {
+        setAnswers((p) => ({
+          ...p,
+          ...(data.progress!.answers as Partial<Answers>),
+        }));
+      }
+    })();
+  }, [user?.id]);
+
+  useEffect(() => {
+    if (!user?.id) return;
+    // debounce writes to avoid hammering the API
+    const t = setTimeout(() => {
+      fetch("/api/insurance/progress", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-User-Id": user.id,
+        },
+        body: JSON.stringify({
+          step_index: stepIndex,
+          mode,
+          answers,
+        }),
+      }).catch(() => {});
+    }, 400);
+    return () => clearTimeout(t);
+  }, [user?.id, stepIndex, mode, answers]);
 
   const showError = (message: string) => {
     setError(message);
@@ -137,6 +247,13 @@ export default function BuyInsurancePage() {
     if (mode !== "questions") return;
     const msg = validate(step.id, answers);
     if (msg) {
+      if (
+        step.id === "age" &&
+        msg === "Select your spouse's age." &&
+        answers.relationship.includes("Spouse")
+      ) {
+        setSpouseAgeOpen(true);
+      }
       showError(msg);
       return;
     }
@@ -146,55 +263,12 @@ export default function BuyInsurancePage() {
       return;
     }
 
-    // Last step → fetch plans
-    setLoading(true);
-    try {
-      const res = await fetch("/api/insurance/plans", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type, answers }),
-      });
-      if (!res.ok) throw new Error(await res.text());
-      const data = (await res.json()) as { plans: Plan[] };
-      setPlans(data.plans ?? []);
-      setSelectedPlanId(data.plans?.[0]?.planId ?? "");
-      setMode("plans");
-    } catch (e) {
-      showError(e instanceof Error ? e.message : "Failed to load plans.");
-    } finally {
-      setLoading(false);
-    }
+    router.push(`/buy-insurance/plans?type=${encodeURIComponent(type)}`);
   };
 
   const back = () => {
     setError(null);
-    if (mode === "plans") {
-      setMode("questions");
-      return;
-    }
     setStepIndex((s) => Math.max(0, s - 1));
-  };
-
-  const buyNow = async () => {
-    if (!selectedPlanId) {
-      showError("Select a plan to continue.");
-      return;
-    }
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await fetch("/api/insurance/purchase", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type, planId: selectedPlanId, answers }),
-      });
-      if (!res.ok) throw new Error(await res.text());
-      setMode("success");
-    } catch (e) {
-      showError(e instanceof Error ? e.message : "Purchase failed.");
-    } finally {
-      setLoading(false);
-    }
   };
 
   const relationshipOptions = [
@@ -209,7 +283,9 @@ export default function BuyInsurancePage() {
   return (
     <div className="flex">
       <div className="w-1/3 bg-[#FFF7ED] py-4 px-8 h-screen">
-        <Image src={Logo} alt="Logo" width={78} height={32} />
+        <Link href="/">
+          <Image src={Logo} alt="Logo" width={78} height={32} />
+        </Link>
         <div className="pt-13">
           <div className="flex flex-col  gap-x-2">
             <p className="text-base tracking-4 leading-6  font-medium text-accent-foreground">
@@ -222,7 +298,7 @@ export default function BuyInsurancePage() {
         </div>
 
         <div className="pt-10">
-          <div className="flex flex-col gap-5">
+          <div className="flex flex-col gap-8">
             {STEPS.map((s, idx) => {
               const active =
                 mode === "questions"
@@ -230,24 +306,25 @@ export default function BuyInsurancePage() {
                   : idx === STEPS.length - 1;
               const done = idx < stepIndex && mode === "questions";
               return (
-                <div key={s.id} className="flex items-center gap-3">
+                <div
+                  key={s.id}
+                  className={`flex items-center gap-4 relative before:content-[] before:w-0.5 before:h-8.5 before:absolute before:top-[23px] last:before:hidden before:left-[11px] ${
+                    done ? "before:bg-[#FF5E00]" : "before:bg-primary/30"
+                  }`}
+                >
                   <div
-                    className={`size-5 rounded-full border flex items-center justify-center ${
+                    className={`size-6 z-1 relative rounded-full border flex items-center justify-center ${
                       done
                         ? "bg-[#FF5E00] border-[#FF5E00]"
                         : active
-                          ? "border-[#FF5E00]"
-                          : "border-muted-foreground/30"
+                          ? "border-[#FF5E00] "
+                          : "border-primary/30 bg-transparent"
                     }`}
                   >
-                    {done ? (
-                      <div className="size-2 rounded-full bg-white" />
-                    ) : null}
+                    {done ? <Check className="text-white size-4" /> : null}
                   </div>
                   <p
-                    className={`text-base font-medium ${
-                      active ? "text-foreground" : "text-muted-foreground"
-                    }`}
+                    className={`text-base font-medium ${done ? "text-foreground" : active ? "text-foreground" : "text-muted-foreground"}`}
                   >
                     {s.title}
                   </p>
@@ -278,103 +355,270 @@ export default function BuyInsurancePage() {
 
             <div className="space-y-5">
               {step.id === "member" && (
-                <div className="grid grid-cols-4 gap-3">
+                <div className="grid grid-cols-3 gap-3">
                   {relationshipOptions.map((opt) => (
                     <Checkbox
                       key={opt}
                       label={opt}
-                      onCheckedChange={() =>
-                        setAnswers((p) => ({ ...p, relationship: opt }))
-                      }
+                      checked={answers.relationship.includes(opt)}
+                      onCheckedChange={(checked) => {
+                        const isChecked = Boolean(checked);
+
+                        if (opt === "Spouse") {
+                          if (isChecked && !answers.spouseAge) {
+                            setSpouseAgeOpen(true);
+                          }
+                          if (!isChecked) {
+                            setSpouseAgeOpen(false);
+                          }
+                        }
+
+                        setAnswers((p) => ({
+                          ...p,
+                          relationship: isChecked
+                            ? Array.from(new Set([...p.relationship, opt]))
+                            : p.relationship.filter((r) => r !== opt),
+                          spouseAge:
+                            opt === "Spouse"
+                              ? isChecked
+                                ? p.spouseAge
+                                : undefined
+                              : p.spouseAge,
+                        }));
+                      }}
                     />
                   ))}
                 </div>
               )}
 
               {step.id === "age" && (
-                <Input
-                  type="number"
-                  placeholder="Enter age"
-                  size="lg"
-                  value={answers.age}
-                  onChange={(e) =>
-                    setAnswers((p) => ({ ...p, age: e.target.value }))
-                  }
-                />
+                <>
+                  <Select
+                    value={answers.age}
+                    onValueChange={(value) =>
+                      setAnswers((p) => ({ ...p, age: value }))
+                    }
+                  >
+                    <SelectTrigger
+                      className="w-full"
+                      size="lg"
+                      variant="outline"
+                    >
+                      <SelectValue placeholder="Select Your Age" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="18">18-25</SelectItem>
+                      <SelectItem value="19">26-35</SelectItem>
+                      <SelectItem value="20">36-45</SelectItem>
+                      <SelectItem value="21">46-55</SelectItem>
+                      <SelectItem value="22">56-65</SelectItem>
+                      <SelectItem value="23">66-75</SelectItem>
+                      <SelectItem value="24">76-85</SelectItem>
+                      <SelectItem value="25">86+</SelectItem>
+                    </SelectContent>
+                  </Select>
+
+                  <Select
+                    value={answers.spouseAge}
+                    open={spouseAgeOpen}
+                    onOpenChange={setSpouseAgeOpen}
+                    onValueChange={(value) =>
+                      setAnswers((p) => ({ ...p, spouseAge: value }))
+                    }
+                  >
+                    <SelectTrigger
+                      className="w-full"
+                      size="lg"
+                      variant="outline"
+                    >
+                      <SelectValue placeholder="Select Spouse Age" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="18">18-25</SelectItem>
+                      <SelectItem value="19">26-35</SelectItem>
+                      <SelectItem value="20">36-45</SelectItem>
+                      <SelectItem value="21">46-55</SelectItem>
+                      <SelectItem value="22">56-65</SelectItem>
+                      <SelectItem value="23">66-75</SelectItem>
+                      <SelectItem value="24">76-85</SelectItem>
+                      <SelectItem value="25">86+</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </>
               )}
 
               {step.id === "location" && (
-                <div className="grid grid-cols-2 gap-3">
-                  <Input
-                    placeholder="City"
-                    value={answers.city}
-                    size="lg"
-                    onChange={(e) =>
-                      setAnswers((p) => ({ ...p, city: e.target.value }))
-                    }
-                  />
-                  <Input
-                    placeholder="Pincode"
-                    value={answers.pincode}
-                    size="lg"
-                    onChange={(e) =>
-                      setAnswers((p) => ({ ...p, pincode: e.target.value }))
-                    }
-                  />
-                </div>
+                <Select
+                  value={answers.city}
+                  onValueChange={(value) =>
+                    setAnswers((p) => ({ ...p, city: value }))
+                  }
+                >
+                  <SelectTrigger className="w-full" size="lg" variant="outline">
+                    <SelectValue placeholder="Select Your City" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="india">India</SelectItem>
+                    <SelectItem value="iceland">Iceland</SelectItem>
+                    <SelectItem value="italy">Italy</SelectItem>
+                    <SelectItem value="japan">Japan</SelectItem>
+                    <SelectItem value="korea">Korea</SelectItem>
+                    <SelectItem value="spain">Spain</SelectItem>
+                    <SelectItem value="sweden">Sweden</SelectItem>
+                    <SelectItem value="switzerland">Switzerland</SelectItem>
+                    <SelectItem value="united states">United States</SelectItem>
+                    <SelectItem value="united kingdom">
+                      United Kingdom
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
               )}
 
               {step.id === "personal" && (
-                <Input
-                  placeholder="Full name"
-                  value={answers.fullName}
-                  size="lg"
-                  onChange={(e) =>
-                    setAnswers((p) => ({ ...p, fullName: e.target.value }))
-                  }
-                />
+                <>
+                  <div className="flex gap-4">
+                    <Input
+                      placeholder="Enter first name"
+                      value={answers.fullName}
+                      variant="outline"
+                      size="lg"
+                      onChange={(e) =>
+                        setAnswers((p) => ({ ...p, fullName: e.target.value }))
+                      }
+                    />
+                    <Input
+                      placeholder="Enter last name"
+                      value={answers.lastName}
+                      variant="outline"
+                      size="lg"
+                      onChange={(e) =>
+                        setAnswers((p) => ({ ...p, lastName: e.target.value }))
+                      }
+                    />
+                  </div>
+                  <Input
+                    placeholder="Enter mobile number"
+                    value={answers.mobileNumber}
+                    size="lg"
+                    variant="outline"
+                    onChange={(e) =>
+                      setAnswers((p) => ({
+                        ...p,
+                        mobileNumber: e.target.value,
+                      }))
+                    }
+                  />
+                </>
               )}
 
               {step.id === "medical" && (
-                <div className="space-y-3">
-                  <label className="flex items-center justify-between gap-3 rounded-lg border p-4">
-                    <span className="text-sm font-medium">Diabetes</span>
-                    <input
-                      type="checkbox"
-                      checked={answers.hasDiabetes}
-                      onChange={(e) =>
-                        setAnswers((p) => ({
-                          ...p,
-                          hasDiabetes: e.target.checked,
-                        }))
-                      }
-                    />
-                  </label>
-                  <label className="flex items-center justify-between gap-3 rounded-lg border p-4">
-                    <span className="text-sm font-medium">Blood pressure</span>
-                    <input
-                      type="checkbox"
-                      checked={answers.hasBp}
-                      onChange={(e) =>
-                        setAnswers((p) => ({ ...p, hasBp: e.target.checked }))
-                      }
-                    />
-                  </label>
+                <div className="grid grid-cols-2  gap-4">
+                  <Checkbox
+                    label="Diabetes"
+                    checked={answers.hasDiabetes}
+                    onCheckedChange={(checked) =>
+                      setAnswers((p) => ({
+                        ...p,
+                        hasDiabetes: Boolean(checked),
+                        hasNone: checked ? false : p.hasNone,
+                      }))
+                    }
+                  />
+                  <Checkbox
+                    label="Blood pressure"
+                    checked={answers.hasBp}
+                    onCheckedChange={(checked) =>
+                      setAnswers((p) => ({
+                        ...p,
+                        hasBp: Boolean(checked),
+                        hasNone: checked ? false : p.hasNone,
+                      }))
+                    }
+                  />
+                  <Checkbox
+                    label="Heart Disease"
+                    checked={answers.hasHeartDisease}
+                    onCheckedChange={(checked) =>
+                      setAnswers((p) => ({
+                        ...p,
+                        hasHeartDisease: Boolean(checked),
+                        hasNone: checked ? false : p.hasNone,
+                      }))
+                    }
+                  />
+                  <Checkbox
+                    label="Thyroid"
+                    checked={answers.hasThyroid}
+                    onCheckedChange={(checked) =>
+                      setAnswers((p) => ({
+                        ...p,
+                        hasThyroid: Boolean(checked),
+                        hasNone: checked ? false : p.hasNone,
+                      }))
+                    }
+                  />
+                  <Checkbox
+                    label="Asthma"
+                    checked={answers.hasAsthma}
+                    onCheckedChange={(checked) =>
+                      setAnswers((p) => ({
+                        ...p,
+                        hasAsthma: Boolean(checked),
+                        hasNone: checked ? false : p.hasNone,
+                      }))
+                    }
+                  />
+
+                  <Checkbox
+                    label="Others"
+                    checked={answers.hasOthers}
+                    onCheckedChange={(checked) =>
+                      setAnswers((p) => ({
+                        ...p,
+                        hasOthers: Boolean(checked),
+                        hasNone: checked ? false : p.hasNone,
+                      }))
+                    }
+                  />
+                  <Checkbox
+                    label="None of these"
+                    checked={answers.hasNone}
+                    onCheckedChange={(checked) =>
+                      setAnswers((p) => ({
+                        ...p,
+                        hasNone: Boolean(checked),
+                        ...(checked
+                          ? {
+                              hasDiabetes: false,
+                              hasBp: false,
+                              hasHeartDisease: false,
+                              hasThyroid: false,
+                              hasAsthma: false,
+                              hasOthers: false,
+                            }
+                          : null),
+                      }))
+                    }
+                  />
                 </div>
               )}
 
               {step.id === "insurance" && (
-                <Input
-                  placeholder="Coverage amount (e.g. 10L)"
-                  value={answers.coverageAmount}
-                  size="lg"
-                  onChange={(e) =>
-                    setAnswers((p) => ({
-                      ...p,
-                      coverageAmount: e.target.value,
-                    }))
-                  }
-                />
+                <div className="space-y-4">
+                  <RadioGroup
+                    className="flex gap-4"
+                    value={answers.hasExistingInsurance}
+                    onValueChange={(value) =>
+                      setAnswers((p) => ({
+                        ...p,
+                        hasExistingInsurance: value as "yes" | "no" | "",
+                      }))
+                    }
+                  >
+                    <RadioGroupItem value="yes" id="yes" label="Yes" />
+                    <RadioGroupItem value="no" id="no" label="No" />
+                  </RadioGroup>
+                </div>
               )}
             </div>
 
@@ -391,83 +635,6 @@ export default function BuyInsurancePage() {
                   : "Continue"}
             </Button>
           </>
-        )}
-
-        {mode === "plans" && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-xl">Plans for {type}</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {plans.length === 0 ? (
-                <p className="text-muted-foreground">No plans found.</p>
-              ) : (
-                plans.map((p) => (
-                  <button
-                    key={p.planId}
-                    type="button"
-                    onClick={() => setSelectedPlanId(p.planId)}
-                    className={`w-full text-left rounded-lg border p-4 transition ${
-                      selectedPlanId === p.planId
-                        ? "border-[#FF5E00] bg-orange-50"
-                        : "border-border"
-                    }`}
-                  >
-                    <div className="flex items-center justify-between gap-4">
-                      <div>
-                        <p className="font-semibold text-foreground">
-                          {p.name}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          {p.provider}
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-semibold text-foreground">
-                          ₹{p.monthlyPrice}/mo
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          ₹{p.yearlyPrice}/yr
-                        </p>
-                      </div>
-                    </div>
-                    {p.highlights?.length ? (
-                      <ul className="mt-2 text-sm text-muted-foreground list-disc pl-5">
-                        {p.highlights.slice(0, 3).map((h) => (
-                          <li key={h}>{h}</li>
-                        ))}
-                      </ul>
-                    ) : null}
-                  </button>
-                ))
-              )}
-
-              <div className="flex gap-3 pt-2">
-                <Button className="w-full" onClick={buyNow} disabled={loading}>
-                  {loading ? "Buying…" : "Buy now"}
-                </Button>
-                <Button variant="outline" onClick={back} disabled={loading}>
-                  Back
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {mode === "success" && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-xl">Success</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <p className="text-muted-foreground">
-                Your {type} insurance purchase and answers were saved.
-              </p>
-              <Button onClick={() => router.push("/your-policy")}>
-                Go to Your Policy
-              </Button>
-            </CardContent>
-          </Card>
         )}
       </div>
     </div>
