@@ -168,6 +168,10 @@ interface ApiResponse {
   };
 }
 
+type CoverageResponse = {
+  overallScore: number;
+};
+
 const healthCards = [
   {
     id: "1",
@@ -231,6 +235,7 @@ const DashboardPage = () => {
   const { user } = useAuth();
   const userId = user?.id ?? "";
   const [apiData, setApiData] = useState<ApiResponse | null>(null);
+  const [coverageScore, setCoverageScore] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -262,7 +267,6 @@ const DashboardPage = () => {
 
   const handleModalOpenChange = (open: boolean) => {
     setIsModalOpen(open);
-    4;
     if (!open) {
       setEditingPolicy(null);
     }
@@ -358,6 +362,32 @@ const DashboardPage = () => {
   useEffect(() => {
     fetchPolicies();
   }, [fetchPolicies]);
+
+  // Fetch coverage score from /api/coverage so it matches Coverage page
+  useEffect(() => {
+    if (!userId) return;
+    let cancelled = false;
+
+    (async () => {
+      try {
+        const res = await fetch("/api/coverage", {
+          cache: "no-store",
+          headers: { "X-User-Id": userId },
+        });
+        if (!res.ok) return;
+        const json = (await res.json()) as CoverageResponse;
+        if (!cancelled && typeof json.overallScore === "number") {
+          setCoverageScore(json.overallScore);
+        }
+      } catch {
+        // ignore
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [userId]);
 
   const policies: Policy[] = useMemo(() => {
     return apiData?.endpoints?.policies?.getAllPolicies?.response ?? [];
@@ -779,10 +809,12 @@ const DashboardPage = () => {
           </div>
 
           <GaugeComponent
-            className="!max-w-[460px] !w-full mx-auto !h-[380px] max-h-[380px] min-h-[380px]"
+            className="max-w-[460px]! w-full! mx-auto h-[380px]! max-h-[380px] min-h-[380px]"
             value={
+              coverageScore ??
               apiData?.endpoints?.riskAssessment?.getRiskScore?.response
-                ?.overallScore
+                ?.overallScore ??
+              0
             }
             type="semicircle"
             minValue={0}

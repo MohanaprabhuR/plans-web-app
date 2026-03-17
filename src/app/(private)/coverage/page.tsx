@@ -5,6 +5,7 @@ import useAuth from "@/hooks/useAuth";
 import { Card } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
 import Image from "next/image";
+import { Spinner } from "@/components/ui/spinner";
 
 type CoverageProfileItem = {
   key: "personal" | "lifestyle" | "medical" | "financial";
@@ -79,7 +80,7 @@ export default function CoveragePage() {
     <div className="w-full px-6 md:px-10 py-8 space-y-6">
       {loading ? (
         <div className="w-full h-full flex items-center justify-center">
-          <Loader2 className="size-10 animate-spin" />
+          <Spinner size="xl" track />
         </div>
       ) : null}
       {error ? <p className="text-sm text-destructive">{error}</p> : null}
