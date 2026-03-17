@@ -23,6 +23,8 @@ type CoveragePolicyItem = {
   score: number; // 0-100
   status: "covered" | "missing" | "none";
   message: string;
+  risk: string;
+  riskProfile: "Excellent" | "Good" | "Fair" | "Poor";
 };
 
 type CoverageRecommendation = {
@@ -41,6 +43,7 @@ export type CoverageResponse = {
   coverageBreakdown: CoveragePolicyItem[];
   recommendations: CoverageRecommendation[];
   updatedAt: string;
+  risk: string;
 };
 
 const supabaseUrl = (process.env.NEXT_PUBLIC_SUPABASE_URL || "").trim();
@@ -112,7 +115,9 @@ function defaultCoverage(userId: string): CoverageResponse {
       coverage: "5 Lakhs",
       score: 80,
       status: "covered",
-      message: "Excellent! You're well protected",
+      message: "",
+      risk: "Excellent! You're well protected",
+      riskProfile: "Excellent",
     },
     {
       category: "Home Insurance",
@@ -120,7 +125,9 @@ function defaultCoverage(userId: string): CoverageResponse {
       coverage: "10 Lakhs",
       score: 55,
       status: "missing",
-      message: "Theft protection missing. Fix your gap!",
+      message: "",
+      risk: "Theft protection missing. Fix your gap!",
+      riskProfile: "Good",
     },
     {
       category: "Auto Insurance",
@@ -128,7 +135,9 @@ function defaultCoverage(userId: string): CoverageResponse {
       coverage: "3 Lakhs",
       score: 90,
       status: "covered",
-      message: "You're protected but need to upgrade!",
+      message: "",
+      risk: "You're protected but need to upgrade!",
+      riskProfile: "Good",
     },
     {
       category: "Life Insurance",
@@ -136,25 +145,31 @@ function defaultCoverage(userId: string): CoverageResponse {
       coverage: "10 Lakhs",
       score: 65,
       status: "missing",
-      message: "Death benefit missing. Fix your gap!",
+      message: "",
+      risk: "Death benefit missing. Fix your gap!",
+      riskProfile: "Good",
     },
     {
       category: "Pet Insurance",
-      provider: "-",
-      coverage: "-",
+      provider: "",
+      coverage: "",
       score: 0,
       status: "none",
       message:
         "Your pet doesn't have protection for accidents or illnesses. Adding pet insurance will help cover unexpected vet costs.",
+      risk: "",
+      riskProfile: "Poor",
     },
     {
       category: "Renters Insurance",
-      provider: "-",
-      coverage: "-",
+      provider: "",
+      coverage: "",
       score: 0,
       status: "none",
       message:
         "Your belongings and liability are currently unprotected. Adding renters insurance will improve your coverage score.",
+      risk: "",
+      riskProfile: "Poor",
     },
   ];
 
@@ -312,4 +327,3 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: message }, { status: 400 });
   }
 }
-
