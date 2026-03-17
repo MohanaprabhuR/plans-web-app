@@ -71,7 +71,7 @@ const HeaderLayout = () => {
               Your Policies
             </Link>
             <Link
-              href="/"
+              href="/coverage"
               className=" hover:text-orange-500 transition-all duration-300 delay-100 font-medium text-base leading-6 tracking-none text-light-gray-800"
             >
               Coverage

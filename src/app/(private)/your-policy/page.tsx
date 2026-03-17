@@ -243,7 +243,14 @@ const page = () => {
                             </p>
                           </div>
                         </div>
-                        <Button size="lg">Renew Now</Button>
+                        <Button
+                          size="lg"
+                          onClick={() =>
+                            router.push(`/renewal?policyId=${expiry.policyId}`)
+                          }
+                        >
+                          Renew Now
+                        </Button>
                       </CardContent>
                     </Card>
                   ),

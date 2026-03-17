@@ -23,6 +23,11 @@ const nextConfig: NextConfig = {
         hostname: "img.freepik.com",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "kcsabpgulzajylvdhhtl.supabase.co",
+        pathname: "/**",
+      },
     ],
   },
 };
