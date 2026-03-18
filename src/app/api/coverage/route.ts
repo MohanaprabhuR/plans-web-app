@@ -43,7 +43,6 @@ export type CoverageResponse = {
   coverageBreakdown: CoveragePolicyItem[];
   recommendations: CoverageRecommendation[];
   updatedAt: string;
-  risk: string;
 };
 
 const supabaseUrl = (process.env.NEXT_PUBLIC_SUPABASE_URL || "").trim();

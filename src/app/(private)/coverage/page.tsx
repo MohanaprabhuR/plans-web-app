@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, type ReactNode } from "react";
 import useAuth from "@/hooks/useAuth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -8,7 +8,16 @@ import Image from "next/image";
 import { Spinner } from "@/components/ui/spinner";
 import dynamic from "next/dynamic";
 import { Badge } from "@/components/ui/badge";
-import { Award } from "lucide-react";
+import {
+  Award,
+  BriefcaseMedical,
+  CarFront,
+  Dog,
+  Heart,
+  House,
+  KeyRound,
+  PlaneTakeoff,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const GaugeComponent = dynamic(() => import("react-gauge-component"), {
@@ -51,6 +60,79 @@ type CoverageResponse = {
   updatedAt: string;
 };
 
+function clampToPercent(value: number) {
+  if (!Number.isFinite(value)) return 0;
+  return Math.max(0, Math.min(100, value));
+}
+
+function getScoreStrokeColor(status: CoverageProfileItem["status"]) {
+  if (status === "Excellent") return "#0ee087";
+  if (status === "Good") return "#47eda7";
+  if (status === "Fair") return "#f5da29";
+  return "#eb4f46";
+}
+
+function MiniSemiCircleProgress({
+  className,
+  value,
+  strokeColor,
+}: {
+  className?: string;
+  value: number;
+  strokeColor: string;
+}) {
+  const normalizedValue = clampToPercent(value);
+  const progress = normalizedValue / 100;
+
+  // Semi-circle path: center (20,20), radius 16, from left to right.
+  const radius = 16;
+  const circumference = Math.PI * radius;
+  const dashOffset = (1 - progress) * circumference;
+
+  return (
+    <svg
+      viewBox="0 0 40 24"
+      className={className ?? "w-11 h-11"}
+      aria-label={`Score ${Math.round(normalizedValue)} out of 100`}
+      role="img"
+    >
+      <path
+        d="M4 20 A16 16 0 0 1 36 20"
+        fill="none"
+        stroke="var(--color-border)"
+        strokeWidth="4"
+        strokeLinecap="round"
+      />
+      <path
+        d="M4 20 A16 16 0 0 1 36 20"
+        fill="none"
+        stroke={strokeColor}
+        strokeWidth="4"
+        strokeLinecap="round"
+        strokeDasharray={`${circumference} ${circumference}`}
+        strokeDashoffset={dashOffset}
+      />
+      <text
+        x="20"
+        y="18"
+        textAnchor="middle"
+        className="fill-foreground text-[10px] font-semibold"
+      >
+        {Math.round(normalizedValue)}
+      </text>
+    </svg>
+  );
+}
+
+function getCoverageStrokeColor(riskProfile: string | undefined) {
+  const normalized = (riskProfile ?? "").toLowerCase();
+  if (normalized === "excellent") return "#0ee087";
+  if (normalized === "good") return "#47eda7";
+  if (normalized === "fair") return "#f5da29";
+  if (normalized === "poor") return "#eb4f46";
+  return "#c7c7c7";
+}
+
 export default function CoveragePage() {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
@@ -89,12 +171,14 @@ export default function CoveragePage() {
 
   return (
     <div className="w-full px-6 md:px-10 py-8 space-y-6">
-      {loading ? (
-        <div className="w-full h-full flex items-center justify-center">
-          <Spinner size="xl" track />
+      <h3 className="font-semibold text-3xl leading-8 tracking-4 text-accent-foreground">
+        Coverage
+      </h3>
+      {loading && (
+        <div className="flex items-center justify-center py-12">
+          <p className="text-muted-foreground">Loading Coverage...</p>
         </div>
-      ) : null}
-      {error ? <p className="text-sm text-destructive">{error}</p> : null}
+      )}
       {data ? (
         <>
           <Card className="flex items-center flex-row justify-between">
@@ -195,12 +279,14 @@ export default function CoveragePage() {
                 {data.profileBreakdown.map((profile, index) => (
                   <li
                     key={profile.key ?? index}
-                    className="flex items-center justify-between py-4 first:pt-0 last:pb-0 border-b border-border last:border-b-0"
+                    className="flex items-center gap-4 justify-between py-4 first:pt-0 last:pb-0 border-b border-border last:border-b-0"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-11 h-11  bg-secondary rounded-full flex items-center justify-center">
-                        <p>{profile.score}</p>
-                      </div>
+                      <MiniSemiCircleProgress
+                        value={profile.score}
+                        strokeColor={getScoreStrokeColor(profile.status)}
+                        className="max-w-11 min-w-11 w-full"
+                      />
 
                       <div>
                         <p className="text-foreground font-semibold text-base leading-6 tracking-4">
@@ -239,10 +325,30 @@ export default function CoveragePage() {
                   {data.coverageBreakdown.map((coverage, index) => (
                     <li
                       key={coverage.category ?? index}
-                      className="flex items-start justify-between py-4 first:pt-0 last:pb-0 border-b border-border last:border-b-0"
+                      className="flex items-start justify-between py-4 gap-4 first:pt-0 last:pb-0 border-b border-border last:border-b-0"
                     >
                       <div className="flex items-start gap-4">
-                        <div className="w-12 h-13 min-w-12 min-h-13  bg-secondary rounded-2xl flex items-center justify-center"></div>
+                        <div
+                          className={`w-12 h-13 min-w-12 min-h-13  rounded-2xl flex items-center justify-center ${coverage?.category === "Health Insurance" ? "bg-[#F8F5FF]" : coverage?.category === "Auto Insurance" ? "bg-[#FDF0FF]" : coverage?.category === "Life Insurance" ? "bg-[#FFF5F5]" : coverage?.category === "Home Insurance" ? "bg-[#FEF6EA]" : coverage?.category === "Travel Insurance" ? "bg-[#FFF4E5]" : coverage?.category === "Pet Insurance" ? "bg-[#ECFEFF]" : coverage?.category === "Renters Insurance" ? "bg-[#F0FDFA]" : ""}`}
+                        >
+                          {coverage?.category === "Health Insurance" ? (
+                            <BriefcaseMedical className="stroke-[#8E51FF]" />
+                          ) : coverage?.category === "Auto Insurance" ? (
+                            <CarFront className="stroke-[#E12AFB]" />
+                          ) : coverage?.category === "Life Insurance" ? (
+                            <Heart className="stroke-[#FF5255]" />
+                          ) : coverage?.category === "Home Insurance" ? (
+                            <House className="stroke-[#FE9A00]" />
+                          ) : coverage?.category === "Travel Insurance" ? (
+                            <PlaneTakeoff className="stroke-[#00D3F2]" />
+                          ) : coverage?.category === "Pet Insurance" ? (
+                            <Dog className="stroke-[#00D3F2]" />
+                          ) : coverage?.category === "Renters Insurance" ? (
+                            <KeyRound className="stroke-[#00BBA7]" />
+                          ) : (
+                            ""
+                          )}
+                        </div>
                         <div className="flex flex-col">
                           {coverage?.category ? (
                             <p className="text-foreground font-semibold text-lg leading-6 tracking-4">
@@ -278,9 +384,14 @@ export default function CoveragePage() {
                           ) : null}
                         </div>
                       </div>
-                      <div className="size-20 min-w-20 flex items-center justify-center bg-secondary rounded-full">
-                        <p>{coverage?.score}</p>
-                      </div>
+
+                      <MiniSemiCircleProgress
+                        className="max-w-20 min-h-20 w-full "
+                        value={coverage?.score ?? 0}
+                        strokeColor={getCoverageStrokeColor(
+                          coverage?.riskProfile,
+                        )}
+                      />
                     </li>
                   ))}
                 </ul>
