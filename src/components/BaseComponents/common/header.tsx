@@ -72,13 +72,19 @@ const HeaderLayout = () => {
             </Link>
             <Link
               href="/coverage"
-              className=" hover:text-orange-500 transition-all duration-300 delay-100 font-medium text-base leading-6 tracking-none text-light-gray-800"
+              className={`font-medium text-base leading-6 tracking-none hover:text-orange-500 transition-all duration-300 delay-100 ${
+                isActive("/coverage")
+                  ? "text-orange-500"
+                  : "text-light-gray-800"
+              }`}
             >
               Coverage
             </Link>
             <Link
-              href="/"
-              className=" hover:text-orange-500 transition-all duration-300 delay-100 font-medium text-base leading-6 tracking-none text-light-gray-800"
+              href="/search"
+              className={`font-medium text-base leading-6 tracking-none hover:text-orange-500 transition-all duration-300 delay-100 ${
+                isActive("/search") ? "text-orange-500" : "text-light-gray-800"
+              }`}
             >
               Search
             </Link>
