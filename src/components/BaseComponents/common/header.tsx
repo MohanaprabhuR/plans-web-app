@@ -111,7 +111,7 @@ const HeaderLayout = () => {
                 <DropdownMenuItem onClick={() => router.push("/my-profile")}>
                   <User className="w-6 h-6" /> Profile
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={() => router.push("/my-claims")}>
                   <SquareChartGantt className="w-6 h-6" />
                   My Claims
                 </DropdownMenuItem>

@@ -3,9 +3,7 @@
 import React, { useEffect, useState, type ReactNode } from "react";
 import useAuth from "@/hooks/useAuth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
 import Image from "next/image";
-import { Spinner } from "@/components/ui/spinner";
 import dynamic from "next/dynamic";
 import { Badge } from "@/components/ui/badge";
 import {

@@ -64,6 +64,7 @@ import Image from "next/image";
 import { StaticImport } from "next/dist/shared/lib/get-img-props";
 import dynamic from "next/dynamic";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useRouter } from "next/navigation";
 
 const GaugeComponent = dynamic(() => import("react-gauge-component"), {
   ssr: false,
@@ -492,6 +493,8 @@ const DashboardPage = () => {
       setSubmitting(false);
     }
   };
+
+  const router = useRouter();
 
   return (
     <div className="space-y-12">
@@ -1202,7 +1205,9 @@ const DashboardPage = () => {
               <CardTitle className="flex items-center gap-x-2 font-semibold">
                 <SquareChartGantt className="size-5" /> Claims
               </CardTitle>
-              <Button variant="ghost">View All</Button>
+              <Button variant="ghost" onClick={() => router.push("/my-claims")}>
+                View All
+              </Button>
             </CardHeader>
             <CardContent className="flex flex-col gap-y-4">
               {loading ? (
