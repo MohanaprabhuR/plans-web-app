@@ -812,7 +812,7 @@ const DashboardPage = () => {
           </div>
 
           <GaugeComponent
-            className="max-w-[460px]! w-full! mx-auto h-[380px]! max-h-[380px] min-h-[380px]"
+            className="max-w-[380px]! w-full! mx-auto h-[380px]! max-h-[380px] min-h-[380px]"
             value={
               coverageScore ??
               apiData?.endpoints?.riskAssessment?.getRiskScore?.response
@@ -879,7 +879,7 @@ const DashboardPage = () => {
             endAngle={135}
           />
 
-          <div className="flex gap-6 justify-between pt-5">
+          <div className="flex gap-6 justify-between">
             <div className="flex flex-col gap-y-4 w-full">
               <p className="text-base leading-6 font-medium text-muted-foreground flex items-center gap-x-1">
                 Personal Factors

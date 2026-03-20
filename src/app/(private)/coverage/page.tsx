@@ -58,79 +58,6 @@ type CoverageResponse = {
   updatedAt: string;
 };
 
-function clampToPercent(value: number) {
-  if (!Number.isFinite(value)) return 0;
-  return Math.max(0, Math.min(100, value));
-}
-
-function getScoreStrokeColor(status: CoverageProfileItem["status"]) {
-  if (status === "Excellent") return "#0ee087";
-  if (status === "Good") return "#47eda7";
-  if (status === "Fair") return "#f5da29";
-  return "#eb4f46";
-}
-
-function MiniSemiCircleProgress({
-  className,
-  value,
-  strokeColor,
-}: {
-  className?: string;
-  value: number;
-  strokeColor: string;
-}) {
-  const normalizedValue = clampToPercent(value);
-  const progress = normalizedValue / 100;
-
-  // Semi-circle path: center (20,20), radius 16, from left to right.
-  const radius = 16;
-  const circumference = Math.PI * radius;
-  const dashOffset = (1 - progress) * circumference;
-
-  return (
-    <svg
-      viewBox="0 0 40 24"
-      className={className ?? "w-11 h-11"}
-      aria-label={`Score ${Math.round(normalizedValue)} out of 100`}
-      role="img"
-    >
-      <path
-        d="M4 20 A16 16 0 0 1 36 20"
-        fill="none"
-        stroke="var(--color-border)"
-        strokeWidth="4"
-        strokeLinecap="round"
-      />
-      <path
-        d="M4 20 A16 16 0 0 1 36 20"
-        fill="none"
-        stroke={strokeColor}
-        strokeWidth="4"
-        strokeLinecap="round"
-        strokeDasharray={`${circumference} ${circumference}`}
-        strokeDashoffset={dashOffset}
-      />
-      <text
-        x="20"
-        y="18"
-        textAnchor="middle"
-        className="fill-foreground text-[10px] font-semibold"
-      >
-        {Math.round(normalizedValue)}
-      </text>
-    </svg>
-  );
-}
-
-function getCoverageStrokeColor(riskProfile: string | undefined) {
-  const normalized = (riskProfile ?? "").toLowerCase();
-  if (normalized === "excellent") return "#0ee087";
-  if (normalized === "good") return "#47eda7";
-  if (normalized === "fair") return "#f5da29";
-  if (normalized === "poor") return "#eb4f46";
-  return "#c7c7c7";
-}
-
 export default function CoveragePage() {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
@@ -284,12 +211,38 @@ export default function CoveragePage() {
                       className="flex items-center gap-4 justify-between py-4 first:pt-0 last:pb-0 border-b border-border last:border-b-0"
                     >
                       <div className="flex items-center gap-3">
-                        <MiniSemiCircleProgress
-                          value={profile.score}
-                          strokeColor={getScoreStrokeColor(profile.status)}
-                          className="max-w-11 min-w-11 w-full"
-                        />
-
+                        <div className="w-11 h-11">
+                          <GaugeComponent
+                            value={profile.score}
+                            type="grafana"
+                            arc={{
+                              width: 0.11,
+                              padding: 0,
+                              outerArc: { width: 0 },
+                              cornerRadius: 0,
+                              subArcsStrokeWidth: 0,
+                            }}
+                            labels={{
+                              valueLabel: {
+                                formatTextValue: (e) => `${Math.round(e)}`,
+                                style: {
+                                  fontSize: "72px",
+                                  fill: "#383838",
+                                  fontWeight: "600",
+                                  textShadow: "none",
+                                },
+                                matchColorWithArc: true,
+                              },
+                              tickLabels: {
+                                hideMinMax: true,
+                                defaultTickLineConfig: { hide: true },
+                                defaultTickValueConfig: { hide: true },
+                              },
+                            }}
+                            startAngle={-135}
+                            endAngle={135}
+                          />
+                        </div>
                         <div>
                           <p className="text-foreground font-semibold text-base leading-6 tracking-4">
                             {profile.label}
@@ -387,13 +340,38 @@ export default function CoveragePage() {
                           </div>
                         </div>
 
-                        <MiniSemiCircleProgress
-                          className="max-w-20 min-h-20 w-full "
-                          value={coverage?.score ?? 0}
-                          strokeColor={getCoverageStrokeColor(
-                            coverage?.riskProfile,
-                          )}
-                        />
+                        <div className="w-20 min-w-20 h-20">
+                          <GaugeComponent
+                            value={coverage?.score ?? 0}
+                            type="grafana"
+                            arc={{
+                              width: 0.11,
+                              padding: 0,
+                              outerArc: { width: 0 },
+                              cornerRadius: 0,
+                              subArcsStrokeWidth: 0,
+                            }}
+                            labels={{
+                              valueLabel: {
+                                formatTextValue: (e) => `${Math.round(e)}`,
+                                style: {
+                                  fontSize: "72px",
+                                  fill: "#383838",
+                                  fontWeight: "600",
+                                  textShadow: "none",
+                                },
+                                matchColorWithArc: true,
+                              },
+                              tickLabels: {
+                                hideMinMax: true,
+                                defaultTickLineConfig: { hide: true },
+                                defaultTickValueConfig: { hide: true },
+                              },
+                            }}
+                            startAngle={-135}
+                            endAngle={135}
+                          />
+                        </div>
                       </li>
                     ))}
                   </ul>
