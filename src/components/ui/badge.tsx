@@ -27,7 +27,7 @@ const badgeVariants = cva(
       variant: "default",
       size: "sm",
     },
-  }
+  },
 );
 
 const themeVars: Record<
@@ -101,7 +101,7 @@ function Badge({
       className={cn(
         badgeVariants({ variant, size }),
         "leading-tight",
-        className
+        className,
       )}
       {...props}
     >

@@ -1,0 +1,302 @@
+.dark {
+  /* Dark Violet Shades */
+  --color-violet-50: #cdbeff;
+  --color-violet-100: #bca9fc;
+  --color-violet-200: #9f87ed;
+  --color-violet-300: #9478f8;
+  --color-violet-400: #8363f1;
+  --color-violet-500: #5a3eba;
+  --color-violet-600: #403397;
+  --color-violet-700: #3d3286;
+  --color-violet-800: #291d64;
+  --color-violet-900: #1f1841;
+  --color-violet-950: #17132c;
+
+  /* Dark Pink Shades */
+  --color-pink-50: #ffbbe4;
+  --color-pink-100: #f69ad1;
+  --color-pink-200: #ed77be;
+  --color-pink-300: #e359ab;
+  --color-pink-400: #cb4394;
+  --color-pink-500: #ac377d;
+  --color-pink-600: #892660;
+  --color-pink-700: #6f1d4d;
+  --color-pink-800: #5b183f;
+  --color-pink-900: #42132f;
+  --color-pink-950: #341126;
+
+  /* Dark Purple Shades */
+  --color-purple-50: #e5c6fb;
+  --color-purple-100: #d9aff5;
+  --color-purple-200: #c993ef;
+  --color-purple-300: #b168e8;
+  --color-purple-400: #984bd8;
+  --color-purple-500: #7a2db9;
+  --color-purple-600: #622195;
+  --color-purple-700: #491870;
+  --color-purple-800: #391457;
+  --color-purple-900: #270e3b;
+  --color-purple-950: #1f112a;
+
+  /* Dark Cyan Shades */
+  --color-cyan-50: #d0f0fa;
+  --color-cyan-100: #95e3f6;
+  --color-cyan-200: #62cae9;
+  --color-cyan-300: #3cb8dc;
+  --color-cyan-400: #1d94b9;
+  --color-cyan-500: #107b9b;
+  --color-cyan-600: #14667f;
+  --color-cyan-700: #104f62;
+  --color-cyan-800: #0d3b49;
+  --color-cyan-900: #0c2d37;
+  --color-cyan-950: #0c242d;
+
+  /* dark teal Shades */
+  --color-teal-50: #a0f7ed;
+  --color-teal-100: #7ef3e7;
+  --color-teal-200: #51decf;
+  --color-teal-300: #28bcac;
+  --color-teal-400: #1c988b;
+  --color-teal-500: #1b7169;
+  --color-teal-600: #145b54;
+  --color-teal-700: #0b4942;
+  --color-teal-800: #0b3a35;
+  --color-teal-900: #0a2d29;
+  --color-teal-950: #0a211e;
+
+  /* Dark Yellow Shades */
+  --color-yellow-50: #ffeeb8;
+  --color-yellow-100: #ffe386;
+  --color-yellow-200: #f8d76a;
+  --color-yellow-300: #ecc02e;
+  --color-yellow-400: #daae15;
+  --color-yellow-500: #c69c12;
+  --color-yellow-600: #9c7a0a;
+  --color-yellow-700: #705606;
+  --color-yellow-800: #5b4605;
+  --color-yellow-900: #3f3004;
+  --color-yellow-950: #322604;
+
+  /* Dark Orange Shades */
+  --color-orange-50: #ffcdad;
+  --color-orange-100: #ffa873;
+  --color-orange-200: #fa8a40;
+  --color-orange-300: #de6d1b;
+  --color-orange-400: #c45a0e;
+  --color-orange-500: #984509;
+  --color-orange-600: #823906;
+  --color-orange-700: #683108;
+  --color-orange-800: #532707;
+  --color-orange-900: #361c09;
+  --color-orange-950: #261407;
+
+  /* Dark Amber Shades */
+  --color-amber-50: #ffe59a;
+  --color-amber-100: #f4c25f;
+  --color-amber-200: #ffaa3e;
+  --color-amber-300: #fa961f;
+  --color-amber-400: #e27e1b;
+  --color-amber-500: #cb6d10;
+  --color-amber-600: #975215;
+  --color-amber-700: #753a07;
+  --color-amber-800: #4b2606;
+  --color-amber-900: #371e06;
+  --color-amber-950: #281808;
+
+  /* Dark Green Shades */
+  --color-green-50: #c8f3de;
+  --color-green-100: #9be6c1;
+  --color-green-200: #78d7a9;
+  --color-green-300: #58c08e;
+  --color-green-400: #1db269;
+  --color-green-500: #0c9150;
+  --color-green-600: #077241;
+  --color-green-700: #035831;
+  --color-green-800: #0a3f27;
+  --color-green-900: #0b2e1c;
+  --color-green-950: #0c2016;
+
+  /* Dark Blue Shades */
+  --color-blue-50: #c9e0f5;
+  --color-blue-100: #add2f5;
+  --color-blue-200: #8cc1ec;
+  --color-blue-300: #5aaef2;
+  --color-blue-400: #3294e3;
+  --color-blue-500: #1580d8;
+  --color-blue-600: #155999;
+  --color-blue-700: #063d71;
+  --color-blue-800: #052b53;
+  --color-blue-900: #0e2037;
+  --color-blue-950: #0c1726;
+
+  /* Dark Red Shades */
+  --color-red-50: #ffdede;
+  --color-red-100: #ffc1c1;
+  --color-red-200: #fe7c7c;
+  --color-red-300: #eb4d52;
+  --color-red-400: #d73232;
+  --color-red-500: #b01f1f;
+  --color-red-600: #862020;
+  --color-red-700: #661717;
+  --color-red-800: #521515;
+  --color-red-900: #3c1316;
+  --color-red-950: #2a0c0c;
+
+  /* Dark Red Alpha Shades */
+  --color-red-alpha-300: rgba(255, 88, 88, 0.94);
+  --color-red-alpha-400: rgba(255, 88, 88, 0.85);
+  --color-red-alpha-500: rgba(255, 88, 88, 0.73);
+  --color-red-alpha-600: rgba(255, 88, 88, 0.56);
+  --color-red-alpha-700: rgba(255, 88, 88, 0.54);
+  --color-red-alpha-800: rgba(255, 88, 88, 0.49);
+  --color-red-alpha-900: rgba(255, 88, 88, 0.4);
+  --color-red-alpha-950: rgba(255, 88, 88, 0.38);
+
+  /* Dark Gray Shades */
+  --color-gray-50: #f8f8f8;
+  --color-gray-100: #d9d9d9;
+  --color-gray-200: #afafaf;
+  --color-gray-300: #808080;
+  --color-gray-400: #717171;
+  --color-gray-450: #575757;
+  --color-gray-500: #424242;
+  --color-gray-600: #343434;
+  --color-gray-700: #2b2b2b;
+  --color-gray-800: #232323;
+  --color-gray-900: #1c1c1c;
+  --color-gray-950: #0f0f0f;
+
+  /* Dark Gray Alpha Shades */
+  --color-gray-alpha-50: rgba(255, 255, 255, 0.97);
+  --color-gray-alpha-100: rgba(255, 255, 255, 0.82);
+  --color-gray-alpha-200: rgba(255, 255, 255, 0.67);
+  --color-gray-alpha-300: rgba(255, 255, 255, 0.47);
+  --color-gray-alpha-400: rgba(255, 255, 255, 0.41);
+  --color-gray-alpha-450: rgba(255, 255, 255, 0.3);
+  --color-gray-alpha-500: rgba(255, 255, 255, 0.21);
+  --color-gray-alpha-600: rgba(255, 255, 255, 0.15);
+  --color-gray-alpha-700: rgba(255, 255, 255, 0.12);
+  --color-gray-alpha-800: rgba(255, 255, 255, 0.08);
+  --color-gray-alpha-900: rgba(255, 255, 255, 0.06);
+  --color-gray-alpha-950: rgba(255, 255, 255, 0.04);
+
+  --autofill: var(--color-orange-900);
+  --border: var(--color-gray-600);
+  --background: var(--color-black);
+  --foreground: var(--color-gray-50);
+  --primary: var(--color-gray-50);
+  --primary-foreground: var(--color-gray-950);
+  --secondary: var(--color-gray-700);
+  --secondary-foreground: var(--color-gray-200);
+  --destructive: var(--color-red-500);
+  --destructive-foreground: var(--color-red-400);
+  --accent: var(--color-gray-600);
+  --accent-foreground: var(--color-gray-100);
+  --accent-active: var(--color-gray-500);
+  --border: var(--color-gray-600);
+  --muted: var(--color-gray-700);
+  --muted-foreground: var(--color-gray-300);
+  --input: var(--color-gray-600);
+  --ring: var(--color-ring-color);
+  --card: var(--color-gray-800);
+  --card-foreground: var(--color-gray-50);
+  --popover: var(--color-gray-800);
+  --popover-foreground: var(--color-gray-200);
+  --sidebar: var(--color-black);
+  --sidebar-foreground: var(--color-gray-200);
+  --sidebar-primary: var(--color-gray-600);
+  --sidebar-primary-foreground: var(--color-gray-50);
+  --sidebar-accent: var(--color-gray-700);
+  --sidebar-accent-foreground: var(--color-gray-50);
+  --sidebar-border: var(--color-gray-800);
+  --sidebar-ring: var(--color-ring-color);
+
+  --chart-1: var(--color-light-blue-900);
+  --chart-2: var(--color-light-blue-800);
+  --chart-3: var(--color-light-blue-700);
+  --chart-4: var(--color-light-blue-600);
+  --chart-5: var(--color-light-blue-500);
+
+  /* Badge Styles - primary */
+  --default-border-hover: var(--color-gray-500);
+  --default-border-active: var(--color-gray-500);
+
+  /* Badge Styles - Blue */
+  --blue-primary: var(--color-blue-500);
+  --blue-primary-hover: var(--color-blue-400);
+  --blue-primary-active: var(--color-blue-600);
+  --blue-primary-foreground: var(--color-white);
+  --blue-secondary: var(--color-blue-900);
+  --blue-secondary-hover: var(--color-blue-800);
+  --blue-secondary-active: var(--color-blue-700);
+  --blue-secondary-foreground: var(--color-blue-300);
+  --blue-border: var(--color-blue-800);
+  --blue-border-hover: var(--color-blue-700);
+  --blue-border-active: var(--color-blue-600);
+  --blue-disabled: var(--color-blue-900);
+  --blue-disabled-foreground: var(--color-blue-700);
+
+  /* Badge Styles - Green */
+  --green-primary: var(--color-green-500);
+  --green-primary-foreground: var(--color-white);
+  --green-secondary: var(--color-green-900);
+  --green-secondary-foreground: var(--color--green-300);
+  --green-border: var(--color-green-800);
+
+  /* Badge Styles - Amber */
+  --amber-primary: var(--color-amber-500);
+  --amber-primary-foreground: var(--color-white);
+  --amber-secondary: var(--color-amber-900);
+  --amber-secondary-foreground: var(--color-amber-300);
+  --amber-border: var(--color-dark-amber-800);
+
+  /* Badge Styles - Red */
+  --red-primary: var(--color-red-500);
+  --red-primary-foreground: var(--color-white);
+  --red-secondary: var(--color-red-900);
+  --red-secondary-foreground: var(--color-red-300);
+  --red-border: var(--color-red-800);
+
+  /* Badge Styles - Violet */
+  --violet-primary: var(--color-violet-500);
+  --violet-primary-foreground: var(--color-white);
+  --violet-secondary: var(--color-violet-900);
+  --violet-secondary-foreground: var(--color-violet-300);
+  --violet-border: var(--color-violet-800);
+
+  /* State */
+  --success: var(--color-green-900);
+  --success-foreground: var(--color-green-400);
+  --warning: var(--color-amber-900);
+  --warning-foreground: var(--color-amber-400);
+  --error: var(--color-red-900);
+  --error-foreground: var(--color-red-400);
+  --success-border: var(--color-green-600);
+  --warning-border: var(--color-amber-700);
+  --error-border: var(--color-red-600);
+  --autofill: var(--color-orange-900);
+  --autofill-border: var(--color-orange-700);
+
+  /* Spinner Border Color */
+  --track-gray: var(--color-gray-500);
+  --track-blue: var(--color-blue-500);
+  --track-green: var(--color-green-500);
+  --track-amber: var(--color-amber-500);
+  --track-red: var(--color-red-500);
+
+  /* Gradient Color */
+  --spinner-gray: conic-gradient(
+    from 90deg,
+    rgba(255, 255, 255, 0.0018) 0deg,
+    rgba(255, 255, 255, 1) 260.571deg,
+    rgba(255, 255, 255, 0) 359.525deg,
+    rgba(255, 255, 255, 0.0018) 360deg
+  );
+  --spinner-dark-common: conic-gradient(
+    from 90deg,
+    rgba(255, 255, 255, 0.0018) 0deg,
+    rgba(255, 255, 255, 1) 260.571deg,
+    rgba(255, 255, 255, 0) 359.525deg,
+    rgba(255, 255, 255, 0.0018) 360deg
+  );
+}
