@@ -820,70 +820,66 @@ const DashboardPage = () => {
               0
             }
             type="semicircle"
-            minValue={0}
+            minValue={10}
             maxValue={100}
             arc={{
-              width: 0.43,
-              cornerRadius: 7,
-              nbSubArcs: 100,
-              colorArray: [
-                "#FF6467",
-                "#FF8A8D",
-                "#FDC700",
-                "#9AE600",
-                "#cccccc",
-              ],
-              padding: 0.015,
-              subArcsStrokeWidth: 0,
-              subArcsStrokeColor: "#000000",
-              effects: { glow: true, glowBlur: 1, glowSpread: 2 },
+              width: 0.2,
+              padding: 0.03,
+              cornerRadius: 0,
               subArcs: [],
+              colorArray: [
+                "#eb4f46",
+                "#e9833d",
+                "#edd748",
+                "#67f06d",
+                "#0ee087",
+              ],
+              nbSubArcs: 5,
+              subArcsStrokeWidth: 0,
             }}
             pointer={{
               type: "arrow",
-              elastic: false,
-              animationDelay: 200,
-              animationDuration: 1400,
-              length: 0.87,
-              width: 24,
+              color: "#383838",
+              length: 0.7,
+              width: 22,
+              maxFps: 30,
               baseColor: "#ffffff",
-              strokeWidth: 0,
-              strokeColor: "#000000",
-              maxFps: 60,
-              animationThreshold: 0.0096,
-              color: "#5be12c",
+              strokeWidth: 2,
               arrowOffset: 0.9,
             }}
             labels={{
               valueLabel: {
-                matchColorWithArc: true,
+                formatTextValue: (e) => "".concat(e, ""),
                 style: {
-                  fontSize: "17px",
+                  fontSize: "20px",
+                  fill: "#383838",
                   fontWeight: "bold",
                   textShadow: "none",
                 },
-                offsetY: 25,
-                animateValue: true,
               },
               tickLabels: {
                 type: "outer",
+                defaultTickValueConfig: {
+                  formatTextValue: (e) => "".concat(e, "\xb0"),
+                  style: { fontSize: "9px", fill: "#aaa" },
+                  hide: true,
+                },
+                defaultTickLineConfig: {
+                  color: "#666",
+                  length: 4,
+                  width: 1,
+                  hide: true,
+                },
+                ticks: [],
                 hideMinMax: true,
                 autoSpaceTickLabels: false,
-                ticks: [],
-                defaultTickLineConfig: {
-                  length: 5,
-                  hide: true,
-                  color: "#a95b82",
-                  width: 2,
-                },
-                defaultTickValueConfig: {
-                  hide: true,
-                  style: { fill: "#b30059" },
-                },
               },
             }}
+            startAngle={-135}
+            endAngle={135}
           />
-          <div className="flex gap-6 justify-between">
+
+          <div className="flex gap-6 justify-between pt-5">
             <div className="flex flex-col gap-y-4 w-full">
               <p className="text-base leading-6 font-medium text-muted-foreground flex items-center gap-x-1">
                 Personal Factors

@@ -191,45 +191,43 @@ export default function CoveragePage() {
                     maxValue={100}
                     arc={{
                       width: 0.2,
-                      padding: 0.015,
-                      cornerRadius: 2,
+                      padding: 0.03,
+                      cornerRadius: 0,
                       subArcs: [],
                       colorArray: [
                         "#eb4f46",
-                        "#eccd46",
-                        "#f5da29",
-                        "#47eda7",
+                        "#e9833d",
+                        "#edd748",
+                        "#67f06d",
                         "#0ee087",
                       ],
                       nbSubArcs: 5,
+                      subArcsStrokeWidth: 0,
                     }}
                     pointer={{
                       type: "arrow",
-                      color: "#000000",
+                      color: "#383838",
                       length: 0.7,
-                      width: 26,
+                      width: 22,
                       maxFps: 30,
                       baseColor: "#ffffff",
-                      strokeWidth: 2.5,
-                      arrowOffset: 0.85,
+                      strokeWidth: 2,
+                      arrowOffset: 0.9,
                     }}
                     labels={{
                       valueLabel: {
-                        formatTextValue: (e) => `${Math.round(e)}`,
+                        formatTextValue: (e) => "".concat(e, ""),
                         style: {
                           fontSize: "20px",
-                          fill: "#e0e0e0",
+                          fill: "#383838",
                           fontWeight: "bold",
                           textShadow: "none",
                         },
-                        matchColorWithArc: true,
-                        hide: false,
-                        animateValue: true,
                       },
                       tickLabels: {
-                        type: "inner",
+                        type: "outer",
                         defaultTickValueConfig: {
-                          formatTextValue: (e) => `${e}`,
+                          formatTextValue: (e) => "".concat(e, "\xb0"),
                           style: { fontSize: "9px", fill: "#aaa" },
                           hide: true,
                         },
@@ -237,11 +235,15 @@ export default function CoveragePage() {
                           color: "#666",
                           length: 4,
                           width: 1,
+                          hide: true,
                         },
                         ticks: [],
                         hideMinMax: true,
+                        autoSpaceTickLabels: false,
                       },
                     }}
+                    startAngle={-135}
+                    endAngle={135}
                   />
                 </div>
               </div>
