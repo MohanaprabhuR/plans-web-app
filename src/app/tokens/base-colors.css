@@ -203,7 +203,9 @@
   --radius-xs: 0.25rem; /* 4px */
   --radius-sm: 0.3125rem; /* 5px */
   --radius-md: 0.375rem; /* 6px */
+  --radius-xmd: 0.4375rem; /* 7px */
   --radius-lg: 0.5rem; /* 8px */
+  --radius-xlg: 0.5625rem; /* 9px */
   --radius-xl: 0.625rem; /* 10px */
   --radius-2xl: 0.75rem; /* 12px */
   --radius-3xl: 0.875rem; /* 14px */
