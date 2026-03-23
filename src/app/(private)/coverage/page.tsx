@@ -175,7 +175,7 @@ export default function CoveragePage() {
                   <GaugeComponent
                     value={data?.overallScore}
                     type="grafana"
-                    minValue={10}
+                    minValue={0}
                     maxValue={100}
                     arc={{
                       width: 0.02,

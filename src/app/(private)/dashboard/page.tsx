@@ -888,7 +888,7 @@ const DashboardPage = () => {
             }
             className="max-w-[380px]! w-full! mx-auto h-[380px]! max-h-[380px] min-h-[380px]"
             type="grafana"
-            minValue={10}
+            minValue={0}
             maxValue={100}
             arc={{
               width: 0.02,
