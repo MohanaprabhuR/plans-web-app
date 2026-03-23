@@ -811,7 +811,7 @@ const DashboardPage = () => {
             </Button>
           </div>
 
-          <GaugeComponent
+          {/* <GaugeComponent
             className="max-w-[380px]! w-full! mx-auto h-[380px]! max-h-[380px] min-h-[380px]"
             value={
               coverageScore ??
@@ -866,6 +866,75 @@ const DashboardPage = () => {
                 },
                 defaultTickLineConfig: {
                   color: "#666",
+                  length: 4,
+                  width: 1,
+                  hide: true,
+                },
+                ticks: [],
+                hideMinMax: true,
+                autoSpaceTickLabels: false,
+              },
+            }}
+            startAngle={-135}
+            endAngle={135}
+          /> */}
+
+          <GaugeComponent
+            value={
+              coverageScore ??
+              apiData?.endpoints?.riskAssessment?.getRiskScore?.response
+                ?.overallScore ??
+              0
+            }
+            className="max-w-[380px]! w-full! mx-auto h-[380px]! max-h-[380px] min-h-[380px]"
+            type="grafana"
+            minValue={10}
+            maxValue={100}
+            arc={{
+              width: 0.02,
+              padding: 0.03,
+              cornerRadius: 0,
+              subArcs: [],
+              colorArray: [
+                "#eb4f46",
+                "#e9833d",
+                "#edd748",
+                "#67f06d",
+                "#0ee087",
+              ],
+              nbSubArcs: 5,
+              subArcsStrokeWidth: 0,
+              outerArc: { width: 28, padding: 0.04 },
+            }}
+            pointer={{
+              type: "arrow",
+              color: "#383838",
+              length: 0.7,
+              width: 22,
+              maxFps: 30,
+              baseColor: "#ffffff",
+              strokeWidth: 2,
+              arrowOffset: 0.9,
+            }}
+            labels={{
+              valueLabel: {
+                formatTextValue: (e) => "".concat(e, ""),
+                style: {
+                  fontSize: "20px",
+                  fill: "#383838",
+                  fontWeight: "bold",
+                  textShadow: "none",
+                },
+              },
+              tickLabels: {
+                type: "outer",
+                defaultTickValueConfig: {
+                  formatTextValue: (e) => "".concat(e, "\xb0"),
+                  style: { fontSize: "9px", fill: "#aaa" },
+                  hide: true,
+                },
+                defaultTickLineConfig: {
+                  color: "#ededed",
                   length: 4,
                   width: 1,
                   hide: true,
