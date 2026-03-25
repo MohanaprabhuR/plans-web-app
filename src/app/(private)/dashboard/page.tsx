@@ -416,6 +416,7 @@ const DashboardPage = () => {
   const handleAddPolicy = async () => {
     if (submitting) return;
     setSubmitting(true);
+    const isEdit = policies.some((p) => p.policyId === policyId);
     try {
       if (
         !policyId ||
@@ -446,8 +447,6 @@ const DashboardPage = () => {
         }))
         .filter((m) => m.name);
 
-      const isEdit = Boolean(editingPolicy);
-
       const response = await fetch("/api/policy", {
         method: isEdit ? "PUT" : "POST",
         headers: {
@@ -470,23 +469,30 @@ const DashboardPage = () => {
 
       if (!response.ok) {
         const msg = await response.text();
-        throw new Error(msg || "Failed to add policy");
+        throw new Error(
+          msg || (isEdit ? "Failed to update policy" : "Failed to add policy"),
+        );
       }
       toast.custom(() => (
         <Alert variant="success">
           <CircleAlert className="size-4" />
-          <AlertTitle>Policy added</AlertTitle>
+          <AlertTitle>{isEdit ? "Policy updated" : "Policy added"}</AlertTitle>
         </Alert>
       ));
 
       handleModalOpenChange(false);
       await fetchPolicies();
     } catch (error) {
-      console.error("Error adding policy:", error);
+      console.error(
+        isEdit ? "Error updating policy:" : "Error adding policy:",
+        error,
+      );
       toast.custom(() => (
         <Alert variant="error">
           <CircleAlert className="size-4" />
-          <AlertTitle>Failed to add policy</AlertTitle>
+          <AlertTitle>
+            {isEdit ? "Failed to update policy" : "Failed to add policy"}
+          </AlertTitle>
         </Alert>
       ));
     } finally {

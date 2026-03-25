@@ -87,6 +87,33 @@ async function addPolicyToSupabase(
   return !error;
 }
 
+async function updatePolicyInSupabase(
+  userId: string,
+  policy: Policy,
+): Promise<boolean> {
+  const supabase = getSupabase();
+  if (!supabase) return false;
+
+  const { error } = await supabase
+    .from("policies")
+    .update({
+      type: policy.type,
+      status: policy.status,
+      provider: policy.provider,
+      provider_logo: policy.providerLogo,
+      coverage: policy.coverage,
+      premium: policy.premium,
+      claim_amount: policy.claimAmount,
+      members: policy.members,
+      days_left: policy.daysLeft,
+      renewal_date: policy.renewalDate,
+    })
+    .eq("user_id", userId)
+    .eq("policy_id", policy.policyId);
+
+  return !error;
+}
+
 // In-memory fallback when Supabase is not configured (e.g. local dev without env)
 const policiesStore: Record<string, Policy[]> = {};
 
@@ -587,6 +614,86 @@ export async function POST(req: Request) {
     return NextResponse.json({
       ok: true,
       policy: newPolicy,
+      policies: updatedList,
+    });
+  } catch (e) {
+    const message = e instanceof Error ? e.message : "Invalid JSON";
+    return NextResponse.json({ error: message }, { status: 400 });
+  }
+}
+
+export async function PUT(req: Request) {
+  try {
+    const headersList = await headers();
+    const userId =
+      headersList.get("X-User-Id") ?? req.headers.get("X-User-Id") ?? "";
+    if (!userId) {
+      return NextResponse.json(
+        { error: "Unauthorized: X-User-Id header required" },
+        { status: 401 },
+      );
+    }
+
+    const body = (await req.json()) as Partial<Policy>;
+    const policyId = body.policyId?.toString().trim();
+    const type = body.type?.toString().trim();
+    const status = body.status?.toString().trim();
+    const provider = body.provider?.toString().trim();
+
+    if (!policyId || !type || !status || !provider) {
+      return NextResponse.json(
+        { error: "Missing required fields: policyId, type, status, provider" },
+        { status: 400 },
+      );
+    }
+
+    const userPolicies = await getPoliciesForUser(userId);
+    const existing = userPolicies.find((p) => p.policyId === policyId);
+
+    if (!existing) {
+      return NextResponse.json(
+        { error: "Policy not found for update" },
+        { status: 404 },
+      );
+    }
+
+    const updatedPolicy: Policy = {
+      ...existing,
+      policyId,
+      type,
+      status,
+      provider,
+      providerLogo:
+        body.providerLogo?.toString().trim() || existing.providerLogo,
+      coverage: body.coverage?.toString().trim() || "-",
+      premium: body.premium?.toString().trim() || "-",
+      claimAmount: body.claimAmount?.toString().trim() || "None",
+      members: Array.isArray(body.members) ? body.members : existing.members,
+      daysLeft:
+        typeof body.daysLeft === "number"
+          ? body.daysLeft
+          : Number(body.daysLeft ?? existing.daysLeft) || 0,
+      renewalDate: body.renewalDate?.toString().trim() || existing.renewalDate,
+    };
+
+    if (supabaseConfigured) {
+      const updated = await updatePolicyInSupabase(userId, updatedPolicy);
+      if (!updated) {
+        return NextResponse.json(
+          { error: "Failed to update policy" },
+          { status: 500 },
+        );
+      }
+    } else {
+      policiesStore[userId] = userPolicies.map((p) =>
+        p.policyId === policyId ? updatedPolicy : p,
+      );
+    }
+
+    const updatedList = await getPoliciesForUser(userId);
+    return NextResponse.json({
+      ok: true,
+      policy: updatedPolicy,
       policies: updatedList,
     });
   } catch (e) {
