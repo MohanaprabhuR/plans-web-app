@@ -14,7 +14,7 @@ const avatarVariants = cva("relative flex shrink-0 overflow-hidden ", {
       lg: "size-7",
       xl: "size-8",
       "2xl": "size-10",
-      "3xl": "size-[46px]",
+      "3xl": "size-11.5",
     },
   },
   defaultVariants: {
@@ -73,8 +73,9 @@ const statusIconMap: Record<Status, React.ReactNode> = {
       viewBox="0 0 17 16"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
     >
-      <circle cx="8.5" cy="8" r="8" fill="var(--color-light-green-700)" />
+      <circle cx="8.5" cy="8" r="8" fill="var(--color-green-700)" />
     </svg>
   ),
   away: (
@@ -84,12 +85,13 @@ const statusIconMap: Record<Status, React.ReactNode> = {
       viewBox="0 0 17 16"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
     >
       <path
         fillRule="evenodd"
         clipRule="evenodd"
         d="M8.5 16C12.9183 16 16.5 12.4183 16.5 8C16.5 3.58172 12.9183 0 8.5 0C4.08172 0 0.5 3.58172 0.5 8C0.5 12.4183 4.08172 16 8.5 16ZM8.5 13C11.2614 13 13.5 10.7614 13.5 8C13.5 5.23858 11.2614 3 8.5 3C5.73858 3 3.5 5.23858 3.5 8C3.5 10.7614 5.73858 13 8.5 13Z"
-        fill="#7C7C7C"
+        fill="currentColor"
       />
     </svg>
   ),
@@ -100,10 +102,11 @@ const statusIconMap: Record<Status, React.ReactNode> = {
       viewBox="0 0 17 16"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
     >
       <path
         d="M16.4819 8.71993C16.4899 8.63114 16.3851 8.57883 16.3161 8.63536C15.2802 9.48479 13.9551 9.99457 12.5109 9.99457C9.19415 9.99457 6.50543 7.30585 6.50543 3.98914C6.50543 2.54495 7.01521 1.21982 7.86464 0.183882C7.92117 0.114945 7.86886 0.0101007 7.78008 0.0180934C3.69856 0.385505 0.5 3.8156 0.5 7.99276C0.5 12.415 4.08496 16 8.50724 16C12.6844 16 16.1145 12.8014 16.4819 8.71993Z"
-        fill="#7C7C7C"
+        fill="currentColor"
       />
     </svg>
   ),
@@ -114,6 +117,7 @@ const statusIconMap: Record<Status, React.ReactNode> = {
       viewBox="0 0 12 12"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
     >
       <path
         d="M1.10811 2.32035C0.773372 1.98562 0.773372 1.4429 1.10811 1.10817C1.44284 0.773433 1.98556 0.773433 2.32029 1.10817L5.99991 4.78779L9.67954 1.10817C10.0143 0.773433 10.557 0.773433 10.8917 1.10817C11.2265 1.4429 11.2265 1.98562 10.8917 2.32035L7.2121 5.99997L10.8917 9.6796C11.2265 10.0143 11.2265 10.557 10.8917 10.8918C10.557 11.2265 10.0143 11.2265 9.67954 10.8918L5.99991 7.21216L2.32029 10.8918C1.98556 11.2265 1.44284 11.2265 1.10811 10.8918C0.773372 10.557 0.773372 10.0143 1.10811 9.6796L4.78773 5.99997L1.10811 2.32035Z"
@@ -128,6 +132,7 @@ const statusIconMap: Record<Status, React.ReactNode> = {
       viewBox="0 0 12 10"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
     >
       <path
         fillRule="evenodd"
@@ -144,10 +149,11 @@ const statusIconMap: Record<Status, React.ReactNode> = {
       viewBox="0 0 17 16"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
     >
       <path
         d="M15.6265 5.75851L10.7414 0.873414C10.2097 0.341675 9.94381 0.0758058 9.66329 0.0189383C9.41797 -0.0307914 9.16294 0.0183228 8.95364 0.155604C5.68535 2.29929 7.19133 4.8215 2.15218 5.82933C0.322067 6.19535 -0.062262 6.95627 1.37562 8.39415L3.8794 10.898L1.66331 13.114C1.27278 13.5046 1.27278 14.1377 1.66331 14.5283L2.04011 14.9051C2.43064 15.2956 3.06379 15.2956 3.45432 14.9051L5.67043 12.689L8.10585 15.1244C9.54373 16.5623 10.3047 16.1779 10.6707 14.3478C11.6785 9.30867 14.2007 10.8146 16.3443 7.54629C16.4816 7.33699 16.5307 7.08196 16.481 6.83665C16.4241 6.55612 16.1583 6.29025 15.6265 5.75851Z"
-        fill="#7C7C7C"
+        fill="currentColor"
       />
     </svg>
   ),
@@ -158,6 +164,7 @@ const statusIconMap: Record<Status, React.ReactNode> = {
       viewBox="0 0 13 12"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
     >
       <path
         d="M11.6222 4.38893L8.11102 0.877766C7.72884 0.495579 7.53774 0.304485 7.33611 0.263612C7.15979 0.227869 6.97649 0.263169 6.82606 0.36184C4.47697 1.90261 5.55939 3.71545 1.9375 4.43983C0.622111 4.70291 0.345874 5.24982 1.37935 6.28329L3.17894 8.08294L1.72155 9.5403C1.36607 9.89577 1.36606 10.4721 1.72154 10.8276C2.07702 11.1831 2.65335 11.1831 3.00883 10.8276L4.46625 9.37022L6.2167 11.1207C7.25018 12.1541 7.79709 11.8779 8.06017 10.5625C8.78455 6.94061 10.5973 8.02299 12.1381 5.6739C12.2368 5.52346 12.2721 5.34016 12.2363 5.16384C12.1955 4.96221 12.0044 4.77112 11.6222 4.38893Z"
@@ -184,24 +191,24 @@ interface AvatarProps
     React.ComponentProps<typeof AvatarPrimitive.Root>,
     VariantProps<typeof avatarVariants> {
   shape?: Shape;
-  status?: Status | null;
+  status?: Status;
 }
 
-export function Avatar({
+function Avatar({
   size = "sm",
   shape = "circle",
-  status = null,
+  status = "null",
   className,
   children,
   ...props
 }: AvatarProps) {
   const radiusClass =
     shape === "square" ? radiusMap[size ?? "sm"] : "rounded-full";
-  const statusIcon = status != null ? statusIconMap[status] : undefined;
+  const statusIcon = statusIconMap[status];
 
   return (
     <AvatarSizeContext.Provider value={{ size, shape }}>
-      <div className="relative ">
+      <div className="relative w-fit">
         <AvatarPrimitive.Root
           data-slot="avatar"
           className={cn(avatarVariants({ size }), radiusClass, className)}
@@ -210,22 +217,27 @@ export function Avatar({
           {children}
         </AvatarPrimitive.Root>
 
-        {status && (
+        {status && status !== "null" && (
           <span
             className={cn(
-              "absolute bottom-0 right-0 flex items-center justify-center rounded-full bg-background ring-1 ring-[var(--background)]",
+              "absolute bottom-0 right-0 flex items-center justify-center rounded-full bg-background ring-2 ring-background",
               {
-                "bg-[var(--color-light-green-600)] p-[2px]":
-                  status === "checked",
-                "bg-[var(--color-light-red-500)] p-[2px]": status === "close",
-                "bg-[var(--color-light-cyan-500)] p-[1px]": status === "pin",
+                "bg-green-600  p-[2px]": status === "checked",
+                "bg-red-500 p-[2px]": status === "close",
+                "bg-cyan-500 p-px ": status === "pin",
+                "text-green-700 ": status === "active",
+                "text-gray-600 dark:text-gray-300":
+                  status === "away" ||
+                  status === "sleep" ||
+                  status === "pinned",
+
                 "size-[4px]": size === "xs",
                 "size-[5px]": size === "sm",
                 "size-[7px]": size === "md",
                 "size-[8px]": size === "lg" || size === "xl",
                 "size-[10px]": size === "2xl",
                 "size-[12px]": size === "3xl",
-              }
+              },
             )}
           >
             {statusIcon}
@@ -236,15 +248,15 @@ export function Avatar({
   );
 }
 
-export function AvatarImage(
-  props: React.ComponentProps<typeof AvatarPrimitive.Image>
+function AvatarImage(
+  props: React.ComponentProps<typeof AvatarPrimitive.Image>,
 ) {
   return (
     <AvatarPrimitive.Image
       data-slot="avatar-image"
       className={cn(
         "aspect-square w-full h-full object-cover ",
-        props.className
+        props.className,
       )}
       {...props}
     />
@@ -255,7 +267,7 @@ type AvatarFallbackProps = React.ComponentProps<
   typeof AvatarPrimitive.Fallback
 >;
 
-export function AvatarFallback({
+function AvatarFallback({
   className,
   children,
   ...props
@@ -275,7 +287,7 @@ export function AvatarFallback({
         avatarVariants({ size }),
         radiusClass,
         textSizeMap[size ?? "sm"],
-        className
+        className,
       )}
       {...props}
     >
@@ -286,6 +298,7 @@ export function AvatarFallback({
           viewBox="0 0 20 20"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
+          aria-hidden="true"
         >
           <path
             fillRule="evenodd"
@@ -309,7 +322,7 @@ interface AvatarGroupProps extends React.HTMLAttributes<HTMLDivElement> {
   label?: boolean;
 }
 
-export function AvatarGroup({
+function AvatarGroup({
   children,
   className,
   max,
@@ -332,7 +345,7 @@ export function AvatarGroup({
   const radiusClass =
     shape === "square"
       ? radiusMap[size ?? "sm"]
-      : "rounded-full ring-1 ring-[var(--background)]";
+      : "rounded-full ring-2 ring-[var(--background)]";
 
   const AvatarList = (
     <>
@@ -343,7 +356,7 @@ export function AvatarGroup({
           className={cn(
             "relative",
             radiusClass,
-            label && max === 3 && "ring-1 ring-[var(--background)]"
+            label && max === 3 && "ring-2 ring-background",
           )}
         >
           {child}
@@ -355,10 +368,10 @@ export function AvatarGroup({
   const RemainingCircle = (
     <div
       className={cn(
-        "flex items-center justify-center bg-muted text-muted-foreground font-medium border-background ring-1 ring-[var(--background)] relative",
+        "flex items-center justify-center bg-muted text-muted-foreground font-medium border-background ring-1 ring-background relative",
         radiusClass,
         avatarVariants({ size }),
-        textSizeMap[size ?? "sm"]
+        textSizeMap[size ?? "sm"],
       )}
     >
       {remainingCount}
@@ -369,7 +382,7 @@ export function AvatarGroup({
     <p
       className={cn(
         "text-muted-foreground mr-2 font-normal",
-        textSizeMap[size ?? "sm"]
+        textSizeMap[size ?? "sm"],
       )}
     >
       {remainingCount} member{remainingCount > 1 ? "s" : ""}
@@ -390,3 +403,5 @@ export function AvatarGroup({
     </AvatarSizeContext.Provider>
   );
 }
+
+export { Avatar, AvatarImage, AvatarFallback, AvatarGroup };
