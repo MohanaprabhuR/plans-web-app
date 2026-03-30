@@ -9,6 +9,7 @@ import Logo from "../../../../public/images/svg/plans-logo.svg";
 import Notification from "../../../../public/images/svg/notification.svg";
 import Image from "next/image";
 import useAuth from "@/hooks/useAuth";
+import { useEffect, useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -30,6 +31,16 @@ const HeaderLayout = () => {
   const router = useRouter();
   const pathname = usePathname();
   const isActive = (path: string) => pathname === path;
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => {
+      setIsScrolled(window.scrollY > 90);
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   const handleSignOut = async () => {
     await client.auth.signOut();
@@ -44,7 +55,11 @@ const HeaderLayout = () => {
   };
   return (
     <>
-      <Header className="shadow-[0_1px_0_0_rgba(255,94,0,0.1)] bg-[#FFF7ED] border-0  z-10 px-4 fixed top-0 left-0 w-full z-50">
+      <Header
+        className={`shadow-[0_1px_0_0_rgba(255,94,0,0.1)] border-0 px-4 fixed top-0 left-0 w-full z-50 transition-colors duration-200 ${
+          isScrolled ? "bg-white" : "bg-[#FFF7ED]"
+        }`}
+      >
         <div className="w-full mx-auto max-w-[1142px] px-4 flex items-center justify-between">
           <Link href="/dashboard">
             <Image src={Logo} alt="logo" width={100} height={100} />
