@@ -44,7 +44,7 @@ const HeaderLayout = () => {
   };
   return (
     <>
-      <Header className="shadow-[0_1px_0_0_rgba(255,94,0,0.1)] bg-[#FFF7ED] border-0 relative z-10 px-4">
+      <Header className="shadow-[0_1px_0_0_rgba(255,94,0,0.1)] bg-[#FFF7ED] border-0  z-10 px-4 fixed top-0 left-0 w-full z-50">
         <div className="w-full mx-auto max-w-[1142px] px-4 flex items-center justify-between">
           <Link href="/dashboard">
             <Image src={Logo} alt="logo" width={100} height={100} />
