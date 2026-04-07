@@ -242,6 +242,11 @@ export default function BuyInsurancePage() {
     if (mode !== "questions") return;
 
     setError(null);
+    const message = validate(step.id, answers);
+    if (message) {
+      showError(message);
+      return;
+    }
     if (stepIndex < STEPS.length - 1) {
       setStepIndex((s) => s + 1);
       return;

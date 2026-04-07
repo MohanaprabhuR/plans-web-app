@@ -105,6 +105,11 @@ export default function CoveragePage() {
             <p className="text-muted-foreground">Loading Coverage...</p>
           </div>
         )}
+        {error && !loading && (
+          <div className="flex items-center justify-center py-12">
+            <p className="text-destructive">{error}</p>
+          </div>
+        )}
 
         {data ? (
           <>

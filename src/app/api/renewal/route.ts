@@ -178,7 +178,12 @@ export async function POST(req: Request) {
           ? body.newPremium
           : Number(body.newPremium ?? 0) || 0,
       dueDate: body.dueDate?.toString().trim() || "2026-02-11",
-      status: body.status === "renewed" ? "renewed" : (body.status as any) || "pending",
+      status:
+        body.status === "renewed"
+          ? "renewed"
+          : body.status === "expired"
+            ? "expired"
+            : "pending",
     };
 
     if (supabaseConfigured) {

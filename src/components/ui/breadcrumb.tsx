@@ -7,7 +7,6 @@ import { BreadcrumbEllipsisIcon } from "../../../public/images/svg/breadcrumbEll
 
 import { cn } from "@/lib/utils";
 type BreadcrumbSize = "sm" | "md";
-type SeparatorType = "chevron" | "slash";
 
 const BreadcrumbContext = React.createContext<{ size: BreadcrumbSize }>({
   size: "sm",

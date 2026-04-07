@@ -106,7 +106,7 @@ export default function BuyInsurancePlansPage() {
     return () => {
       cancelled = true;
     };
-  }, [user?.id, type]);
+  }, [user?.id, type, router]);
 
   const buyNow = async () => {
     if (!selectedPlanId) {

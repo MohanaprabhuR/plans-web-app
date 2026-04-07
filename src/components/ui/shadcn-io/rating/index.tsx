@@ -231,7 +231,7 @@ export const Rating = ({
         onMouseLeave={() => setHoverValue(null)}
         ref={containerRef}
         role="radiogroup"
-        {...(props as any)}
+        {...props}
       >
         {Children.map(children, (child, index) => {
           if (!child) {
