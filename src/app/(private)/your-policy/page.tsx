@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/rules-of-hooks */
 "use client";
 import useAuth from "@/hooks/useAuth";
 import {
@@ -103,7 +102,7 @@ interface ApiResponse {
   };
 }
 
-const page = () => {
+const YourPolicyPage = () => {
   const { user } = useAuth();
   const userId = user?.id ?? "";
   const [apiData, setApiData] = useState<ApiResponse | null>(null);
@@ -374,4 +373,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default YourPolicyPage;

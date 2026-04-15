@@ -92,8 +92,6 @@ export default function CoveragePage() {
     };
   }, [user?.id]);
 
-  console.log(data);
-
   return (
     <>
       <h3 className="font-semibold text-3xl leading-8 tracking-4 text-accent-foreground">
@@ -248,7 +246,7 @@ export default function CoveragePage() {
                       {user?.user_metadata?.full_name}
                     </p>
                     <p className="text-muted-foreground text-base leading-6 tracking-4 font-normal">
-                      We&apos;ve found {data?.risksFound}Risks based on your
+                      We&apos;ve found {data?.risksFound} Risks based on your
                       details.
                     </p>
                   </div>
@@ -396,7 +394,7 @@ export default function CoveragePage() {
                                     ? "green"
                                     : coverage?.riskProfile === "Good"
                                       ? "blue"
-                                      : coverage?.riskProfile === "poor"
+                                      : coverage?.riskProfile === "Poor"
                                         ? "amber"
                                         : "red"
                                 }

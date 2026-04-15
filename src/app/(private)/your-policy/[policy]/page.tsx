@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/rules-of-hooks */
 "use client";
 import { Alert, AlertTitle } from "@/components/ui/alert";
 import {
@@ -113,7 +112,7 @@ interface ApiResponse {
   };
 }
 
-const policyIndividualPage = () => {
+const PolicyDetailPage = () => {
   const router = useRouter();
   const params = useParams<{ policy: string }>();
   const policyIdFromRoute = useMemo(() => {
@@ -624,4 +623,4 @@ const policyIndividualPage = () => {
   );
 };
 
-export default policyIndividualPage;
+export default PolicyDetailPage;
