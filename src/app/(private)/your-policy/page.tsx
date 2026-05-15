@@ -213,10 +213,10 @@ const YourPolicyPage = () => {
             <div className="embla__viewport overflow-hidden" ref={emblaRef}>
               <div className="embla__container flex gap-4">
                 {apiData?.endpoints?.expiry?.getExpiry?.response?.map(
-                  (expiry) => (
+                  (expiry, expiryIndex) => (
                     <Card
                       className="gap-4 embla__slide flex-[0_0_100%] "
-                      key={expiry.policyId}
+                      key={`${expiry.policyId}-${expiry.type}-${expiryIndex}`}
                     >
                       <CardContent className="flex items-center justify-between">
                         <div className="flex items-center gap-x-4">
@@ -262,8 +262,11 @@ const YourPolicyPage = () => {
               {policies.length === 0 ? (
                 <p className="text-muted-foreground">No policies found</p>
               ) : (
-                policies.map((policy) => (
-                  <PolicyListCard key={policy.policyId} policy={policy} />
+                policies.map((policy, policyIndex) => (
+                  <PolicyListCard
+                    key={`${policy.policyId}-${policy.type}-${policyIndex}`}
+                    policy={policy}
+                  />
                 ))
               )}
             </>

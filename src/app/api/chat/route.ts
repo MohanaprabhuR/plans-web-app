@@ -87,8 +87,9 @@ export async function POST(req: Request) {
       const code = typeof e.code === "string" ? e.code : undefined;
       const type = typeof e.type === "string" ? e.type : undefined;
       const status = typeof e.status === "number" ? e.status : 502;
+      const detailLower = detail.toLowerCase();
 
-      if (detail.toLowerCase().includes("aborted")) {
+      if (detailLower.includes("aborted")) {
         return NextResponse.json(
           {
             ok: false,
@@ -96,6 +97,31 @@ export async function POST(req: Request) {
               "OPENAI_TIMEOUT: The AI request took too long. Please try again.",
           },
           { status: 504 },
+        );
+      }
+
+      if (
+        code === "insufficient_quota" ||
+        (status === 429 && detailLower.includes("quota"))
+      ) {
+        return NextResponse.json(
+          {
+            ok: false,
+            error:
+              "OPENAI_QUOTA_EXCEEDED: Your OpenAI account has no credits or billing is inactive. Add payment method or credits at https://platform.openai.com/account/billing — then try again.",
+          },
+          { status: 402 },
+        );
+      }
+
+      if (status === 429 && !detailLower.includes("quota")) {
+        return NextResponse.json(
+          {
+            ok: false,
+            error:
+              "OPENAI_RATE_LIMIT: Too many requests. Wait a moment and try again.",
+          },
+          { status: 429 },
         );
       }
 

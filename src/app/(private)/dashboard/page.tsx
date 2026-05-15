@@ -790,9 +790,9 @@ const DashboardPage = () => {
                 </div>
               </Card>
             ) : (
-              policies.map((policy) => (
+              policies.map((policy, policyIndex) => (
                 <PolicyCard
-                  key={policy.policyId}
+                  key={`${policy.policyId}-${policy.type}-${policyIndex}`}
                   policy={policy}
                   onClick={() => openEditModal(policy)}
                 />
