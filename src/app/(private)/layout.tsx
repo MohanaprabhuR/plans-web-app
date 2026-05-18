@@ -51,7 +51,7 @@ export default function PrivateLayout({
         <>
           <HeaderLayout />
           <div className="relative flex min-h-[calc(100vh-62px)] w-full flex-col items-center pb-12">
-            <div className="pointer-events-none absolute left-0 top-[62px] mt-0 h-77 w-full bg-[linear-gradient(180deg,#FFF7ED_0%,rgba(255,247,237,0)_75%)]" />
+            <div className="pointer-events-none absolute left-0 top-15 mt-0 h-77 w-full bg-[linear-gradient(180deg,#FFF7ED_0%,rgba(255,247,237,0)_75%)]" />
             <div className="relative z-10 mx-auto w-full max-w-285.5 px-4 pt-[100px]">
               {children}
             </div>

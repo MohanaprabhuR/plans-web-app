@@ -6,7 +6,6 @@ import client from "@/api/client";
 import { toast } from "sonner";
 import { useRouter, usePathname } from "next/navigation";
 import Logo from "../../../../public/images/svg/plans-logo.svg";
-import Notification from "../../../../public/images/svg/notification.svg";
 import Image from "next/image";
 import useAuth from "@/hooks/useAuth";
 import { useEffect, useState } from "react";
@@ -20,6 +19,7 @@ import Link from "next/link";
 import {
   User,
   LogOut,
+  Bell,
   ChevronDown,
   CircleAlert,
   SquareChartGantt,
@@ -30,7 +30,8 @@ const HeaderLayout = () => {
   const { user } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
-  const isActive = (path: string) => pathname === path;
+  const isActive = (path: string) =>
+    pathname === path || pathname.startsWith(`${path}/`);
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
@@ -56,13 +57,13 @@ const HeaderLayout = () => {
   return (
     <>
       <Header
-        className={`shadow-[0_1px_0_0_rgba(255,94,0,0.1)] border-0 px-4 fixed top-0 left-0 w-full z-50 transition-colors duration-200 ${
+        className={`shadow-[0_1px_0_0_rgba(255,94,0,0.1)] border-0 px-0 py-3.5 fixed top-0 left-0 w-full z-50 transition-colors duration-200 ${
           isScrolled ? "bg-white" : "bg-[#FFF7ED]"
         }`}
       >
         <div className="w-full mx-auto max-w-[1142px] px-4 flex items-center justify-between">
           <Link href="/dashboard">
-            <Image src={Logo} alt="logo" width={100} height={100} />
+            <Image src={Logo} alt="logo" width={78} height={32} priority />
           </Link>
           <div className="flex items-center gap-x-8">
             <Link
@@ -106,7 +107,20 @@ const HeaderLayout = () => {
           </div>
 
           <div className="flex items-center gap-2">
-            <Image src={Notification} alt="logo" width={32} height={32} />
+            <Link
+              href="/notifications"
+              className="relative rounded-lg p-1 transition-colors hover:opacity-80"
+              aria-label="Notifications"
+            >
+              <Bell
+                className={`size-6 transition-colors duration-300 ${
+                  isActive("/notifications")
+                    ? "text-orange-500"
+                    : "text-[#555555]"
+                }`}
+                strokeWidth={2}
+              />
+            </Link>
             <DropdownMenu>
               <DropdownMenuTrigger className="flex items-center gap-2">
                 <Avatar size="xl">

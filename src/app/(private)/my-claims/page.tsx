@@ -59,9 +59,7 @@ function getTypeBg(type: string) {
   return "bg-accent";
 }
 
-function getStatusTheme(
-  status: string,
-): "amber" | "green" | "red" | "blue" {
+function getStatusTheme(status: string): "amber" | "green" | "red" | "blue" {
   const s = status.toLowerCase();
   if (s === "approved") return "green";
   if (s === "rejected" || s === "denied") return "red";
@@ -69,16 +67,10 @@ function getStatusTheme(
   return "amber";
 }
 
-function StatCard({
-  label,
-  value,
-}: {
-  label: string;
-  value: string | number;
-}) {
+function StatCard({ label, value }: { label: string; value: string | number }) {
   return (
     <Card>
-      <CardContent className="flex flex-col gap-1 py-5">
+      <CardContent className="flex flex-col gap-1 ">
         <p className="text-sm text-muted-foreground font-medium">{label}</p>
         <p className="text-2xl font-bold text-accent-foreground">{value}</p>
       </CardContent>
