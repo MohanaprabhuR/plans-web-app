@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import useAuth from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
+import { ScreenLoading } from "@/components/ui/screen-loading";
 import { Alert, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -254,11 +254,11 @@ export default function NotificationsPage() {
       )}
 
       {loading && (
-        <div className="flex flex-col gap-4">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton key={i} className="h-40 w-full rounded-2xl" />
-          ))}
-        </div>
+        <ScreenLoading
+          variant="list"
+          rows={5}
+          label="Loading notifications"
+        />
       )}
 
       {error && !loading && (

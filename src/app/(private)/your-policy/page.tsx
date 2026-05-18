@@ -27,6 +27,7 @@ import { Badge } from "@/components/ui/badge";
 import useEmblaCarousel from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
 import { useRouter } from "next/navigation";
+import { ScreenLoading } from "@/components/ui/screen-loading";
 
 interface Policy {
   policyId: string;
@@ -173,9 +174,11 @@ const YourPolicyPage = () => {
         Your Policy
       </h3>
       {loading && (
-        <div className="flex items-center justify-center py-12">
-          <p className="text-muted-foreground">Loading policies...</p>
-        </div>
+        <ScreenLoading
+          variant="page"
+          label="Loading policies"
+          className="pt-2"
+        />
       )}
       {error && (
         <div className="flex items-center justify-center py-12">

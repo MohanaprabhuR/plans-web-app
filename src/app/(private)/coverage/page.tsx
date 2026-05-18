@@ -17,6 +17,7 @@ import {
   PlaneTakeoff,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ScreenLoading } from "@/components/ui/screen-loading";
 
 const GaugeComponent = dynamic(() => import("react-gauge-component"), {
   ssr: false,
@@ -99,9 +100,11 @@ export default function CoveragePage() {
       </h3>
       <div className="w-full pt-8">
         {loading && (
-          <div className="flex items-center justify-center py-12">
-            <p className="text-muted-foreground">Loading Coverage...</p>
-          </div>
+          <ScreenLoading
+            variant="page"
+            label="Loading coverage"
+            className="py-4"
+          />
         )}
         {error && !loading && (
           <div className="flex items-center justify-center py-12">

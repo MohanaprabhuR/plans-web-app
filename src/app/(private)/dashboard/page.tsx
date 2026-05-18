@@ -64,6 +64,7 @@ import Image from "next/image";
 import { StaticImport } from "next/dist/shared/lib/get-img-props";
 import dynamic from "next/dynamic";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ScreenLoading } from "@/components/ui/screen-loading";
 import { useRouter } from "next/navigation";
 
 const GaugeComponent = dynamic(() => import("react-gauge-component"), {
@@ -715,9 +716,11 @@ const DashboardPage = () => {
         </div>
 
         {loading && (
-          <div className="flex items-center justify-center py-12">
-            <p className="text-muted-foreground">Loading policies...</p>
-          </div>
+          <ScreenLoading
+            variant="cards-row"
+            rows={4}
+            label="Loading policies"
+          />
         )}
 
         {error && (

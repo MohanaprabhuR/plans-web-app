@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
+import { ScreenLoading } from "@/components/ui/screen-loading";
 import {
   BriefcaseMedical,
   CalendarDays,
@@ -226,15 +226,11 @@ export default function RenewalPage() {
       </div>
 
       {loading ? (
-        <div className="flex flex-col gap-6">
-          <div className="grid gap-4 sm:grid-cols-3">
-            <Skeleton className="h-24 w-full rounded-xl" />
-            <Skeleton className="h-24 w-full rounded-xl" />
-            <Skeleton className="h-24 w-full rounded-xl" />
-          </div>
-          <Skeleton className="h-44 w-full rounded-xl" />
-          <Skeleton className="h-44 w-full rounded-xl" />
-        </div>
+        <ScreenLoading
+          variant="summary"
+          rows={2}
+          label="Loading renewals"
+        />
       ) : (
         <>
           <div className="grid gap-4 sm:grid-cols-3">

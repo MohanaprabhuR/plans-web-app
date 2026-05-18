@@ -3,7 +3,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import useAuth from "@/hooks/useAuth";
 import { Card, CardContent } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
+import { ScreenLoading } from "@/components/ui/screen-loading";
 import {
   BriefcaseMedical,
   CarFront,
@@ -148,11 +148,7 @@ const MyClaimsPage = () => {
 
       {/* Loading skeletons */}
       {loading && (
-        <div className="flex flex-col gap-4">
-          {Array.from({ length: 2 }).map((_, i) => (
-            <Skeleton key={i} className="w-full h-32 rounded-xl" />
-          ))}
-        </div>
+        <ScreenLoading variant="list" rows={3} label="Loading claims" />
       )}
 
       {/* Error */}

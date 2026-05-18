@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import useAuth from "@/hooks/useAuth";
 import { toast } from "sonner";
 import { Alert, AlertTitle } from "@/components/ui/alert";
+import { ScreenLoading } from "@/components/ui/screen-loading";
 import { CircleAlert, MoveLeft } from "lucide-react";
 
 type Plan = {
@@ -156,7 +157,7 @@ export default function BuyInsurancePlansPage() {
         </CardHeader>
         <CardContent className="space-y-3">
           {loading && plans.length === 0 ? (
-            <p className="text-muted-foreground">Loading…</p>
+            <ScreenLoading variant="inline" label="Loading plans" />
           ) : plans.length === 0 ? (
             <p className="text-muted-foreground">No plans found.</p>
           ) : (

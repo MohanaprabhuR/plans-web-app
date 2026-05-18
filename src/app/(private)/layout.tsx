@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
 import HeaderLayout from "@/components/BaseComponents/common/header";
+import { ScreenLoading } from "@/components/ui/screen-loading";
 
 export default function PrivateLayout({
   children,
@@ -37,11 +38,7 @@ export default function PrivateLayout({
   }, [router, pathname]);
 
   if (checking) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="size-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-      </div>
-    );
+    return <ScreenLoading variant="full" label="Checking session" />;
   }
 
   return (

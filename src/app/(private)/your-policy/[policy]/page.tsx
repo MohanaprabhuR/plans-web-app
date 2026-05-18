@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ScreenLoading } from "@/components/ui/screen-loading";
 import useAuth from "@/hooks/useAuth";
 import {
   Blend,
@@ -349,7 +350,9 @@ const PolicyDetailPage = () => {
       </div>
       <div className="flex gap-x-6">
         <div className="flex flex-col gap-6">
-          {loading && <p className="text-muted-foreground">Loading policy…</p>}
+          {loading && (
+            <ScreenLoading variant="page" label="Loading policy" />
+          )}
           {!loading && error && (
             <Alert variant="error">
               <CircleAlert className="size-4" />
