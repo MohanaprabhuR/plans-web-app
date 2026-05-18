@@ -25,7 +25,10 @@ import {
   CircleAlert,
   ClipboardList,
   CreditCard,
+  Hospital,
   House,
+  LifeBuoy,
+  PlaneTakeoff,
   ShieldCheck,
 } from "lucide-react";
 
@@ -64,6 +67,25 @@ function formatTypeLabel(type: string) {
   return type.replace(/_/g, " ");
 }
 
+/** Policy line icon — matches policyList (Health, Auto, Home, …) */
+function getCategoryIcon(category: string) {
+  switch (category) {
+    case "Health":
+      return <Hospital className="size-5 min-w-5 text-[#8E51FF]" />;
+    case "Auto":
+      return <CarFront className="size-5 min-w-5 text-[#E12AFB]" />;
+    case "Life":
+      return <LifeBuoy className="size-5 min-w-5 text-[#FE9A00]" />;
+    case "Travel":
+      return <PlaneTakeoff className="size-5 min-w-5 text-[#FE9A00]" />;
+    case "Home":
+      return <House className="size-5 min-w-5 text-[#FE9A00]" />;
+    default:
+      return null;
+  }
+}
+
+/** Notification event icon (renewal, claim, payment) */
 function getTypeIcon(type: string) {
   if (type === "policy_renewal")
     return <House className="size-5 min-w-5 text-[#FE9A00]" />;
@@ -71,9 +93,15 @@ function getTypeIcon(type: string) {
     return <ClipboardList className="size-5 min-w-5 text-[#8E51FF]" />;
   if (type === "payment")
     return <CreditCard className="size-5 min-w-5 text-green-600" />;
-  if (type === "auto")
-    return <CarFront className="size-5 min-w-5 text-[#E12AFB]" />;
   return <ShieldCheck className="size-5 min-w-5 text-muted-foreground" />;
+}
+
+function getSubtitleIcon(item: NotificationItem) {
+  if (item.category) {
+    const categoryIcon = getCategoryIcon(item.category);
+    if (categoryIcon) return categoryIcon;
+  }
+  return getTypeIcon(item.type);
 }
 
 function formatDateShort(iso: string) {
@@ -197,68 +225,15 @@ export default function NotificationsPage() {
           </Button>
           <div>
             <h3 className="text-2xl font-bold tracking-4 text-foreground">
-              Notifications
+              Notifications{` `}
+              {!loading && !error && <>({notifications.length})</>}
             </h3>
           </div>
         </div>
       </div>
 
-      {!loading && !error && notifications.length > 0 && (
-        <div className="grid gap-4 sm:grid-cols-3">
-          <Card>
-            <CardContent className="flex items-center gap-4">
-              <div className="flex size-12 items-center justify-center rounded-full bg-accent">
-                <Bell className="size-6 text-primary" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">
-                  Total
-                </p>
-                <p className="text-3xl font-semibold tracking-4 text-foreground">
-                  {notifications.length}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="flex items-center gap-4 ">
-              <div className="flex size-12 items-center justify-center rounded-full bg-amber-100">
-                <Bell className="size-6 text-amber-700" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">
-                  Unread
-                </p>
-                <p className="text-3xl font-semibold tracking-4 text-foreground">
-                  {unreadCount}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="flex items-center gap-4">
-              <div className="flex size-12 items-center justify-center rounded-full bg-red-100">
-                <CircleAlert className="size-6 text-red-700" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">
-                  High priority
-                </p>
-                <p className="text-3xl font-semibold tracking-4 text-foreground">
-                  {notifications.filter((n) => n.priority === "high").length}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
-
       {loading && (
-        <ScreenLoading
-          variant="list"
-          rows={5}
-          label="Loading notifications"
-        />
+        <ScreenLoading variant="list" rows={5} label="Loading notifications" />
       )}
 
       {error && !loading && (
@@ -318,7 +293,7 @@ export default function NotificationsPage() {
                         </span>
                         <div className="flex items-center gap-x-1.5 pt-1.5 flex-wrap">
                           <div className="flex gap-x-1 items-center">
-                            {getTypeIcon(item.type)}
+                            {getSubtitleIcon(item)}
                             <span className="text-base font-medium leading-5 tracking-4 text-accent-foreground">
                               {subtitleType}
                             </span>
