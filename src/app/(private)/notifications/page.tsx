@@ -120,6 +120,17 @@ function getActionHref(item: NotificationItem): string | null {
   return null;
 }
 
+function getPriorityBadge(priority: string): {
+  theme: "red" | "amber" | "green";
+  variant: "default" | "outline" | "secondary";
+} {
+  const level = priority.toLowerCase();
+  if (level === "high") return { theme: "red", variant: "default" };
+  if (level === "medium") return { theme: "amber", variant: "outline" };
+  if (level === "low") return { theme: "green", variant: "secondary" };
+  return { theme: "amber", variant: "outline" };
+}
+
 export default function NotificationsPage() {
   const { user } = useAuth();
   const router = useRouter();
@@ -210,6 +221,10 @@ export default function NotificationsPage() {
     setReadIds((prev) => new Set(prev).add(id));
   };
 
+  const markAllRead = () => {
+    setReadIds(new Set(notifications.map((n) => n.notificationId)));
+  };
+
   return (
     <div className="flex flex-col gap-8 pb-20">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -225,8 +240,13 @@ export default function NotificationsPage() {
           </Button>
           <div>
             <h3 className="text-2xl font-bold tracking-4 text-foreground">
-              Notifications{` `}
-              {!loading && !error && <>({notifications.length})</>}
+              Notifications
+              {!loading && !error && (
+                <span className="text-muted-foreground font-semibold">
+                  {" "}
+                  ({notifications.length})
+                </span>
+              )}
             </h3>
           </div>
         </div>
@@ -269,6 +289,7 @@ export default function NotificationsPage() {
             const actionHref = getActionHref(item);
             const displayTitle = item.provider ?? item.title;
             const subtitleType = item.category ?? formatTypeLabel(item.type);
+            const statusLabel = read ? "Read" : "Unread";
 
             return (
               <Card
@@ -340,13 +361,9 @@ export default function NotificationsPage() {
                         Priority
                       </span>
                       <Badge
-                        theme={
-                          item.priority === "high"
-                            ? "red"
-                            : item.priority === "medium"
-                              ? "amber"
-                              : "green"
-                        }
+                        {...getPriorityBadge(item.priority)}
+                        size="md"
+                        className="mt-1 w-fit capitalize"
                       >
                         {item.priority}
                       </Badge>
@@ -366,10 +383,6 @@ export default function NotificationsPage() {
           })}
           {notifications.length > 0 && (
             <div className="flex flex-col items-center gap-4 pt-2">
-              <p className="text-sm font-medium text-muted-foreground">
-                Showing {rangeStart}–{rangeEnd} of {notifications.length}{" "}
-                notifications
-              </p>
               {totalPages > 1 && (
                 <Pagination>
                   <PaginationContent>
