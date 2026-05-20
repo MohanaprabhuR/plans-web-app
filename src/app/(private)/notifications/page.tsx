@@ -198,31 +198,11 @@ export default function NotificationsPage() {
     return notifications.slice(start, start + NOTIFICATIONS_PAGE_SIZE);
   }, [notifications, currentPage]);
 
-  const rangeStart =
-    notifications.length === 0
-      ? 0
-      : (currentPage - 1) * NOTIFICATIONS_PAGE_SIZE + 1;
-  const rangeEnd = Math.min(
-    currentPage * NOTIFICATIONS_PAGE_SIZE,
-    notifications.length,
-  );
-
   const isRead = (item: NotificationItem) =>
     item.read || readIds.has(item.notificationId);
 
-  const unreadCount = useMemo(
-    () =>
-      notifications.filter((n) => !n.read && !readIds.has(n.notificationId))
-        .length,
-    [notifications, readIds],
-  );
-
   const markAsRead = (id: string) => {
     setReadIds((prev) => new Set(prev).add(id));
-  };
-
-  const markAllRead = () => {
-    setReadIds(new Set(notifications.map((n) => n.notificationId)));
   };
 
   return (
@@ -289,7 +269,6 @@ export default function NotificationsPage() {
             const actionHref = getActionHref(item);
             const displayTitle = item.provider ?? item.title;
             const subtitleType = item.category ?? formatTypeLabel(item.type);
-            const statusLabel = read ? "Read" : "Unread";
 
             return (
               <Card
