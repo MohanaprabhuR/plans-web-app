@@ -2,13 +2,27 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import useAuth from "@/hooks/useAuth";
 import { toast } from "sonner";
 import { Alert, AlertTitle } from "@/components/ui/alert";
 import { ScreenLoading } from "@/components/ui/screen-loading";
-import { CircleAlert, MoveLeft } from "lucide-react";
+import { cn } from "@/lib/utils";
+import Image from "next/image";
+import {
+  CarFront,
+  ChevronLeft,
+  CircleAlert,
+  Hospital,
+  House,
+  LifeBuoy,
+  PlaneTakeoff,
+  ShieldCheck,
+} from "lucide-react";
+
+const DEFAULT_LOGO =
+  "https://img.freepik.com/free-vector/insurance-policy-shield_603843-179.jpg";
 
 type Plan = {
   planId: string;
@@ -25,6 +39,136 @@ function normalizeType(raw: string | null): string {
   return (raw ?? "").trim() || "Health";
 }
 
+function formatInr(amount: number) {
+  return amount.toLocaleString("en-IN");
+}
+
+function getCategoryIcon(category: string) {
+  switch (category) {
+    case "Health":
+      return <Hospital className="size-5 min-w-5 text-[#8E51FF]" />;
+    case "Auto":
+      return <CarFront className="size-5 min-w-5 text-[#E12AFB]" />;
+    case "Life":
+      return <LifeBuoy className="size-5 min-w-5 text-[#FE9A00]" />;
+    case "Travel":
+      return <PlaneTakeoff className="size-5 min-w-5 text-[#FE9A00]" />;
+    case "Home":
+      return <House className="size-5 min-w-5 text-[#FE9A00]" />;
+    default:
+      return <ShieldCheck className="size-5 min-w-5 text-muted-foreground" />;
+  }
+}
+
+function PlanOptionCard({
+  plan,
+  category,
+  selected,
+  onSelect,
+}: {
+  plan: Plan;
+  category: string;
+  selected: boolean;
+  onSelect: () => void;
+}) {
+  const highlights = plan.highlights?.slice(0, 3) ?? [];
+
+  return (
+    <Card
+      role="button"
+      tabIndex={0}
+      onClick={onSelect}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onSelect();
+        }
+      }}
+      className={cn(
+        "bg-white w-full cursor-pointer transition-shadow hover:shadow-md",
+        selected && "ring-1 ring-primary/30",
+      )}
+    >
+      <CardContent>
+        <div className="flex items-center justify-between pb-4 border-b border-dashed">
+          <div className="flex items-center gap-x-4 min-w-0">
+            <div className="p-0.5 bg-white rounded-lg shrink-0">
+              <Image
+                src={DEFAULT_LOGO}
+                alt={plan.provider}
+                width={44}
+                height={44}
+                className="object-contain rounded-md overflow-hidden"
+              />
+            </div>
+            <div className="flex flex-col min-w-0">
+              <span className="font-medium text-xl leading-6 tracking-4 text-accent-foreground truncate">
+                {plan.name}
+              </span>
+              <div className="flex items-center gap-x-1.5 pt-1.5 flex-wrap">
+                <div className="flex gap-x-1 items-center">
+                  {getCategoryIcon(category)}
+                  <span className="text-base font-medium leading-5 tracking-4 text-accent-foreground">
+                    {plan.provider}
+                  </span>
+                </div>
+                <div className="size-1 rounded-full bg-[#757575]" />
+                <span className="text-base font-medium leading-5 tracking-4 text-accent-foreground">
+                  {category}
+                </span>
+                {selected && (
+                  <span className="size-2 rounded-full bg-primary ml-1 shrink-0" />
+                )}
+              </div>
+            </div>
+          </div>
+
+          <Button
+            variant="outline"
+            size="lg"
+            className="shrink-0 ml-4"
+            onClick={(e) => {
+              e.stopPropagation();
+              onSelect();
+            }}
+          >
+            {selected ? "Selected" : "Select"}
+          </Button>
+        </div>
+
+        <div className="flex items-start justify-between gap-4 pt-4 flex-wrap">
+          <div className="flex text-sm flex-col min-w-[100px]">
+            <span className="text-muted-foreground text-base font-medium leading-5 tracking-4">
+              Premium
+            </span>
+            <span className="text-accent-foreground text-lg font-medium leading-6 tracking-4">
+              ₹{formatInr(plan.monthlyPrice)}/mo
+            </span>
+          </div>
+          <div className="flex text-sm flex-col min-w-[100px]">
+            <span className="text-muted-foreground text-base font-medium leading-5 tracking-4">
+              Yearly
+            </span>
+            <span className="text-accent-foreground text-lg font-medium leading-6 tracking-4">
+              ₹{formatInr(plan.yearlyPrice)}/yr
+            </span>
+          </div>
+          <div className="flex text-sm flex-col flex-1 min-w-[140px]">
+            <span className="text-muted-foreground text-base font-medium leading-5 tracking-4">
+              Coverage
+            </span>
+            <span className="text-accent-foreground text-lg font-medium leading-6 tracking-4 line-clamp-2">
+              {highlights.length > 0
+                ? highlights.join(" · ")
+                : "Standard benefits"}
+            </span>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 export default function BuyInsurancePlansPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -35,7 +179,8 @@ export default function BuyInsurancePlansPage() {
     [searchParams],
   );
 
-  const [loading, setLoading] = useState(false);
+  const [loadingPlans, setLoadingPlans] = useState(true);
+  const [purchasing, setPurchasing] = useState(false);
   const [plans, setPlans] = useState<Plan[]>([]);
   const [selectedPlanId, setSelectedPlanId] = useState<string>("");
   const [answers, setAnswers] = useState<Answers | null>(null);
@@ -54,25 +199,23 @@ export default function BuyInsurancePlansPage() {
     let cancelled = false;
 
     (async () => {
-      setLoading(true);
+      setLoadingPlans(true);
       try {
         const progressRes = await fetch("/api/insurance/progress", {
           headers: { "X-User-Id": user.id },
         });
         const progressJson = progressRes.ok
           ? ((await progressRes.json()) as {
-              progress:
-                | {
-                    step_index?: number;
-                    answers?: Answers;
-                  }
-                | null;
+              progress: {
+                step_index?: number;
+                answers?: Answers;
+              } | null;
             })
           : null;
 
         const progress = progressJson?.progress ?? null;
         const stepIndex = progress?.step_index ?? -1;
-        const completedStepIndex = 4; // last step index in buy-insurance flow
+        const completedStepIndex = 4;
 
         if (stepIndex < completedStepIndex) {
           showError("Please complete all steps before viewing plans.");
@@ -100,7 +243,7 @@ export default function BuyInsurancePlansPage() {
       } catch (e) {
         showError(e instanceof Error ? e.message : "Failed to load plans.");
       } finally {
-        if (!cancelled) setLoading(false);
+        if (!cancelled) setLoadingPlans(false);
       }
     })();
 
@@ -119,7 +262,7 @@ export default function BuyInsurancePlansPage() {
       return;
     }
 
-    setLoading(true);
+    setPurchasing(true);
     try {
       const res = await fetch("/api/insurance/purchase", {
         method: "POST",
@@ -134,75 +277,71 @@ export default function BuyInsurancePlansPage() {
     } catch (e) {
       showError(e instanceof Error ? e.message : "Purchase failed.");
     } finally {
-      setLoading(false);
+      setPurchasing(false);
     }
   };
 
   return (
-    <div className="flex flex-col gap-4 w-full min-h-screen py-10 px-6 md:px-16">
-      <div className="flex items-center gap-4">
+    <div className="flex flex-col gap-8 pb-20">
+      <div className="flex items-center gap-2">
         <Button
           variant="ghost"
+          size="lg"
           iconOnly
-          onClick={() => router.push(`/buy-insurance?type=${encodeURIComponent(type)}`)}
+          onClick={() =>
+            router.push(`/buy-insurance?type=${encodeURIComponent(type)}`)
+          }
+          aria-label="Go back"
         >
-          <MoveLeft className="text-muted-foreground" />
+          <ChevronLeft />
         </Button>
-        <p className="font-semibold text-foreground text-xl">Plans for {type}</p>
+        <div>
+          <h3 className="text-2xl font-bold tracking-4 text-foreground">
+            Plans for {type}
+          </h3>
+          <p className="text-base font-medium tracking-4 text-muted-foreground">
+            Choose a plan that fits your needs
+          </p>
+        </div>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-xl">Choose a plan</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          {loading && plans.length === 0 ? (
-            <ScreenLoading variant="inline" label="Loading plans" />
-          ) : plans.length === 0 ? (
-            <p className="text-muted-foreground">No plans found.</p>
-          ) : (
-            plans.map((p) => (
-              <button
-                key={p.planId}
-                type="button"
-                onClick={() => setSelectedPlanId(p.planId)}
-                className={`w-full text-left rounded-lg border p-4 transition ${
-                  selectedPlanId === p.planId
-                    ? "border-[#FF5E00] bg-orange-50"
-                    : "border-border"
-                }`}
-              >
-                <div className="flex items-center justify-between gap-4">
-                  <div>
-                    <p className="font-semibold text-foreground">{p.name}</p>
-                    <p className="text-sm text-muted-foreground">{p.provider}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-semibold text-foreground">
-                      ₹{p.monthlyPrice}/mo
-                    </p>
-                    <p className="text-sm text-muted-foreground">₹{p.yearlyPrice}/yr</p>
-                  </div>
-                </div>
-                {p.highlights?.length ? (
-                  <ul className="mt-2 text-sm text-muted-foreground list-disc pl-5">
-                    {p.highlights.slice(0, 3).map((h) => (
-                      <li key={h}>{h}</li>
-                    ))}
-                  </ul>
-                ) : null}
-              </button>
-            ))
-          )}
+      {loadingPlans && (
+        <ScreenLoading variant="list" rows={3} label="Loading plans" />
+      )}
 
-          <div className="flex gap-3 pt-2">
-            <Button className="w-full" onClick={buyNow} disabled={loading}>
-              {loading ? "Buying…" : "Buy now"}
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+      {!loadingPlans && plans.length === 0 && (
+        <Card className="border-dashed">
+          <CardContent className="flex flex-col items-center justify-center gap-4 py-16 text-center">
+            <p className="text-lg font-semibold text-foreground">No plans found</p>
+            <p className="text-sm text-muted-foreground">
+              Try a different insurance type or complete the questionnaire again.
+            </p>
+          </CardContent>
+        </Card>
+      )}
+
+      {!loadingPlans && plans.length > 0 && (
+        <div className="flex flex-col gap-4">
+          {plans.map((plan) => (
+            <PlanOptionCard
+              key={plan.planId}
+              plan={plan}
+              category={type}
+              selected={selectedPlanId === plan.planId}
+              onSelect={() => setSelectedPlanId(plan.planId)}
+            />
+          ))}
+
+          <Button
+            className="w-full"
+            size="lg"
+            onClick={buyNow}
+            disabled={purchasing || !selectedPlanId}
+          >
+            {purchasing ? "Buying…" : "Buy now"}
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
-
