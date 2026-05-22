@@ -295,14 +295,10 @@ export default function BuyInsurancePlansPage() {
         >
           <ChevronLeft />
         </Button>
-        <div>
-          <h3 className="text-2xl font-bold tracking-4 text-foreground">
-            Plans for {type}
-          </h3>
-          <p className="text-base font-medium tracking-4 text-muted-foreground">
-            Choose a plan that fits your needs
-          </p>
-        </div>
+
+        <h3 className="text-2xl font-bold tracking-4 text-foreground">
+          Plans for {type}
+        </h3>
       </div>
 
       {loadingPlans && (
@@ -312,9 +308,12 @@ export default function BuyInsurancePlansPage() {
       {!loadingPlans && plans.length === 0 && (
         <Card className="border-dashed">
           <CardContent className="flex flex-col items-center justify-center gap-4 py-16 text-center">
-            <p className="text-lg font-semibold text-foreground">No plans found</p>
+            <p className="text-lg font-semibold text-foreground">
+              No plans found
+            </p>
             <p className="text-sm text-muted-foreground">
-              Try a different insurance type or complete the questionnaire again.
+              Try a different insurance type or complete the questionnaire
+              again.
             </p>
           </CardContent>
         </Card>
