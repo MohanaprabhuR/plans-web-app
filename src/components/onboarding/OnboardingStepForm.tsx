@@ -26,6 +26,7 @@ import {
 } from "@/lib/onboarding";
 import { supabase } from "@/lib/supabase/client";
 import { toast } from "sonner";
+import { Card, CardContent } from "../ui/card";
 
 const CATEGORY_ICONS: Record<string, React.ReactNode> = {
   welcome: null,
@@ -155,10 +156,10 @@ export function OnboardingStepForm() {
       : "animate-in fade-in slide-in-from-left duration-300";
 
   return (
-    <div className="min-h-screen bg-background flex flex-col max-w-lg mx-auto">
+    <div className="min-h-screen bg-background flex-col max-w-lg mx-auto flex justify-center">
       {/* Header: back + category title + progress */}
       {step.id !== "welcome" && step.id !== "confirmation" && (
-        <header className="flex items-center justify-between gap-2 px-4 py-3 border-b border-border shrink-0">
+        <header className="flex items-center justify-between gap-2 px-4 py-3 border-b border-border shrink-0 mb-2">
           <Button
             variant="ghost"
             size="sm"
@@ -179,48 +180,47 @@ export function OnboardingStepForm() {
         </header>
       )}
 
-      <div className="flex-1 flex flex-col px-4 py-6 overflow-hidden">
-        <div
-          key={step.id}
-          className={cn(
-            "flex flex-col flex-1 min-h-0",
-            isAnimating && animationClass,
-          )}
-        >
-          {step.id === "welcome" && <WelcomeStep />}
+      <Card>
+        <CardContent>
+          <div
+            key={step.id}
+            className={cn("flex flex-col ", isAnimating && animationClass)}
+          >
+            {step.id === "welcome" && <WelcomeStep />}
 
-          {step.id === "confirmation" && <ConfirmationStep />}
+            {step.id === "confirmation" && <ConfirmationStep />}
 
-          {step.id !== "welcome" && step.id !== "confirmation" && (
-            <QuestionStep
-              step={step}
-              formData={formData}
-              updateField={updateField}
-              onAutoNext={goNext}
-              categoryIcon={CATEGORY_ICONS[step.category]}
-              isCategoryEnd={Boolean(step.nextButtonLabel)}
-            />
-          )}
-        </div>
-
-        {/* Bottom CTA: welcome, confirmation, or end-of-section (e.g. "Continue to Lifestyle") */}
-        {(step.id === "welcome" ||
-          step.id === "confirmation" ||
-          isCategoryEndWithAnswer(step, formData)) && (
-          <div className="pt-4 shrink-0">
-            <Button
-              size="lg"
-              className="w-full rounded-xl"
-              onClick={goNext}
-              disabled={isSubmitting}
-            >
-              {isSubmitting
-                ? "Saving…"
-                : (step.nextButtonLabel ?? "Let's Get Started")}
-            </Button>
+            {step.id !== "welcome" && step.id !== "confirmation" && (
+              <QuestionStep
+                step={step}
+                formData={formData}
+                updateField={updateField}
+                onAutoNext={goNext}
+                categoryIcon={CATEGORY_ICONS[step.category]}
+                isCategoryEnd={Boolean(step.nextButtonLabel)}
+              />
+            )}
           </div>
-        )}
-      </div>
+
+          {/* Bottom CTA: welcome, confirmation, or end-of-section (e.g. "Continue to Lifestyle") */}
+          {(step.id === "welcome" ||
+            step.id === "confirmation" ||
+            isCategoryEndWithAnswer(step, formData)) && (
+            <div className="pt-4 shrink-0">
+              <Button
+                size="lg"
+                className="w-full rounded-xl"
+                onClick={goNext}
+                disabled={isSubmitting}
+              >
+                {isSubmitting
+                  ? "Saving…"
+                  : (step.nextButtonLabel ?? "Let's Get Started")}
+              </Button>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }
@@ -228,7 +228,7 @@ export function OnboardingStepForm() {
 function WelcomeStep() {
   return (
     <>
-      <div className="flex-1 flex flex-col justify-center text-center">
+      <div className=" flex flex-col justify-center text-center">
         <h1 className="text-2xl font-semibold text-accent-foreground mb-2">
           Crafting Your Personalized Risk Portfolio
         </h1>
