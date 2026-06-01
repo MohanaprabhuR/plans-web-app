@@ -176,7 +176,7 @@ const YourPolicyPage = () => {
       {loading && (
         <ScreenLoading label="Loading policies" className="pt-2" />
       )}
-      {error && (
+      {error && !loading && (
         <div className="flex items-center justify-center py-12">
           <div className="text-center">
             <p className="text-red-600 dark:text-red-400 mb-2">
@@ -206,6 +206,7 @@ const YourPolicyPage = () => {
           </div>
         </div>
       )}
+      {!loading && !error && (
       <div className="w-full flex gap-x-6 pt-8">
         <div className="w-full flex flex-col gap-y-6 max-w-[730px] ">
           <div className="embla overflow-hidden">
@@ -256,19 +257,15 @@ const YourPolicyPage = () => {
               </div>
             </div>
           </div>
-          {!loading && !error && (
-            <>
-              {policies.length === 0 ? (
-                <p className="text-muted-foreground">No policies found</p>
-              ) : (
-                policies.map((policy, policyIndex) => (
-                  <PolicyListCard
-                    key={`${policy.policyId}-${policy.type}-${policyIndex}`}
-                    policy={policy}
-                  />
-                ))
-              )}
-            </>
+          {policies.length === 0 ? (
+            <p className="text-muted-foreground">No policies found</p>
+          ) : (
+            policies.map((policy, policyIndex) => (
+              <PolicyListCard
+                key={`${policy.policyId}-${policy.type}-${policyIndex}`}
+                policy={policy}
+              />
+            ))
           )}
         </div>
         <div className="w-full max-w-[354px] min-w-[354px] flex flex-col gap-y-6">
@@ -371,6 +368,7 @@ const YourPolicyPage = () => {
           </Card>
         </div>
       </div>
+      )}
     </>
   );
 };

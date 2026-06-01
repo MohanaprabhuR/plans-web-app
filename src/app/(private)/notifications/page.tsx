@@ -141,7 +141,10 @@ export default function NotificationsPage() {
   const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
-    if (!user?.id) return;
+    if (!user?.id) {
+      setLoading(false);
+      return;
+    }
     let cancelled = false;
 
     (async () => {

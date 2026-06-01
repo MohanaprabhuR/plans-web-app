@@ -195,7 +195,10 @@ export default function BuyInsurancePlansPage() {
   };
 
   useEffect(() => {
-    if (!user?.id) return;
+    if (!user?.id) {
+      setLoadingPlans(false);
+      return;
+    }
     let cancelled = false;
 
     (async () => {

@@ -326,6 +326,10 @@ const DashboardPage = () => {
   };
 
   const fetchPolicies = useCallback(async () => {
+    if (!userId) {
+      setLoading(false);
+      return;
+    }
     try {
       setLoading(true);
       setError(null);

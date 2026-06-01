@@ -124,7 +124,10 @@ export default function RenewalPage() {
   };
 
   useEffect(() => {
-    if (!user?.id) return;
+    if (!user?.id) {
+      setLoading(false);
+      return;
+    }
     let cancelled = false;
 
     (async () => {

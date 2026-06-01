@@ -81,11 +81,14 @@ function StatCard({ label, value }: { label: string; value: string | number }) {
 const MyClaimsPage = () => {
   const { user } = useAuth();
   const [apiData, setApiData] = useState<ApiResponse | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!user?.id) return;
+    if (!user?.id) {
+      setLoading(false);
+      return;
+    }
     let cancelled = false;
 
     (async () => {

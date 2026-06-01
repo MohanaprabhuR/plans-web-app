@@ -61,12 +61,15 @@ type CoverageResponse = {
 
 export default function CoveragePage() {
   const { user } = useAuth();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<CoverageResponse | null>(null);
 
   useEffect(() => {
-    if (!user?.id) return;
+    if (!user?.id) {
+      setLoading(false);
+      return;
+    }
     let cancelled = false;
 
     (async () => {
@@ -108,7 +111,7 @@ export default function CoveragePage() {
           </div>
         )}
 
-        {data ? (
+        {!loading && data ? (
           <>
             <Card className="flex items-center flex-row justify-between">
               <div className="w-1/2 flex items-center justify-center h-full">
