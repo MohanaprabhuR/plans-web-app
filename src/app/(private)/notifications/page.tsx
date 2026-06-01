@@ -233,7 +233,7 @@ export default function NotificationsPage() {
       </div>
 
       {loading && (
-        <ScreenLoading variant="list" rows={5} label="Loading notifications" />
+        <ScreenLoading label="Loading notifications" />
       )}
 
       {error && !loading && (

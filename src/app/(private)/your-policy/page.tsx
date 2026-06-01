@@ -174,11 +174,7 @@ const YourPolicyPage = () => {
         Your Policy
       </h3>
       {loading && (
-        <ScreenLoading
-          variant="page"
-          label="Loading policies"
-          className="pt-2"
-        />
+        <ScreenLoading label="Loading policies" className="pt-2" />
       )}
       {error && (
         <div className="flex items-center justify-center py-12">

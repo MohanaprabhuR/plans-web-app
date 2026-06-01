@@ -2,10 +2,11 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 
+/** @deprecated Use default `page` — kept for call-site compatibility */
 export type ScreenLoadingVariant =
   | "full"
-  | "navigate"
   | "page"
+  | "navigate"
   | "list"
   | "inline"
   | "cards-row"
@@ -13,15 +14,52 @@ export type ScreenLoadingVariant =
 
 export interface ScreenLoadingProps extends React.ComponentProps<"div"> {
   variant?: ScreenLoadingVariant;
-  /** Number of list/card rows for `list` variant */
+  /** Number of content card rows (default 4) */
   rows?: number;
   /** Screen reader label */
   label?: string;
 }
 
+function PageContentSkeleton({
+  rows = 4,
+  className,
+}: {
+  rows?: number;
+  className?: string;
+}) {
+  const contentRows = Math.min(6, Math.max(3, rows));
+
+  return (
+    <div className={cn("flex w-full flex-col gap-8", className)}>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <Skeleton className="h-9 w-52 max-w-full rounded-lg sm:h-10" />
+        <Skeleton className="h-10 w-32 rounded-lg max-sm:max-w-[140px]" />
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <Skeleton
+            key={`stat-${i}`}
+            className="h-[88px] w-full rounded-xl sm:h-[92px]"
+          />
+        ))}
+      </div>
+
+      <div className="flex flex-col gap-4">
+        {Array.from({ length: contentRows }).map((_, i) => (
+          <Skeleton
+            key={`row-${i}`}
+            className="h-[136px] w-full rounded-2xl sm:h-[148px]"
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 /**
- * Consistent loading shells for auth gate, route transitions, and in-page fetches.
- * Matches app chrome (warm background accent via skeleton tones).
+ * Shared loading shell for route transitions and in-page fetches.
+ * All private pages use the same `page` skeleton layout.
  */
 function ScreenLoading({
   variant = "page",
@@ -30,8 +68,6 @@ function ScreenLoading({
   className,
   ...props
 }: ScreenLoadingProps) {
-  const listRows = Math.min(8, Math.max(2, rows));
-
   if (variant === "full") {
     return (
       <div
@@ -48,141 +84,21 @@ function ScreenLoading({
             <div className="absolute inset-0 rounded-full border-2 border-primary/25" />
             <div className="absolute inset-0 animate-spin rounded-full border-2 border-transparent border-t-primary" />
           </div>
-          <Skeleton className="h-4 w-36 rounded-md bg-primary/10" />
-          <Skeleton className="h-3 w-48 rounded-md bg-muted" />
+          <Skeleton className="h-4 w-36 rounded-md" />
+          <Skeleton className="h-3 w-48 rounded-md" />
         </div>
       </div>
     );
   }
 
-  if (variant === "navigate") {
-    return (
-      <div
-        role="status"
-        aria-label={label}
-        className={cn("flex w-full flex-col gap-8 pb-12", className)}
-        {...props}
-      >
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <Skeleton className="h-9 w-48 max-w-full rounded-lg sm:h-10" />
-          <Skeleton className="h-10 w-36 rounded-lg max-sm:hidden" />
-        </div>
-        <div className="grid gap-4 sm:grid-cols-3">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <Skeleton
-              key={i}
-              className="h-24 w-full rounded-xl bg-muted/80 sm:h-[104px]"
-            />
-          ))}
-        </div>
-        <div className="flex flex-col gap-4">
-          {Array.from({ length: listRows }).map((_, i) => (
-            <Skeleton
-              key={i}
-              className="h-36 w-full rounded-2xl bg-muted/70 sm:h-40"
-            />
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  if (variant === "list") {
-    return (
-      <div
-        role="status"
-        aria-label={label}
-        className={cn("flex w-full flex-col gap-4", className)}
-        {...props}
-      >
-        {Array.from({ length: listRows }).map((_, i) => (
-          <Skeleton
-            key={i}
-            className="h-32 w-full rounded-2xl bg-muted/70 sm:h-36"
-          />
-        ))}
-      </div>
-    );
-  }
-
-  if (variant === "inline") {
-    return (
-      <div
-        role="status"
-        aria-label={label}
-        className={cn("flex flex-col gap-3 py-2", className)}
-        {...props}
-      >
-        {Array.from({ length: 3 }).map((_, i) => (
-          <Skeleton key={i} className="h-16 w-full rounded-lg" />
-        ))}
-      </div>
-    );
-  }
-
-  if (variant === "cards-row") {
-    return (
-      <div
-        role="status"
-        aria-label={label}
-        className={cn(
-          "flex gap-6 overflow-x-auto py-4 scrollbar-hide",
-          className,
-        )}
-        {...props}
-      >
-        {Array.from({ length: listRows }).map((_, i) => (
-          <Skeleton
-            key={i}
-            className="h-[280px] min-w-[300px] shrink-0 rounded-xl bg-muted/70 sm:min-w-[354px]"
-          />
-        ))}
-      </div>
-    );
-  }
-
-  if (variant === "summary") {
-    const detailRows = Math.min(6, Math.max(1, rows));
-    return (
-      <div
-        role="status"
-        aria-label={label}
-        className={cn("flex w-full flex-col gap-6", className)}
-        {...props}
-      >
-        <div className="grid gap-4 sm:grid-cols-3">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <Skeleton
-              key={i}
-              className="h-24 w-full rounded-xl bg-muted/80 sm:h-[104px]"
-            />
-          ))}
-        </div>
-        {Array.from({ length: detailRows }).map((_, i) => (
-          <Skeleton
-            key={i}
-            className="h-44 w-full rounded-xl bg-muted/70 sm:h-48"
-          />
-        ))}
-      </div>
-    );
-  }
-
-  /* page — generic detail / coverage / policy shell */
   return (
     <div
       role="status"
       aria-label={label}
-      className={cn("flex w-full flex-col gap-6 py-4", className)}
+      className={cn("flex w-full flex-col", className)}
       {...props}
     >
-      <Skeleton className="h-28 w-full max-w-3xl rounded-xl bg-muted/70" />
-      <div className="grid gap-4 sm:grid-cols-2">
-        <Skeleton className="h-64 w-full rounded-xl bg-muted/60" />
-        <Skeleton className="h-64 w-full rounded-xl bg-muted/60" />
-      </div>
-      <Skeleton className="h-12 w-full max-w-xl rounded-lg" />
-      <Skeleton className="h-40 w-full rounded-xl bg-muted/50" />
+      <PageContentSkeleton rows={rows} />
     </div>
   );
 }

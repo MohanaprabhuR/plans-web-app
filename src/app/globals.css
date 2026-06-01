@@ -11,3 +11,9 @@
     outline-color: var(--ring);
   }
 }
+
+@keyframes skeleton-shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}

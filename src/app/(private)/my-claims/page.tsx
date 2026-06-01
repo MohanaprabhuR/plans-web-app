@@ -146,10 +146,7 @@ const MyClaimsPage = () => {
         </div>
       )}
 
-      {/* Loading skeletons */}
-      {loading && (
-        <ScreenLoading variant="list" rows={3} label="Loading claims" />
-      )}
+      {loading && <ScreenLoading label="Loading claims" />}
 
       {/* Error */}
       {error && !loading && (

@@ -351,7 +351,7 @@ const PolicyDetailPage = () => {
       <div className="flex gap-x-6">
         <div className="flex flex-col gap-6">
           {loading && (
-            <ScreenLoading variant="page" label="Loading policy" />
+            <ScreenLoading label="Loading policy" />
           )}
           {!loading && error && (
             <Alert variant="error">

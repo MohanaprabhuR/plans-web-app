@@ -100,11 +100,7 @@ export default function CoveragePage() {
       </h3>
       <div className="w-full pt-8">
         {loading && (
-          <ScreenLoading
-            variant="page"
-            label="Loading coverage"
-            className="py-4"
-          />
+          <ScreenLoading label="Loading coverage" className="py-4" />
         )}
         {error && !loading && (
           <div className="flex items-center justify-center py-12">

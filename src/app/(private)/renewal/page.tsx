@@ -222,7 +222,7 @@ export default function RenewalPage() {
       </div>
 
       {loading ? (
-        <ScreenLoading variant="summary" rows={2} label="Loading renewals" />
+        <ScreenLoading label="Loading renewals" />
       ) : (
         <>
           <div className="grid gap-4 sm:grid-cols-3">

@@ -63,7 +63,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { StaticImport } from "next/dist/shared/lib/get-img-props";
 import dynamic from "next/dynamic";
-import { Skeleton } from "@/components/ui/skeleton";
 import { ScreenLoading } from "@/components/ui/screen-loading";
 import { useRouter } from "next/navigation";
 
@@ -705,6 +704,10 @@ const DashboardPage = () => {
           </Button>
         </DialogContent>
       </Dialog>
+      {loading ? (
+        <ScreenLoading label="Loading dashboard" className="py-2" />
+      ) : (
+        <>
       <div className="w-full space-y-6">
         <div className="flex justify-between w-full items-center">
           <h3 className="font-semibold text-3xl leading-8 tracking-4">
@@ -714,14 +717,6 @@ const DashboardPage = () => {
             <PlusIcon className="size-5" /> Add
           </Button>
         </div>
-
-        {loading && (
-          <ScreenLoading
-            variant="cards-row"
-            rows={4}
-            label="Loading policies"
-          />
-        )}
 
         {error && (
           <div className="flex items-center justify-center py-12">
@@ -754,7 +749,7 @@ const DashboardPage = () => {
           </div>
         )}
 
-        {!loading && !error && (
+        {!error && (
           <div className="flex gap-6 overflow-x-auto scrollbar-hide">
             {policies.length === 0 ? (
               <Card
@@ -964,12 +959,6 @@ const DashboardPage = () => {
                 <CornerRightDown className="size-4 relative top-1.5" />
               </p>
               <div className="flex flex-col gap-y-6">
-                {loading ? (
-                  Array.from({ length: 2 }).map((_, index) => (
-                    <Skeleton key={index} className="w-full  h-16"></Skeleton>
-                  ))
-                ) : (
-                  <>
                     {personalFactorsList.map((list, index) => {
                       return (
                         <Card className="w-full p-1 pt-4 gap-6" key={index}>
@@ -1047,8 +1036,6 @@ const DashboardPage = () => {
                         </Card>
                       );
                     })}
-                  </>
-                )}
               </div>
             </div>
             <div className="flex flex-col gap-y-4 w-full">
@@ -1057,12 +1044,6 @@ const DashboardPage = () => {
                 <CornerRightDown className="size-4 relative top-1.5 " />
               </p>
               <div className="flex flex-col gap-y-6">
-                {loading ? (
-                  Array.from({ length: 2 }).map((_, index) => (
-                    <Skeleton key={index} className="w-full  h-16"></Skeleton>
-                  ))
-                ) : (
-                  <>
                     {assetFactorList.map((list, index) => {
                       return (
                         <Card className="w-full p-1 pt-4 gap-6" key={index}>
@@ -1141,8 +1122,6 @@ const DashboardPage = () => {
                         </Card>
                       );
                     })}
-                  </>
-                )}
               </div>
             </div>
           </div>
@@ -1207,9 +1186,6 @@ const DashboardPage = () => {
                   <p className="text-base leading-6  font-medium text-muted-foreground">
                     Total Coverage
                   </p>
-                  {loading ? (
-                    <Skeleton className="w-full max-w-[150px] h-4" />
-                  ) : (
                     <p className="text-3xl font-medium leading-8  text-accent-foreground">
                       $
                       {
@@ -1217,11 +1193,7 @@ const DashboardPage = () => {
                           ?.response?.totalYearlyPremium
                       }
                     </p>
-                  )}
                 </div>
-                {loading ? (
-                  <Skeleton className="w-full max-w-[100px] h-4" />
-                ) : (
                   <div className="bg-accent size-14 rounded-lg flex items-center justify-center text-center p-2">
                     <p className="text-[8px] leading-3  font-semibold text-muted-foreground uppercase flex flex-col items-center justify-center">
                       <span className="text-accent-foreground font-medium text-3xl">
@@ -1233,18 +1205,9 @@ const DashboardPage = () => {
                       policies
                     </p>
                   </div>
-                )}
               </div>
               <div className="flex flex-wrap gap-3">
-                {loading
-                  ? // Show fixed number of skeletons while loading
-                    Array.from({ length: 4 }).map((_, index) => (
-                      <Skeleton
-                        key={index}
-                        className="w-full max-w-[154px] h-16"
-                      />
-                    ))
-                  : apiData?.endpoints?.premiumOverview?.getPremiumSummary?.response?.breakdown?.map(
+                {apiData?.endpoints?.premiumOverview?.getPremiumSummary?.response?.breakdown?.map(
                       (item) => (
                         <Card
                           key={item.category}
@@ -1284,12 +1247,6 @@ const DashboardPage = () => {
               </Button>
             </CardHeader>
             <CardContent className="flex flex-col gap-y-4">
-              {loading ? (
-                Array.from({ length: 2 }).map((_, index) => (
-                  <Skeleton key={index} className="w-full  h-16" />
-                ))
-              ) : (
-                <>
                   {apiData?.endpoints?.claims?.getAllClaims?.response?.map(
                     (claim) => (
                       <Card className="relative" key={claim.claimId}>
@@ -1347,8 +1304,6 @@ const DashboardPage = () => {
                       </Card>
                     ),
                   )}
-                </>
-              )}
             </CardContent>
           </Card>
         </div>
@@ -1364,14 +1319,7 @@ const DashboardPage = () => {
           </p>
         </div>
         <div className="flex gap-x-6 flex-wrap">
-          {loading ? (
-            Array.from({ length: 2 }).map((_, index) => (
-              <Skeleton
-                key={index}
-                className="w-[344px] min-w-[344px] h-20 rounded-xl"
-              />
-            ))
-          ) : apiData?.endpoints?.offers?.getExclusiveOffers?.response
+          {apiData?.endpoints?.offers?.getExclusiveOffers?.response
               ?.length ? (
             apiData.endpoints.offers.getExclusiveOffers.response.map(
               (offer, index) => (
@@ -1424,6 +1372,8 @@ const DashboardPage = () => {
           )}
         </div>
       </div>
+        </>
+      )}
     </div>
   );
 };
