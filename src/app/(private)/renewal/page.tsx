@@ -215,26 +215,18 @@ export default function RenewalPage() {
         >
           <ChevronLeft />
         </Button>
-        <div>
-          <h3 className="text-2xl font-bold tracking-4 text-foreground">
-            Policy renewals
-          </h3>
-          <p className="text-base font-medium tracking-4 text-muted-foreground">
-            Review premiums and renew before your coverage ends
-          </p>
-        </div>
+
+        <h3 className="text-2xl font-bold tracking-4 text-foreground">
+          Policy renewals
+        </h3>
       </div>
 
       {loading ? (
-        <ScreenLoading
-          variant="summary"
-          rows={2}
-          label="Loading renewals"
-        />
+        <ScreenLoading variant="summary" rows={2} label="Loading renewals" />
       ) : (
         <>
           <div className="grid gap-4 sm:grid-cols-3">
-            <Card className="border-border/60 bg-card shadow-sm">
+            <Card className=" bg-card shadow-sm">
               <CardContent className="flex items-center gap-4">
                 <div className="flex size-12 items-center justify-center rounded-full bg-amber-100">
                   <Clock className="size-6 text-amber-700" />
@@ -249,7 +241,7 @@ export default function RenewalPage() {
                 </div>
               </CardContent>
             </Card>
-            <Card className="border-border/60 bg-card shadow-sm">
+            <Card className="bg-card shadow-sm">
               <CardContent className="flex items-center gap-4">
                 <div className="flex size-12 items-center justify-center rounded-full bg-green-100">
                   <CheckCircle2 className="size-6 text-green-700" />
@@ -264,7 +256,7 @@ export default function RenewalPage() {
                 </div>
               </CardContent>
             </Card>
-            <Card className="border-border/60 bg-card shadow-sm">
+            <Card className="bg-card shadow-sm">
               <CardContent className="flex items-center gap-4">
                 <div className="flex size-12 items-center justify-center rounded-full bg-blue-100">
                   <TrendingUp className="size-6 text-blue-700" />
