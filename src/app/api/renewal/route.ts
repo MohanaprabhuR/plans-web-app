@@ -61,9 +61,9 @@ async function getRenewalsFromSupabase(
 async function upsertRenewalInSupabase(
   userId: string,
   renewal: Renewal,
-): Promise<boolean> {
+): Promise<{ ok: boolean; errorMessage?: string }> {
   const supabase = getSupabase();
-  if (!supabase) return false;
+  if (!supabase) return { ok: false, errorMessage: "Supabase not configured" };
   const { error } = await supabase.from("renewals").upsert(
     {
       user_id: userId,
@@ -79,11 +79,22 @@ async function upsertRenewalInSupabase(
     },
     { onConflict: "renewal_id" },
   );
-  return !error;
+  return error ? { ok: false, errorMessage: error.message } : { ok: true };
 }
 
 // In-memory fallback when Supabase is not configured (e.g. local dev)
 const renewalsStore: Record<string, Renewal[]> = {};
+
+function saveRenewalInMemory(userId: string, renewal: Renewal) {
+  const current = renewalsStore[userId] ?? [];
+  const idx = current.findIndex((r) => r.renewalId === renewal.renewalId);
+  if (idx >= 0) {
+    current[idx] = renewal;
+    renewalsStore[userId] = current;
+  } else {
+    renewalsStore[userId] = [renewal, ...current];
+  }
+}
 
 async function getRenewalsForUser(userId: string): Promise<Renewal[]> {
   if (!userId) return [];
@@ -159,7 +170,6 @@ export async function POST(req: Request) {
     }
 
     const currentRenewals = await getRenewalsForUser(userId);
-    const existing = currentRenewals.find((r) => r.renewalId === renewalId);
 
     const renewal: Renewal = {
       renewalId,
@@ -187,21 +197,15 @@ export async function POST(req: Request) {
     };
 
     if (supabaseConfigured) {
-      const ok = await upsertRenewalInSupabase(userId, renewal);
-      if (!ok) {
-        return NextResponse.json(
-          { error: "Failed to save renewal" },
-          { status: 500 },
-        );
+      const result = await upsertRenewalInSupabase(userId, renewal);
+      if (!result.ok) {
+        console.warn("Supabase upsert renewal failed, using in-memory fallback", {
+          error: result.errorMessage,
+        });
+        saveRenewalInMemory(userId, renewal);
       }
     } else {
-      if (existing) {
-        renewalsStore[userId] = currentRenewals.map((r) =>
-          r.renewalId === renewal.renewalId ? renewal : r,
-        );
-      } else {
-        renewalsStore[userId] = [renewal, ...currentRenewals];
-      }
+      saveRenewalInMemory(userId, renewal);
     }
 
     const updated = await getRenewalsForUser(userId);

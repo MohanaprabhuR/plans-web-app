@@ -198,7 +198,12 @@ export default function RenewalPage() {
       if (!res.ok) throw new Error(await res.text());
       const data = (await res.json()) as { renewals: Renewal[] };
       setRenewals(data.renewals ?? []);
-      toast.success("Policy renewed successfully.");
+      toast.custom(() => (
+        <Alert variant="success">
+          <CheckCircle2 className="size-4" />
+          <AlertTitle>Policy renewed successfully.</AlertTitle>
+        </Alert>
+      ));
     } catch (e) {
       showError(e instanceof Error ? e.message : "Failed to renew policy.");
     } finally {
@@ -229,7 +234,7 @@ export default function RenewalPage() {
       ) : (
         <>
           <div className="grid gap-4 sm:grid-cols-3">
-            <Card className=" bg-card shadow-sm">
+            <Card>
               <CardContent className="flex items-center gap-4">
                 <div className="flex size-12 items-center justify-center rounded-full bg-amber-100">
                   <Clock className="size-6 text-amber-700" />
@@ -244,7 +249,7 @@ export default function RenewalPage() {
                 </div>
               </CardContent>
             </Card>
-            <Card className="bg-card shadow-sm">
+            <Card>
               <CardContent className="flex items-center gap-4">
                 <div className="flex size-12 items-center justify-center rounded-full bg-green-100">
                   <CheckCircle2 className="size-6 text-green-700" />
@@ -259,7 +264,7 @@ export default function RenewalPage() {
                 </div>
               </CardContent>
             </Card>
-            <Card className="bg-card shadow-sm">
+            <Card>
               <CardContent className="flex items-center gap-4">
                 <div className="flex size-12 items-center justify-center rounded-full bg-blue-100">
                   <TrendingUp className="size-6 text-blue-700" />
@@ -308,10 +313,8 @@ export default function RenewalPage() {
                 return (
                   <Card
                     key={r.renewalId}
-                    className={`overflow-hidden transition-shadow ${
-                      isHighlighted
-                        ? "ring-2 ring-primary/40 shadow-md"
-                        : "shadow-sm"
+                    className={`overflow-hidden  ${
+                      isHighlighted ? "ring-2 ring-primary/40 shadow-md" : ""
                     }`}
                   >
                     <CardHeader className="flex flex-row items-start justify-between gap-4 border-b border-dashed pb-4">

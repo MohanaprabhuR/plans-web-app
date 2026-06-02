@@ -265,6 +265,12 @@ export default function BuyInsurancePlansPage() {
       return;
     }
 
+    const selectedPlan = plans.find((plan) => plan.planId === selectedPlanId);
+    if (!selectedPlan) {
+      showError("Selected plan not found. Please try again.");
+      return;
+    }
+
     setPurchasing(true);
     try {
       const res = await fetch("/api/insurance/purchase", {
@@ -276,6 +282,38 @@ export default function BuyInsurancePlansPage() {
         body: JSON.stringify({ type, planId: selectedPlanId, answers }),
       });
       if (!res.ok) throw new Error(await res.text());
+
+      // Persist a policy record so "My Policy" cards update immediately.
+      const now = new Date();
+      const renewalDate = new Date(now);
+      renewalDate.setFullYear(now.getFullYear() + 1);
+      const policyId = `POL-${selectedPlan.planId}-${Date.now().toString().slice(-6)}`;
+
+      const createPolicyRes = await fetch("/api/policy", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-User-Id": user.id,
+        },
+        body: JSON.stringify({
+          policyId,
+          type,
+          status: "Active",
+          provider: selectedPlan.provider,
+          providerLogo:
+            "https://img.freepik.com/free-vector/insurance-policy-shield_603843-179.jpg",
+          coverage: `₹${selectedPlan.yearlyPrice.toLocaleString("en-IN")}`,
+          premium: `₹${selectedPlan.monthlyPrice.toLocaleString("en-IN")}/month`,
+          claimAmount: "None",
+          members: [],
+          daysLeft: 365,
+          renewalDate: renewalDate.toISOString().slice(0, 10),
+        }),
+      });
+      if (!createPolicyRes.ok) {
+        throw new Error(await createPolicyRes.text());
+      }
+
       router.push("/your-policy");
     } catch (e) {
       showError(e instanceof Error ? e.message : "Purchase failed.");

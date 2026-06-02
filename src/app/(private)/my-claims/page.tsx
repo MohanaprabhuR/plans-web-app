@@ -174,18 +174,7 @@ const MyClaimsPage = () => {
             <Card key={claim.claimId} className="overflow-hidden">
               <CardContent className="p-0">
                 <div className="flex items-stretch">
-                  {/* Left color accent bar */}
-                  <div
-                    className={`w-1.5 shrink-0 ${
-                      claim.status.toLowerCase() === "approved"
-                        ? "bg-green-500"
-                        : claim.status.toLowerCase() === "rejected"
-                          ? "bg-red-500"
-                          : "bg-amber-400"
-                    }`}
-                  />
-
-                  <div className="flex flex-1 items-center gap-5 px-5 py-5">
+                  <div className="flex flex-1 items-center gap-5 ">
                     {/* Icon */}
                     <div
                       className={`size-12 min-w-12 rounded-2xl flex items-center justify-center ${getTypeBg(claim.type)}`}
@@ -216,10 +205,14 @@ const MyClaimsPage = () => {
                         {claim.title}
                       </p>
                       <div className="flex items-center gap-3 mt-0.5">
-                        <Badge variant="outline">{claim.provider}</Badge>
+                        <Badge variant="outline" theme="amber">
+                          {claim.provider}
+                        </Badge>
+                        <span className="w-1 h-1 bg-muted-foreground/50 rounded-full" />
                         <span className="text-xs text-muted-foreground">
                           Submitted {claim.submittedDate}
                         </span>
+                        <span className="w-1 h-1 bg-muted-foreground/50 rounded-full" />
                         {claim.estimatedResolutionDays > 0 && (
                           <span className="flex items-center gap-1 text-xs text-muted-foreground">
                             <Timer className="size-3" />
@@ -234,6 +227,7 @@ const MyClaimsPage = () => {
                       <Badge theme={getStatusTheme(claim.status)}>
                         {claim.status}
                       </Badge>
+
                       <p className="text-2xl font-bold text-accent-foreground">
                         ₹{claim.amount}
                       </p>
