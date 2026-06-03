@@ -149,7 +149,15 @@ const MyClaimsPage = () => {
         </div>
       )}
 
-      {loading && <ScreenLoading label="Loading claims" />}
+      {loading && (
+        <ScreenLoading
+          variant="summary"
+          showHeader={false}
+          statCount={4}
+          rows={3}
+          label="Loading claims"
+        />
+      )}
 
       {/* Error */}
       {error && !loading && (

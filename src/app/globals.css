@@ -20,3 +20,7 @@
     transform: translateX(100%);
   }
 }
+
+[data-slot="skeleton"]::after {
+  animation-delay: var(--skeleton-delay, 0s);
+}

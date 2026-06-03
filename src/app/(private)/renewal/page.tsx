@@ -230,7 +230,13 @@ export default function RenewalPage() {
       </div>
 
       {loading ? (
-        <ScreenLoading label="Loading renewals" />
+        <ScreenLoading
+          variant="summary"
+          showHeader={false}
+          statCount={3}
+          rows={3}
+          label="Loading renewals"
+        />
       ) : (
         <>
           <div className="grid gap-4 sm:grid-cols-3">

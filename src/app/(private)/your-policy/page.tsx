@@ -174,7 +174,13 @@ const YourPolicyPage = () => {
         Your Policy
       </h3>
       {loading && (
-        <ScreenLoading label="Loading policies" className="pt-2" />
+        <ScreenLoading
+          variant="cards-row"
+          showHeader={false}
+          rows={2}
+          label="Loading policies"
+          className="pt-2"
+        />
       )}
       {error && !loading && (
         <div className="flex items-center justify-center py-12">

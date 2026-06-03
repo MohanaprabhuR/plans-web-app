@@ -709,7 +709,12 @@ const DashboardPage = () => {
         </DialogContent>
       </Dialog>
       {loading ? (
-        <ScreenLoading label="Loading dashboard" className="py-2" />
+        <ScreenLoading
+          variant="cards-row"
+          rows={4}
+          label="Loading dashboard"
+          className="py-2"
+        />
       ) : (
         <>
       <div className="w-full space-y-6">

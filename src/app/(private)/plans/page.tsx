@@ -343,7 +343,12 @@ export default function BuyInsurancePlansPage() {
       </div>
 
       {loadingPlans && (
-        <ScreenLoading label="Loading plans" />
+        <ScreenLoading
+          variant="list"
+          showHeader={false}
+          rows={3}
+          label="Loading plans"
+        />
       )}
 
       {!loadingPlans && plans.length === 0 && (
