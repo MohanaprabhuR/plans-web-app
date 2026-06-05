@@ -36,7 +36,18 @@ interface PolicyCardProps {
   onClick?: () => void;
 }
 
+function getMinimalPolicyLabel(policyId: string) {
+  const trimmed = policyId.trim();
+  if (!trimmed) return "";
+  const segments = trimmed.split("-").filter(Boolean);
+  if (segments.length > 1) {
+    return `#${segments[segments.length - 1]}`;
+  }
+  return trimmed.length > 12 ? `…${trimmed.slice(-8)}` : trimmed;
+}
+
 const PolicyCard: React.FC<PolicyCardProps> = ({ policy, onClick }) => {
+  const minimalPolicyLabel = getMinimalPolicyLabel(policy.policyId);
   const getBackgroundClass = () => {
     switch (policy.type) {
       case "Health":
@@ -107,8 +118,11 @@ const PolicyCard: React.FC<PolicyCardProps> = ({ policy, onClick }) => {
               {policy.status}
             </span>
           </div>
-          <span className="text-base font-medium leading-5 tracking-4 text-muted-foreground">
-            {policy.policyId}
+          <span
+            className="text-sm font-medium leading-5 tracking-4 text-muted-foreground truncate max-w-[88px]"
+            title={policy.policyId}
+          >
+            {minimalPolicyLabel}
           </span>
         </div>
       </CardHeader>
@@ -116,7 +130,10 @@ const PolicyCard: React.FC<PolicyCardProps> = ({ policy, onClick }) => {
         <div className="flex justify-between">
           <div className="flex justify-between items-center w-full">
             <div className="flex flex-col">
-              <span className="font-medium text-xl leading-6 tracking-4 text-accent-foreground">
+              <span
+                className="font-medium text-xl leading-6 tracking-4 text-accent-foreground truncate max-w-[200px]"
+                title={policy.provider}
+              >
                 {policy.provider}
               </span>
               <span className="text-muted-foreground text-base font-medium leading-6 tracking-4">

@@ -9,6 +9,10 @@ import { toast } from "sonner";
 import { Alert, AlertTitle } from "@/components/ui/alert";
 import { ScreenLoading } from "@/components/ui/screen-loading";
 import { cn } from "@/lib/utils";
+import {
+  buildPolicyPurchaseSuccessUrl,
+  getPolicyPurchaseReturnTo,
+} from "@/lib/policy-purchase";
 import Image from "next/image";
 import {
   CarFront,
@@ -314,7 +318,13 @@ export default function BuyInsurancePlansPage() {
         throw new Error(await createPolicyRes.text());
       }
 
-      router.push("/your-policy");
+      const returnTo = getPolicyPurchaseReturnTo();
+      router.push(
+        buildPolicyPurchaseSuccessUrl(returnTo, {
+          type,
+          provider: selectedPlan.provider,
+        }),
+      );
     } catch (e) {
       showError(e instanceof Error ? e.message : "Purchase failed.");
     } finally {
@@ -383,7 +393,7 @@ export default function BuyInsurancePlansPage() {
             onClick={buyNow}
             disabled={purchasing || !selectedPlanId}
           >
-            {purchasing ? "Buying…" : "Buy now"}
+            {purchasing ? "Buying…" : "Buy Policy"}
           </Button>
         </div>
       )}

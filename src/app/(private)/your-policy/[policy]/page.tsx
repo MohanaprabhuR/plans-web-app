@@ -39,6 +39,7 @@ import React, {
   useState,
 } from "react";
 import { toast } from "sonner";
+import { usePolicyPurchaseSuccessToast } from "@/lib/policy-purchase";
 
 interface Policy {
   policyId: string;
@@ -167,6 +168,10 @@ const PolicyDetailPage = () => {
   useEffect(() => {
     fetchPolicies();
   }, [fetchPolicies]);
+
+  usePolicyPurchaseSuccessToast(() => {
+    void fetchPolicies();
+  });
 
   const policies: Policy[] = useMemo(() => {
     return apiData?.endpoints?.policies?.getAllPolicies?.response ?? [];

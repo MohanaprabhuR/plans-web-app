@@ -93,6 +93,7 @@ const PolicyListCard: React.FC<PolicyCardProps> = ({ policy }) => {
           <Button
             variant="outline"
             size="lg"
+            className="shrink-0 ml-4"
             onClick={() =>
               router.push(`/your-policy/${encodeURIComponent(policy.policyId)}`)
             }

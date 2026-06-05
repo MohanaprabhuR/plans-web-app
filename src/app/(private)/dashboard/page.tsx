@@ -69,6 +69,9 @@ import { useRouter } from "next/navigation";
 const GaugeComponent = dynamic(() => import("react-gauge-component"), {
   ssr: false,
 });
+
+const DASHBOARD_POLICIES_LIMIT = 3;
+
 interface Policy {
   policyId: string;
   type: string;
@@ -398,6 +401,11 @@ const DashboardPage = () => {
     return apiData?.endpoints?.policies?.getAllPolicies?.response ?? [];
   }, [apiData]);
 
+  const dashboardPolicies = useMemo(
+    () => policies.slice(0, DASHBOARD_POLICIES_LIMIT),
+    [policies],
+  );
+
   const assetFactorList = useMemo((): RiskFactorItem[] => {
     const raw =
       apiData?.endpoints?.riskAssessment?.getRiskScore?.response?.assetFactors;
@@ -717,114 +725,114 @@ const DashboardPage = () => {
         />
       ) : (
         <>
-      <div className="w-full space-y-6">
-        <div className="flex justify-between w-full items-center">
-          <h3 className="font-semibold text-3xl leading-8 tracking-4">
-            My Policies
-          </h3>
-          <Button className="gap-0.5" onClick={openAddModal}>
-            <PlusIcon className="size-5" /> Add
-          </Button>
-        </div>
-
-        {error && (
-          <div className="flex items-center justify-center py-12">
-            <div className="text-center">
-              <p className="text-red-600 dark:text-red-400 mb-2">
-                Error: {error}
-              </p>
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setError(null);
-                  setLoading(true);
-                  fetch("/api/policy", {
-                    headers: { "X-User-Id": userId },
-                  })
-                    .then((res) => res.json())
-                    .then((data) => {
-                      setApiData(data);
-                      setLoading(false);
-                    })
-                    .catch((err) => {
-                      setError(err.message);
-                      setLoading(false);
-                    });
-                }}
-              >
-                Retry
+          <div className="w-full space-y-6">
+            <div className="flex justify-between w-full items-center">
+              <h3 className="font-semibold text-3xl leading-8 tracking-4">
+                My Policies
+              </h3>
+              <Button className="gap-0.5" onClick={openAddModal}>
+                <PlusIcon className="size-5" /> Add
               </Button>
             </div>
-          </div>
-        )}
 
-        {!error && (
-          <div className="flex gap-6 overflow-x-auto scrollbar-hide">
-            {policies.length === 0 ? (
-              <Card
-                className="min-w-[354px] border  bg-muted/30 flex flex-col items-center justify-center py-16 px-6 cursor-pointer hover:bg-muted/50 transition-colors"
-                onClick={openAddModal}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    handleModalOpenChange(true);
-                  }
-                }}
-              >
-                <div className="flex flex-col items-center gap-4 text-center cursor-pointer">
-                  <div className="size-12 rounded-full bg-muted flex items-center justify-center">
-                    <PlusIcon className="size-6 text-muted-foreground" />
-                  </div>
-                  <div className="space-y-1">
-                    <p className="font-medium text-accent-foreground">
-                      No policies yet
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      Add your first policy to get started
-                    </p>
-                  </div>
+            {error && (
+              <div className="flex items-center justify-center py-12">
+                <div className="text-center">
+                  <p className="text-red-600 dark:text-red-400 mb-2">
+                    Error: {error}
+                  </p>
                   <Button
-                    className="gap-0.5"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      openAddModal();
+                    variant="outline"
+                    onClick={() => {
+                      setError(null);
+                      setLoading(true);
+                      fetch("/api/policy", {
+                        headers: { "X-User-Id": userId },
+                      })
+                        .then((res) => res.json())
+                        .then((data) => {
+                          setApiData(data);
+                          setLoading(false);
+                        })
+                        .catch((err) => {
+                          setError(err.message);
+                          setLoading(false);
+                        });
                     }}
                   >
-                    <PlusIcon className="size-5" /> Add Policy
+                    Retry
                   </Button>
                 </div>
-              </Card>
-            ) : (
-              policies.map((policy, policyIndex) => (
-                <PolicyCard
-                  key={`${policy.policyId}-${policy.type}-${policyIndex}`}
-                  policy={policy}
-                  onClick={() => openEditModal(policy)}
-                />
-              ))
+              </div>
+            )}
+
+            {!error && (
+              <div className="flex gap-6 overflow-x-auto scrollbar-hide">
+                {policies.length === 0 ? (
+                  <Card
+                    className="min-w-[354px] border  bg-muted/30 flex flex-col items-center justify-center py-16 px-6 cursor-pointer hover:bg-muted/50 transition-colors"
+                    onClick={openAddModal}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        handleModalOpenChange(true);
+                      }
+                    }}
+                  >
+                    <div className="flex flex-col items-center gap-4 text-center cursor-pointer">
+                      <div className="size-12 rounded-full bg-muted flex items-center justify-center">
+                        <PlusIcon className="size-6 text-muted-foreground" />
+                      </div>
+                      <div className="space-y-1">
+                        <p className="font-medium text-accent-foreground">
+                          No policies yet
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          Add your first policy to get started
+                        </p>
+                      </div>
+                      <Button
+                        className="gap-0.5"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openAddModal();
+                        }}
+                      >
+                        <PlusIcon className="size-5" /> Add Policy
+                      </Button>
+                    </div>
+                  </Card>
+                ) : (
+                  dashboardPolicies.map((policy, policyIndex) => (
+                    <PolicyCard
+                      key={`${policy.policyId}-${policy.type}-${policyIndex}`}
+                      policy={policy}
+                      onClick={() => openEditModal(policy)}
+                    />
+                  ))
+                )}
+              </div>
             )}
           </div>
-        )}
-      </div>
-      <div className="w-full flex gap-x-6">
-        <div className="w-full">
-          <div className="w-full flex items-center justify-between">
-            <div className="flex flex-col  gap-x-2">
-              <h3 className="font-semibold text-3xl leading-8 tracking-4">
-                Hello! {user?.user_metadata?.full_name || ""}
-              </h3>
-              <p className="text-accent-foreground font-medium text-xl leading-6 tracking-4">
-                Age:32, Male
-              </p>
-            </div>
-            <Button variant="outline" size="md">
-              Check Risk Coverage
-            </Button>
-          </div>
+          <div className="w-full flex gap-x-6">
+            <div className="w-full">
+              <div className="w-full flex items-center justify-between">
+                <div className="flex flex-col  gap-x-2">
+                  <h3 className="font-semibold text-3xl leading-8 tracking-4">
+                    Hello! {user?.user_metadata?.full_name || ""}
+                  </h3>
+                  <p className="text-accent-foreground font-medium text-xl leading-6 tracking-4">
+                    Age:32, Male
+                  </p>
+                </div>
+                <Button variant="outline" size="md">
+                  Check Risk Coverage
+                </Button>
+              </div>
 
-          {/* <GaugeComponent
+              {/* <GaugeComponent
             className="max-w-[380px]! w-full! mx-auto h-[380px]! max-h-[380px] min-h-[380px]"
             value={
               coverageScore ??
@@ -892,82 +900,82 @@ const DashboardPage = () => {
             endAngle={135}
           /> */}
 
-          <GaugeComponent
-            value={
-              coverageScore ??
-              apiData?.endpoints?.riskAssessment?.getRiskScore?.response
-                ?.overallScore ??
-              0
-            }
-            className="max-w-[380px]! w-full! mx-auto h-[380px]! max-h-[380px] min-h-[380px]"
-            type="grafana"
-            minValue={0}
-            maxValue={100}
-            arc={{
-              width: 0.02,
-              padding: 0.03,
-              cornerRadius: 0,
-              subArcs: [],
-              colorArray: [
-                "#eb4f46",
-                "#e9833d",
-                "#edd748",
-                "#67f06d",
-                "#0ee087",
-              ],
-              nbSubArcs: 5,
-              subArcsStrokeWidth: 0,
-              outerArc: { width: 28, padding: 0.04 },
-            }}
-            pointer={{
-              type: "arrow",
-              color: "#383838",
-              length: 0.7,
-              width: 22,
-              maxFps: 30,
-              baseColor: "#ffffff",
-              strokeWidth: 2,
-              arrowOffset: 0.9,
-            }}
-            labels={{
-              valueLabel: {
-                formatTextValue: (e) => "".concat(e, ""),
-                style: {
-                  fontSize: "20px",
-                  fill: "#383838",
-                  fontWeight: "bold",
-                  textShadow: "none",
-                },
-              },
-              tickLabels: {
-                type: "outer",
-                defaultTickValueConfig: {
-                  formatTextValue: (e) => "".concat(e, "\xb0"),
-                  style: { fontSize: "9px", fill: "#aaa" },
-                  hide: true,
-                },
-                defaultTickLineConfig: {
-                  color: "#ededed",
-                  length: 4,
-                  width: 1,
-                  hide: true,
-                },
-                ticks: [],
-                hideMinMax: true,
-                autoSpaceTickLabels: false,
-              },
-            }}
-            startAngle={-135}
-            endAngle={135}
-          />
+              <GaugeComponent
+                value={
+                  coverageScore ??
+                  apiData?.endpoints?.riskAssessment?.getRiskScore?.response
+                    ?.overallScore ??
+                  0
+                }
+                className="max-w-[380px]! w-full! mx-auto h-[380px]! max-h-[380px] min-h-[380px]"
+                type="grafana"
+                minValue={0}
+                maxValue={100}
+                arc={{
+                  width: 0.02,
+                  padding: 0.03,
+                  cornerRadius: 0,
+                  subArcs: [],
+                  colorArray: [
+                    "#eb4f46",
+                    "#e9833d",
+                    "#edd748",
+                    "#67f06d",
+                    "#0ee087",
+                  ],
+                  nbSubArcs: 5,
+                  subArcsStrokeWidth: 0,
+                  outerArc: { width: 28, padding: 0.04 },
+                }}
+                pointer={{
+                  type: "arrow",
+                  color: "#383838",
+                  length: 0.7,
+                  width: 22,
+                  maxFps: 30,
+                  baseColor: "#ffffff",
+                  strokeWidth: 2,
+                  arrowOffset: 0.9,
+                }}
+                labels={{
+                  valueLabel: {
+                    formatTextValue: (e) => "".concat(e, ""),
+                    style: {
+                      fontSize: "20px",
+                      fill: "#383838",
+                      fontWeight: "bold",
+                      textShadow: "none",
+                    },
+                  },
+                  tickLabels: {
+                    type: "outer",
+                    defaultTickValueConfig: {
+                      formatTextValue: (e) => "".concat(e, "\xb0"),
+                      style: { fontSize: "9px", fill: "#aaa" },
+                      hide: true,
+                    },
+                    defaultTickLineConfig: {
+                      color: "#ededed",
+                      length: 4,
+                      width: 1,
+                      hide: true,
+                    },
+                    ticks: [],
+                    hideMinMax: true,
+                    autoSpaceTickLabels: false,
+                  },
+                }}
+                startAngle={-135}
+                endAngle={135}
+              />
 
-          <div className="flex gap-6 justify-between">
-            <div className="flex flex-col gap-y-4 w-full">
-              <p className="text-base leading-6 font-medium text-muted-foreground flex items-center gap-x-1">
-                Personal Factors
-                <CornerRightDown className="size-4 relative top-1.5" />
-              </p>
-              <div className="flex flex-col gap-y-6">
+              <div className="flex gap-6 justify-between">
+                <div className="flex flex-col gap-y-4 w-full">
+                  <p className="text-base leading-6 font-medium text-muted-foreground flex items-center gap-x-1">
+                    Personal Factors
+                    <CornerRightDown className="size-4 relative top-1.5" />
+                  </p>
+                  <div className="flex flex-col gap-y-6">
                     {personalFactorsList.map((list, index) => {
                       return (
                         <Card className="w-full p-1 pt-4 gap-6" key={index}>
@@ -1045,14 +1053,14 @@ const DashboardPage = () => {
                         </Card>
                       );
                     })}
-              </div>
-            </div>
-            <div className="flex flex-col gap-y-4 w-full">
-              <p className="text-base leading-6 font-medium text-muted-foreground flex items-center gap-x-1">
-                Asset Factors
-                <CornerRightDown className="size-4 relative top-1.5 " />
-              </p>
-              <div className="flex flex-col gap-y-6">
+                  </div>
+                </div>
+                <div className="flex flex-col gap-y-4 w-full">
+                  <p className="text-base leading-6 font-medium text-muted-foreground flex items-center gap-x-1">
+                    Asset Factors
+                    <CornerRightDown className="size-4 relative top-1.5 " />
+                  </p>
+                  <div className="flex flex-col gap-y-6">
                     {assetFactorList.map((list, index) => {
                       return (
                         <Card className="w-full p-1 pt-4 gap-6" key={index}>
@@ -1131,92 +1139,95 @@ const DashboardPage = () => {
                         </Card>
                       );
                     })}
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
-        <div className="w-full max-w-[354px] flex flex-col gap-y-6">
-          <Card className="gap-4">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-x-2 font-semibold">
-                <Zap className="size-5" /> Quick Actions
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="flex gap-[15px]">
-              {quickActions.map((action) => {
-                if (action.type === "drawer") {
-                  return (
-                    <Drawer key={action.id} direction="right">
-                      <DrawerTrigger asChild>
-                        <QuickActionCard
-                          name={action.name}
-                          icon={action.icon}
-                        />
-                      </DrawerTrigger>
+            <div className="w-full max-w-[354px] flex flex-col gap-y-6">
+              <Card className="gap-4">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-x-2 font-semibold">
+                    <Zap className="size-5" /> Quick Actions
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="flex gap-[15px]">
+                  {quickActions.map((action) => {
+                    if (action.type === "drawer") {
+                      return (
+                        <Drawer key={action.id} direction="right">
+                          <DrawerTrigger asChild>
+                            <QuickActionCard
+                              name={action.name}
+                              icon={action.icon}
+                            />
+                          </DrawerTrigger>
 
-                      <DrawerContent className="space-y-[36px] p-6">
-                        <DrawerHeader className="flex flex-row items-center justify-between w-full p-0 mb-[44px]">
-                          Download Health Cards
-                          <DrawerClose>
-                            <XIcon className="size-4" />
-                          </DrawerClose>
-                        </DrawerHeader>
+                          <DrawerContent className="space-y-[36px] p-6">
+                            <DrawerHeader className="flex flex-row items-center justify-between w-full p-0 mb-[44px]">
+                              Download Health Cards
+                              <DrawerClose>
+                                <XIcon className="size-4" />
+                              </DrawerClose>
+                            </DrawerHeader>
 
-                        <div className="space-y-[36px]">
-                          {healthCards.map((card) => (
-                            <HealthCard key={card.id} card={card} />
-                          ))}
-                        </div>
-                      </DrawerContent>
-                    </Drawer>
-                  );
-                }
+                            <div className="space-y-[36px]">
+                              {healthCards.map((card) => (
+                                <HealthCard key={card.id} card={card} />
+                              ))}
+                            </div>
+                          </DrawerContent>
+                        </Drawer>
+                      );
+                    }
 
-                if (action.type === "link" && action.href) {
-                  return (
-                    <Link key={action.id} href={action.href}>
-                      <QuickActionCard name={action.name} icon={action.icon} />
-                    </Link>
-                  );
-                }
-                return null;
-              })}
-            </CardContent>
-          </Card>
-          <Card className="gap-4">
-            <CardHeader className="gap-0">
-              <CardTitle className="flex items-center gap-x-2 font-semibold">
-                <ShieldCheck className="size-5" /> Premium Overview
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="gap-4 flex flex-col">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-base leading-6  font-medium text-muted-foreground">
-                    Total Coverage
-                  </p>
-                    <p className="text-3xl font-medium leading-8  text-accent-foreground">
-                      $
-                      {
-                        apiData?.endpoints?.premiumOverview?.getPremiumSummary
-                          ?.response?.totalYearlyPremium
-                      }
-                    </p>
-                </div>
-                  <div className="bg-accent size-14 rounded-lg flex items-center justify-center text-center p-2">
-                    <p className="text-[8px] leading-3  font-semibold text-muted-foreground uppercase flex flex-col items-center justify-center">
-                      <span className="text-accent-foreground font-medium text-3xl">
+                    if (action.type === "link" && action.href) {
+                      return (
+                        <Link key={action.id} href={action.href}>
+                          <QuickActionCard
+                            name={action.name}
+                            icon={action.icon}
+                          />
+                        </Link>
+                      );
+                    }
+                    return null;
+                  })}
+                </CardContent>
+              </Card>
+              <Card className="gap-4">
+                <CardHeader className="gap-0">
+                  <CardTitle className="flex items-center gap-x-2 font-semibold">
+                    <ShieldCheck className="size-5" /> Premium Overview
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="gap-4 flex flex-col">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-base leading-6  font-medium text-muted-foreground">
+                        Total Coverage
+                      </p>
+                      <p className="text-3xl font-medium leading-8  text-accent-foreground">
+                        $
                         {
                           apiData?.endpoints?.premiumOverview?.getPremiumSummary
-                            ?.response?.totalPolicies
+                            ?.response?.totalYearlyPremium
                         }
-                      </span>
-                      policies
-                    </p>
+                      </p>
+                    </div>
+                    <div className="bg-accent size-14 rounded-lg flex items-center justify-center text-center p-2">
+                      <p className="text-[8px] leading-3  font-semibold text-muted-foreground uppercase flex flex-col items-center justify-center">
+                        <span className="text-accent-foreground font-medium text-3xl">
+                          {
+                            apiData?.endpoints?.premiumOverview
+                              ?.getPremiumSummary?.response?.totalPolicies
+                          }
+                        </span>
+                        policies
+                      </p>
+                    </div>
                   </div>
-              </div>
-              <div className="flex flex-wrap gap-3">
-                {apiData?.endpoints?.premiumOverview?.getPremiumSummary?.response?.breakdown?.map(
+                  <div className="flex flex-wrap gap-3">
+                    {apiData?.endpoints?.premiumOverview?.getPremiumSummary?.response?.breakdown?.map(
                       (item) => (
                         <Card
                           key={item.category}
@@ -1243,19 +1254,22 @@ const DashboardPage = () => {
                         </Card>
                       ),
                     )}
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="gap-4">
-            <CardHeader className="flex items-start justify-between ">
-              <CardTitle className="flex items-center gap-x-2 font-semibold">
-                <SquareChartGantt className="size-5" /> Claims
-              </CardTitle>
-              <Button variant="ghost" onClick={() => router.push("/my-claims")}>
-                View All
-              </Button>
-            </CardHeader>
-            <CardContent className="flex flex-col gap-y-4">
+                  </div>
+                </CardContent>
+              </Card>
+              <Card className="gap-4">
+                <CardHeader className="flex items-start justify-between ">
+                  <CardTitle className="flex items-center gap-x-2 font-semibold">
+                    <SquareChartGantt className="size-5" /> Claims
+                  </CardTitle>
+                  <Button
+                    variant="ghost"
+                    onClick={() => router.push("/my-claims")}
+                  >
+                    View All
+                  </Button>
+                </CardHeader>
+                <CardContent className="flex flex-col gap-y-4">
                   {apiData?.endpoints?.claims?.getAllClaims?.response?.map(
                     (claim) => (
                       <Card className="relative" key={claim.claimId}>
@@ -1313,74 +1327,76 @@ const DashboardPage = () => {
                       </Card>
                     ),
                   )}
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-      <div className="w-full p-6 border rounded-2xl flex items-center justify-between bg-[linear-gradient(60deg,#FFF3EB_0%,rgba(255,243,235,0)_50%)]">
-        <div className="flex flex-col gap-y-2 max-w-[265px]">
-          <Badge variant="secondary" size="md" theme="blue">
-            <BadgePercent className="size-4" />
-            Exclusive Offers
-          </Badge>
-          <p className="text-3xl leading-8 font-semibold text-accent-foreground -tracking-4 ">
-            Get Customized Offers Handpicked For You
-          </p>
-        </div>
-        <div className="flex gap-x-6 flex-wrap">
-          {apiData?.endpoints?.offers?.getExclusiveOffers?.response
-              ?.length ? (
-            apiData.endpoints.offers.getExclusiveOffers.response.map(
-              (offer, index) => (
-                <Card key={index} className="w-[344px] min-w-[344px]">
-                  <CardContent>
-                    <Badge theme="amber">Save {offer.discount} Yearly</Badge>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+          <div className="w-full p-6 border rounded-2xl flex items-center justify-between bg-[linear-gradient(60deg,#FFF3EB_0%,rgba(255,243,235,0)_50%)]">
+            <div className="flex flex-col gap-y-2 max-w-[265px]">
+              <Badge variant="secondary" size="md" theme="blue">
+                <BadgePercent className="size-4" />
+                Exclusive Offers
+              </Badge>
+              <p className="text-3xl leading-8 font-semibold text-accent-foreground -tracking-4 ">
+                Get Customized Offers Handpicked For You
+              </p>
+            </div>
+            <div className="flex gap-x-6 flex-wrap">
+              {apiData?.endpoints?.offers?.getExclusiveOffers?.response
+                ?.length ? (
+                apiData.endpoints.offers.getExclusiveOffers.response.map(
+                  (offer, index) => (
+                    <Card key={index} className="w-[344px] min-w-[344px]">
+                      <CardContent>
+                        <Badge theme="amber">
+                          Save {offer.discount} Yearly
+                        </Badge>
 
-                    <div className="flex items-center justify-between py-4 border-b border-dashed">
-                      <div className="flex gap-x-2.5">
-                        <Image
-                          src={offer.image}
-                          alt={offer.type}
-                          width={40}
-                          height={40}
-                          className="object-cover rounded-md"
-                        />
-                        <div>
-                          <p className="text-accent-foreground text-base leading-6 font-semibold">
-                            {offer.type}
-                          </p>
-                          <p className="text-muted-foreground text-xs leading-4 font-medium">
-                            {offer.provider}
+                        <div className="flex items-center justify-between py-4 border-b border-dashed">
+                          <div className="flex gap-x-2.5">
+                            <Image
+                              src={offer.image}
+                              alt={offer.type}
+                              width={40}
+                              height={40}
+                              className="object-cover rounded-md"
+                            />
+                            <div>
+                              <p className="text-accent-foreground text-base leading-6 font-semibold">
+                                {offer.type}
+                              </p>
+                              <p className="text-muted-foreground text-xs leading-4 font-medium">
+                                {offer.provider}
+                              </p>
+                            </div>
+                          </div>
+
+                          <p className="text-accent-foreground text-3xl leading-4 font-semibold -tracking-4 max-w-[70px] text-right">
+                            ${offer.price}
+                            <br />
+                            <span className="text-muted-foreground text-[10px] uppercase font-medium">
+                              {offer.priceType}
+                            </span>
                           </p>
                         </div>
-                      </div>
 
-                      <p className="text-accent-foreground text-3xl leading-4 font-semibold -tracking-4 max-w-[70px] text-right">
-                        ${offer.price}
-                        <br />
-                        <span className="text-muted-foreground text-[10px] uppercase font-medium">
-                          {offer.priceType}
-                        </span>
-                      </p>
-                    </div>
-
-                    <div className="flex items-center justify-between pt-2">
-                      <p className="text-muted-foreground text-xs leading-4 font-medium">
-                        Offer Ends: {offer.offerEnds}
-                      </p>
-                      <Button variant="ghost">View Quotes</Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ),
-            )
-          ) : (
-            <p className="text-muted-foreground text-sm">
-              No offers available.
-            </p>
-          )}
-        </div>
-      </div>
+                        <div className="flex items-center justify-between pt-2">
+                          <p className="text-muted-foreground text-xs leading-4 font-medium">
+                            Offer Ends: {offer.offerEnds}
+                          </p>
+                          <Button variant="ghost">View Quotes</Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ),
+                )
+              ) : (
+                <p className="text-muted-foreground text-sm">
+                  No offers available.
+                </p>
+              )}
+            </div>
+          </div>
         </>
       )}
     </div>
