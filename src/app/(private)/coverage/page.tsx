@@ -293,6 +293,7 @@ export default function CoveragePage() {
                               outerArc: { width: 0 },
                               cornerRadius: 0,
                               subArcsStrokeWidth: 0,
+                              emptyColor: "#d9d9d9",
                             }}
                             labels={{
                               valueLabel: {
@@ -422,6 +423,7 @@ export default function CoveragePage() {
                               outerArc: { width: 0 },
                               cornerRadius: 0,
                               subArcsStrokeWidth: 0,
+                              emptyColor: "#d9d9d9",
                             }}
                             labels={{
                               valueLabel: {
