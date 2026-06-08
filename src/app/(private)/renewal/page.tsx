@@ -78,21 +78,21 @@ function daysUntil(dueDate: string) {
 function statusBadge(status: Renewal["status"], days: number | null) {
   if (status === "renewed") {
     return (
-      <Badge theme="green" size="md">
+      <Badge theme="green" size="md" variant="outline">
         Renewed
       </Badge>
     );
   }
   if (status === "expired") {
     return (
-      <Badge theme="red" size="md">
+      <Badge theme="red" size="md" variant="outline">
         Expired
       </Badge>
     );
   }
   if (days !== null && days <= 3) {
     return (
-      <Badge theme="amber" size="md">
+      <Badge theme="amber" size="md" variant="outline">
         Due soon
       </Badge>
     );

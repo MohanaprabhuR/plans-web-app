@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Alert, AlertTitle } from "@/components/ui/alert";
@@ -39,6 +39,11 @@ export function buildPolicyPurchaseSuccessUrl(
 export function usePolicyPurchaseSuccessToast(onShown?: () => void) {
   const router = useRouter();
   const pathname = usePathname();
+  const onShownRef = useRef(onShown);
+
+  useEffect(() => {
+    onShownRef.current = onShown;
+  }, [onShown]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -74,8 +79,8 @@ export function usePolicyPurchaseSuccessToast(onShown?: () => void) {
       { id: POLICY_PURCHASE_TOAST_KEY },
     );
 
-    onShown?.();
+    onShownRef.current?.();
     router.replace(pathname);
     sessionStorage.removeItem(guardKey);
-  }, [pathname, router, onShown]);
+  }, [pathname, router]);
 }

@@ -169,8 +169,6 @@ export async function POST(req: Request) {
       );
     }
 
-    const currentRenewals = await getRenewalsForUser(userId);
-
     const renewal: Renewal = {
       renewalId,
       policyId,
