@@ -138,12 +138,12 @@ export default function SearchPage() {
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Failed to get response.";
       const friendly = msg.includes("AI_NOT_CONFIGURED")
-        ? "AI is not configured. Add `OPENAI_API_KEY` in `.env.local` and restart the server."
+        ? "AI is not configured. Add `ANTHROPIC_API_KEY` in `.env.local` and restart the server."
         : msg.includes("AI_AUTH_ERROR")
-          ? "Your AI API key is invalid. Update `OPENAI_API_KEY` and restart the server."
-          : msg.includes("OPENAI_QUOTA_EXCEEDED") || msg.includes("insufficient_quota")
-            ? "OpenAI has no quota left for this API key. Add billing or credits in your OpenAI account (Billing), or use a key from a project with available usage."
-            : msg.includes("OPENAI_RATE_LIMIT")
+          ? "Your AI API key is invalid. Update `ANTHROPIC_API_KEY` and restart the server."
+          : msg.includes("AI_QUOTA_EXCEEDED")
+            ? "Your Anthropic account has no credits left. Add billing or credits at console.anthropic.com, then try again."
+            : msg.includes("AI_RATE_LIMIT")
               ? "Too many AI requests in a short time. Wait a minute and try again."
               : msg;
       setMessages((prev) => [

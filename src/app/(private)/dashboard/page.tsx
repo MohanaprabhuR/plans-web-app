@@ -70,7 +70,7 @@ const GaugeComponent = dynamic(() => import("react-gauge-component"), {
   ssr: false,
 });
 
-const DASHBOARD_POLICIES_LIMIT = 4;
+const DASHBOARD_POLICIES_LIMIT = 3;
 
 interface Policy {
   policyId: string;
