@@ -232,7 +232,7 @@ const quickActions = [
     name: "Policy AI Chat",
     icon: <MessageSquareText className="size-6 text-[#FF5E00]" />,
     type: "link",
-    href: "/policy-ai",
+    href: "/search",
   },
 ];
 const DashboardPage = () => {

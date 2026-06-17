@@ -138,11 +138,11 @@ export default function PolicyAI() {
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Failed to get response.";
       const friendly = msg.includes("AI_NOT_CONFIGURED")
-        ? "AI is not configured. Add `ANTHROPIC_API_KEY` in `.env.local` and restart the server."
+        ? "AI is not configured. Add `OPENAI_API_KEY` or `ANTHROPIC_API_KEY` in `.env.local` and restart the server."
         : msg.includes("AI_AUTH_ERROR")
-          ? "Your AI API key is invalid. Update `ANTHROPIC_API_KEY` and restart the server."
+          ? "Your AI API key is invalid. Check `OPENAI_API_KEY` / `ANTHROPIC_API_KEY` in `.env.local` and restart the server."
           : msg.includes("AI_QUOTA_EXCEEDED")
-            ? "Your Anthropic account has no credits left. Add billing or credits at console.anthropic.com, then try again."
+            ? "Your AI provider has no credits left. Add billing or credits to your OpenAI or Anthropic account, then try again."
             : msg.includes("AI_RATE_LIMIT")
               ? "Too many AI requests in a short time. Wait a minute and try again."
               : msg;
