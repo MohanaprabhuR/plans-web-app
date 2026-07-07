@@ -1,12 +1,11 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import useAuth from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ScreenLoading } from "@/components/ui/screen-loading";
-import { Alert, AlertTitle } from "@/components/ui/alert";
+import { PageLoadState } from "@/components/ui/page-load-state";
+import { useUserFetch } from "@/hooks/useUserFetch";
 import { Badge } from "@/components/ui/badge";
 import {
   Pagination,
@@ -22,7 +21,6 @@ import {
   Bell,
   CarFront,
   ChevronLeft,
-  CircleAlert,
   ClipboardList,
   CreditCard,
   Hospital,
@@ -132,45 +130,17 @@ function getPriorityBadge(priority: string): {
 }
 
 export default function NotificationsPage() {
-  const { user } = useAuth();
   const router = useRouter();
-  const [apiData, setApiData] = useState<ApiResponse | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const {
+    data: apiData,
+    loading,
+    error,
+    refetch,
+  } = useUserFetch<ApiResponse>("/api/policy", [], {
+    errorFallback: "Failed to load notifications.",
+  });
   const [readIds, setReadIds] = useState<Set<string>>(new Set());
   const [currentPage, setCurrentPage] = useState(1);
-
-  useEffect(() => {
-    if (!user?.id) {
-      setLoading(false);
-      return;
-    }
-    let cancelled = false;
-
-    (async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const res = await fetch("/api/policy", {
-          cache: "no-store",
-          headers: { "X-User-Id": user.id },
-        });
-        if (!res.ok) throw new Error(await res.text());
-        const json = (await res.json()) as ApiResponse;
-        if (!cancelled) setApiData(json);
-      } catch (e) {
-        const message =
-          e instanceof Error ? e.message : "Failed to load notifications.";
-        if (!cancelled) setError(message);
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [user?.id]);
 
   const notifications = useMemo(() => {
     const list =
@@ -185,21 +155,12 @@ export default function NotificationsPage() {
     1,
     Math.ceil(notifications.length / NOTIFICATIONS_PAGE_SIZE),
   );
-
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [notifications.length]);
-
-  useEffect(() => {
-    if (currentPage > totalPages) {
-      setCurrentPage(totalPages);
-    }
-  }, [currentPage, totalPages]);
+  const activePage = Math.min(currentPage, totalPages);
 
   const visibleNotifications = useMemo(() => {
-    const start = (currentPage - 1) * NOTIFICATIONS_PAGE_SIZE;
+    const start = (activePage - 1) * NOTIFICATIONS_PAGE_SIZE;
     return notifications.slice(start, start + NOTIFICATIONS_PAGE_SIZE);
-  }, [notifications, currentPage]);
+  }, [notifications, activePage]);
 
   const isRead = (item: NotificationItem) =>
     item.read || readIds.has(item.notificationId);
@@ -235,42 +196,35 @@ export default function NotificationsPage() {
         </div>
       </div>
 
-      {loading && (
-        <ScreenLoading
-          variant="list"
-          showHeader={false}
-          rows={5}
-          label="Loading notifications"
-        />
-      )}
-
-      {error && !loading && (
-        <Alert variant="error">
-          <CircleAlert className="size-4" />
-          <AlertTitle>{error}</AlertTitle>
-        </Alert>
-      )}
-
-      {!loading && !error && notifications.length === 0 && (
-        <Card className="border-dashed">
-          <CardContent className="flex flex-col items-center justify-center gap-4 py-16 text-center">
-            <div className="flex size-16 items-center justify-center rounded-full bg-accent">
-              <Bell className="size-8 text-muted-foreground" />
-            </div>
-            <div className="max-w-sm space-y-1">
-              <p className="text-lg font-semibold text-foreground">
-                You&apos;re all caught up
-              </p>
-              <p className="text-sm text-muted-foreground">
-                New alerts about policies, claims, and payments will appear
-                here.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {!loading && !error && notifications.length > 0 && (
+      <PageLoadState
+        loading={loading}
+        error={error}
+        onRetry={() => void refetch()}
+        variant="list"
+        showHeader={false}
+        rows={5}
+        label="Loading notifications"
+        empty={!loading && !error && notifications.length === 0}
+        emptyState={
+          <Card className="border-dashed">
+            <CardContent className="flex flex-col items-center justify-center gap-4 py-16 text-center">
+              <div className="flex size-16 items-center justify-center rounded-full bg-accent">
+                <Bell className="size-8 text-muted-foreground" />
+              </div>
+              <div className="max-w-sm space-y-1">
+                <p className="text-lg font-semibold text-foreground">
+                  You&apos;re all caught up
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  New alerts about policies, claims, and payments will appear
+                  here.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        }
+      >
+      {notifications.length > 0 && (
         <div className="flex flex-col gap-4">
           {visibleNotifications.map((item) => {
             const read = isRead(item);
@@ -381,22 +335,22 @@ export default function NotificationsPage() {
                           setCurrentPage((p) => Math.max(1, p - 1));
                         }}
                         className={cn(
-                          currentPage === 1 && "pointer-events-none opacity-50",
+                          activePage === 1 && "pointer-events-none opacity-50",
                         )}
                       />
                     </PaginationItem>
                     {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                      (page) => (
-                        <PaginationItem key={page}>
+                      (pageNumber) => (
+                        <PaginationItem key={pageNumber}>
                           <PaginationLink
                             href="#"
-                            isActive={page === currentPage}
+                            isActive={pageNumber === activePage}
                             onClick={(e) => {
                               e.preventDefault();
-                              setCurrentPage(page);
+                              setCurrentPage(pageNumber);
                             }}
                           >
-                            {page}
+                            {pageNumber}
                           </PaginationLink>
                         </PaginationItem>
                       ),
@@ -409,7 +363,7 @@ export default function NotificationsPage() {
                           setCurrentPage((p) => Math.min(totalPages, p + 1));
                         }}
                         className={cn(
-                          currentPage === totalPages &&
+                          activePage === totalPages &&
                             "pointer-events-none opacity-50",
                         )}
                       />
@@ -421,6 +375,7 @@ export default function NotificationsPage() {
           )}
         </div>
       )}
+      </PageLoadState>
     </div>
   );
 }

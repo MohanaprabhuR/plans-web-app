@@ -1,13 +1,12 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
-import useAuth from "@/hooks/useAuth";
+import React, { useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { ScreenLoading } from "@/components/ui/screen-loading";
+import { PageLoadState } from "@/components/ui/page-load-state";
+import { useUserFetch } from "@/hooks/useUserFetch";
 import {
   BriefcaseMedical,
   CarFront,
-  CircleAlert,
   ClipboardList,
   Heart,
   House,
@@ -15,7 +14,6 @@ import {
   Timer,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Alert, AlertTitle } from "@/components/ui/alert";
 
 type Claim = {
   claimId: string;
@@ -79,42 +77,14 @@ function StatCard({ label, value }: { label: string; value: string | number }) {
 }
 
 const MyClaimsPage = () => {
-  const { user } = useAuth();
-  const [apiData, setApiData] = useState<ApiResponse | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!user?.id) {
-      setLoading(false);
-      return;
-    }
-    let cancelled = false;
-
-    (async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const res = await fetch("/api/policy", {
-          cache: "no-store",
-          headers: { "X-User-Id": user.id },
-        });
-        if (!res.ok) throw new Error(await res.text());
-        const json = (await res.json()) as ApiResponse;
-        if (!cancelled) setApiData(json);
-      } catch (e) {
-        const message =
-          e instanceof Error ? e.message : "Failed to load claims.";
-        if (!cancelled) setError(message);
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [user?.id]);
+  const {
+    data: apiData,
+    loading,
+    error,
+    refetch,
+  } = useUserFetch<ApiResponse>("/api/policy", [], {
+    errorFallback: "Failed to load claims.",
+  });
 
   const claims = useMemo(
     () => apiData?.endpoints?.claims?.getAllClaims?.response ?? [],
@@ -139,8 +109,25 @@ const MyClaimsPage = () => {
         My Claims
       </h3>
 
+      <PageLoadState
+        loading={loading}
+        error={error}
+        onRetry={() => void refetch()}
+        variant="summary"
+        showHeader={false}
+        statCount={4}
+        rows={3}
+        label="Loading claims"
+        empty={!loading && !error && claims.length === 0}
+        emptyState={
+          <div className="flex flex-col items-center justify-center gap-3 py-20">
+            <ClipboardList className="size-12 text-muted-foreground/40" />
+            <p className="font-medium text-muted-foreground">No claims found.</p>
+          </div>
+        }
+      >
       {/* Stats row */}
-      {!loading && !error && claims.length > 0 && (
+      {claims.length > 0 && (
         <div className="grid grid-cols-4 gap-4">
           <StatCard label="Total Claims" value={stats.total} />
           <StatCard label="Pending" value={stats.pending} />
@@ -149,34 +136,8 @@ const MyClaimsPage = () => {
         </div>
       )}
 
-      {loading && (
-        <ScreenLoading
-          variant="summary"
-          showHeader={false}
-          statCount={4}
-          rows={3}
-          label="Loading claims"
-        />
-      )}
-
-      {/* Error */}
-      {error && !loading && (
-        <Alert variant="error">
-          <CircleAlert className="size-4" />
-          <AlertTitle>{error}</AlertTitle>
-        </Alert>
-      )}
-
-      {/* Empty state */}
-      {!loading && !error && claims.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-20 gap-3">
-          <ClipboardList className="size-12 text-muted-foreground/40" />
-          <p className="text-muted-foreground font-medium">No claims found.</p>
-        </div>
-      )}
-
       {/* Claims list */}
-      {!loading && !error && claims.length > 0 && (
+      {claims.length > 0 && (
         <div className="flex flex-col gap-4">
           {claims.map((claim) => (
             <Card key={claim.claimId} className="overflow-hidden">
@@ -247,6 +208,7 @@ const MyClaimsPage = () => {
           ))}
         </div>
       )}
+      </PageLoadState>
     </div>
   );
 };

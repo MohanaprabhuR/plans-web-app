@@ -22,7 +22,7 @@ import {
   XIcon,
   Zap,
 } from "lucide-react";
-import { useCallback, useEffect, useState, useMemo, ReactNode } from "react";
+import { useState, useMemo, ReactNode } from "react";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -63,7 +63,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { StaticImport } from "next/dist/shared/lib/get-img-props";
 import dynamic from "next/dynamic";
-import { ScreenLoading } from "@/components/ui/screen-loading";
+import { PageLoadState } from "@/components/ui/page-load-state";
+import { useUserFetch } from "@/hooks/useUserFetch";
 import { useRouter } from "next/navigation";
 
 const GaugeComponent = dynamic(() => import("react-gauge-component"), {
@@ -238,10 +239,28 @@ const quickActions = [
 const DashboardPage = () => {
   const { user } = useAuth();
   const userId = user?.id ?? "";
-  const [apiData, setApiData] = useState<ApiResponse | null>(null);
-  const [coverageScore, setCoverageScore] = useState<number | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const {
+    data: apiData,
+    loading,
+    error,
+    refetch: fetchPolicies,
+    setError,
+  } = useUserFetch<ApiResponse>("/api/policy", [], {
+    errorFallback: "Failed to load policies.",
+    onError: (errorMessage) => {
+      toast.custom(() => (
+        <Alert variant="error">
+          <CircleAlert className="size-4" />
+          <AlertTitle>Failed to load policies: {errorMessage}</AlertTitle>
+        </Alert>
+      ));
+    },
+  });
+  const { data: coverageData } = useUserFetch<CoverageResponse>("/api/coverage");
+  const coverageScore =
+    typeof coverageData?.overallScore === "number"
+      ? coverageData.overallScore
+      : null;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingPolicy, setEditingPolicy] = useState<Policy | null>(null);
   const [policyId, setPolicyId] = useState("");
@@ -327,75 +346,6 @@ const DashboardPage = () => {
       return { ...prev, memberCount: n, members };
     });
   };
-
-  const fetchPolicies = useCallback(async () => {
-    if (!userId) {
-      setLoading(false);
-      return;
-    }
-    try {
-      setLoading(true);
-      setError(null);
-      const response = await fetch("/api/policy", {
-        cache: "no-store",
-        headers: { "X-User-Id": userId },
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(
-          `Failed to fetch policies: ${response.status} ${response.statusText}. ${errorText}`,
-        );
-      }
-
-      const data = await response.json();
-      setApiData(data);
-    } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : "An error occurred";
-      setError(errorMessage);
-
-      toast.custom(() => (
-        <Alert variant="error">
-          <CircleAlert className="size-4" />
-          <AlertTitle>Failed to load policies: {errorMessage}</AlertTitle>
-        </Alert>
-      ));
-    } finally {
-      setLoading(false);
-    }
-  }, [userId]);
-
-  // Fetch policies from API
-  useEffect(() => {
-    fetchPolicies();
-  }, [fetchPolicies]);
-
-  // Fetch coverage score from /api/coverage so it matches Coverage page
-  useEffect(() => {
-    if (!userId) return;
-    let cancelled = false;
-
-    (async () => {
-      try {
-        const res = await fetch("/api/coverage", {
-          cache: "no-store",
-          headers: { "X-User-Id": userId },
-        });
-        if (!res.ok) return;
-        const json = (await res.json()) as CoverageResponse;
-        if (!cancelled && typeof json.overallScore === "number") {
-          setCoverageScore(json.overallScore);
-        }
-      } catch {
-        // ignore
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [userId]);
 
   const policies: Policy[] = useMemo(() => {
     return apiData?.endpoints?.policies?.getAllPolicies?.response ?? [];
@@ -716,17 +666,37 @@ const DashboardPage = () => {
           </Button>
         </DialogContent>
       </Dialog>
-      {loading ? (
-        <ScreenLoading
-          variant="cards-row"
-          rows={4}
-          label="Loading dashboard"
-          className="py-2"
-        />
-      ) : (
-        <>
+      <PageLoadState
+        loading={loading}
+        error={error}
+        onRetry={() => {
+          setError(null);
+          void fetchPolicies();
+        }}
+        variant="cards-row"
+        rows={4}
+        label="Loading dashboard"
+        errorState={
+          <div className="flex items-center justify-center py-12">
+            <div className="text-center">
+              <p className="mb-2 text-red-600 dark:text-red-400">
+                Error: {error}
+              </p>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setError(null);
+                  void fetchPolicies();
+                }}
+              >
+                Retry
+              </Button>
+            </div>
+          </div>
+        }
+      >
           <div className="w-full space-y-6">
-            <div className="flex justify-between w-full items-center">
+            <div className="flex w-full items-center justify-between">
               <h3 className="font-semibold text-3xl leading-8 tracking-4">
                 My Policies
               </h3>
@@ -735,39 +705,7 @@ const DashboardPage = () => {
               </Button>
             </div>
 
-            {error && (
-              <div className="flex items-center justify-center py-12">
-                <div className="text-center">
-                  <p className="text-red-600 dark:text-red-400 mb-2">
-                    Error: {error}
-                  </p>
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      setError(null);
-                      setLoading(true);
-                      fetch("/api/policy", {
-                        headers: { "X-User-Id": userId },
-                      })
-                        .then((res) => res.json())
-                        .then((data) => {
-                          setApiData(data);
-                          setLoading(false);
-                        })
-                        .catch((err) => {
-                          setError(err.message);
-                          setLoading(false);
-                        });
-                    }}
-                  >
-                    Retry
-                  </Button>
-                </div>
-              </div>
-            )}
-
-            {!error && (
-              <div className="flex gap-6 overflow-x-auto scrollbar-hide">
+            <div className="scrollbar-hide flex gap-6 overflow-x-auto">
                 {policies.length === 0 ? (
                   <Card
                     className="min-w-[354px] border  bg-muted/30 flex flex-col items-center justify-center py-16 px-6 cursor-pointer hover:bg-muted/50 transition-colors"
@@ -814,7 +752,6 @@ const DashboardPage = () => {
                   ))
                 )}
               </div>
-            )}
           </div>
           <div className="w-full flex gap-x-6">
             <div className="w-full">
@@ -1397,8 +1334,7 @@ const DashboardPage = () => {
               )}
             </div>
           </div>
-        </>
-      )}
+      </PageLoadState>
     </div>
   );
 };

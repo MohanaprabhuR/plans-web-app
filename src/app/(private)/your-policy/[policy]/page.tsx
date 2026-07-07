@@ -10,8 +10,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ScreenLoading } from "@/components/ui/screen-loading";
-import useAuth from "@/hooks/useAuth";
+import { PageLoadState } from "@/components/ui/page-load-state";
+import { useUserFetch } from "@/hooks/useUserFetch";
 import {
   Blend,
   CarFront,
@@ -31,13 +31,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
-import React, {
-  ReactNode,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import React, { ReactNode, useMemo } from "react";
 import { toast } from "sonner";
 import { usePolicyPurchaseSuccessToast } from "@/lib/policy-purchase";
 
@@ -126,48 +120,22 @@ const PolicyDetailPage = () => {
     }
   }, [params?.policy]);
 
-  const { user } = useAuth();
-  const userId = user?.id ?? "";
-  const [apiData, setApiData] = useState<ApiResponse | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const fetchPolicies = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const response = await fetch("/api/policy", {
-        cache: "no-store",
-        headers: { "X-User-Id": userId },
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(
-          `Failed to fetch policies: ${response.status} ${response.statusText}. ${errorText}`,
-        );
-      }
-
-      const data = await response.json();
-      setApiData(data);
-    } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : "An error occurred";
-      setError(errorMessage);
-
+  const {
+    data: apiData,
+    loading,
+    error,
+    refetch: fetchPolicies,
+  } = useUserFetch<ApiResponse>("/api/policy", [], {
+    errorFallback: "Failed to load policies.",
+    onError: (errorMessage) => {
       toast.custom(() => (
         <Alert variant="error">
           <CircleAlert className="size-4" />
           <AlertTitle>Failed to load policies: {errorMessage}</AlertTitle>
         </Alert>
       ));
-    } finally {
-      setLoading(false);
-    }
-  }, [userId]);
-
-  useEffect(() => {
-    fetchPolicies();
-  }, [fetchPolicies]);
+    },
+  });
 
   usePolicyPurchaseSuccessToast(() => {
     void fetchPolicies();
@@ -355,20 +323,15 @@ const PolicyDetailPage = () => {
       </div>
       <div className="flex gap-x-6">
         <div className="flex flex-col gap-6">
-          {loading && (
-            <ScreenLoading
-              variant="detail"
-              showHeader={false}
-              label="Loading policy"
-            />
-          )}
-          {!loading && error && (
-            <Alert variant="error">
-              <CircleAlert className="size-4" />
-              <AlertTitle>{error}</AlertTitle>
-            </Alert>
-          )}
-          {!loading && !error && !policy && (
+          <PageLoadState
+            loading={loading}
+            error={error}
+            onRetry={() => void fetchPolicies()}
+            variant="detail"
+            showHeader={false}
+            label="Loading policy"
+          >
+          {!policy ? (
             <Alert variant="error">
               <CircleAlert className="size-4" />
               <AlertTitle>
@@ -376,8 +339,7 @@ const PolicyDetailPage = () => {
                 <span className="font-semibold">{policyIdFromRoute}</span>
               </AlertTitle>
             </Alert>
-          )}
-          {!loading && !error && policy && (
+          ) : (
             <Card className="bg-[linear-gradient(180deg,#F5F0FF_0%,rgba(245,240,255,0)_80%)]">
               <CardContent>
                 <div className="flex items-center justify-between pb-4 border-b border-dashed">
@@ -475,6 +437,7 @@ const PolicyDetailPage = () => {
               </CardContent>
             </Card>
           )}
+          </PageLoadState>
           <div className="w-full flex items-center justify-between pt-2">
             <h3 className="font-semibold text-xl leading-6 tracking-4">
               Know Your Coverage

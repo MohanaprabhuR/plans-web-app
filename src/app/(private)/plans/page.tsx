@@ -1,13 +1,15 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import useAuth from "@/hooks/useAuth";
 import { toast } from "sonner";
 import { Alert, AlertTitle } from "@/components/ui/alert";
-import { ScreenLoading } from "@/components/ui/screen-loading";
+import { PageLoadState } from "@/components/ui/page-load-state";
+import { useAsyncData } from "@/hooks/useAsyncData";
+import { fetchJsonWithUser } from "@/lib/fetch-with-user";
 import { cn } from "@/lib/utils";
 import {
   buildPolicyPurchaseSuccessUrl,
@@ -183,81 +185,69 @@ export default function BuyInsurancePlansPage() {
     [searchParams],
   );
 
-  const [loadingPlans, setLoadingPlans] = useState(true);
   const [purchasing, setPurchasing] = useState(false);
-  const [plans, setPlans] = useState<Plan[]>([]);
   const [selectedPlanId, setSelectedPlanId] = useState<string>("");
-  const [answers, setAnswers] = useState<Answers | null>(null);
 
-  const showError = (message: string) => {
+  const showError = useCallback((message: string) => {
     toast.custom(() => (
       <Alert variant="error">
         <CircleAlert className="size-4" />
         <AlertTitle>{message}</AlertTitle>
       </Alert>
     ));
-  };
+  }, []);
+
+  const {
+    data: plansData,
+    loading: loadingPlans,
+    refetch,
+  } = useAsyncData(
+    async (signal) => {
+      const progressJson = await fetchJsonWithUser<{
+        progress: { step_index?: number; answers?: Answers } | null;
+      }>("/api/insurance/progress", user!.id, { signal });
+
+      const progress = progressJson.progress ?? null;
+      const stepIndex = progress?.step_index ?? -1;
+      const completedStepIndex = 4;
+
+      if (stepIndex < completedStepIndex) {
+        showError("Please complete all steps before viewing plans.");
+        router.push(`/buy-insurance?type=${encodeURIComponent(type)}`);
+        return { plans: [] as Plan[], answers: null as Answers | null };
+      }
+
+      const progressAnswers = progress?.answers ?? null;
+      const plansResponse = await fetch("/api/insurance/plans", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type, answers: progressAnswers }),
+        signal,
+      });
+      if (!plansResponse.ok) throw new Error(await plansResponse.text());
+      const data = (await plansResponse.json()) as { plans: Plan[] };
+
+      return {
+        plans: data.plans ?? [],
+        answers: progressAnswers,
+      };
+    },
+    [user?.id, type, router, showError],
+    {
+      enabled: Boolean(user?.id),
+      errorFallback: "Failed to load plans.",
+      onError: showError,
+    },
+  );
+
+  const plans = useMemo(() => plansData?.plans ?? [], [plansData]);
+  const answers = plansData?.answers ?? null;
 
   useEffect(() => {
-    if (!user?.id) {
-      setLoadingPlans(false);
-      return;
+    if (plans[0]?.planId && !selectedPlanId) {
+      setSelectedPlanId(plans[0].planId);
     }
-    let cancelled = false;
-
-    (async () => {
-      setLoadingPlans(true);
-      try {
-        const progressRes = await fetch("/api/insurance/progress", {
-          headers: { "X-User-Id": user.id },
-        });
-        const progressJson = progressRes.ok
-          ? ((await progressRes.json()) as {
-              progress: {
-                step_index?: number;
-                answers?: Answers;
-              } | null;
-            })
-          : null;
-
-        const progress = progressJson?.progress ?? null;
-        const stepIndex = progress?.step_index ?? -1;
-        const completedStepIndex = 4;
-
-        if (stepIndex < completedStepIndex) {
-          showError("Please complete all steps before viewing plans.");
-          if (!cancelled) {
-            router.push(`/buy-insurance?type=${encodeURIComponent(type)}`);
-          }
-          return;
-        }
-
-        const progressAnswers = progress?.answers ?? null;
-        if (!cancelled) setAnswers(progressAnswers);
-
-        const res = await fetch("/api/insurance/plans", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ type, answers: progressAnswers }),
-        });
-        if (!res.ok) throw new Error(await res.text());
-        const data = (await res.json()) as { plans: Plan[] };
-
-        if (!cancelled) {
-          setPlans(data.plans ?? []);
-          setSelectedPlanId(data.plans?.[0]?.planId ?? "");
-        }
-      } catch (e) {
-        showError(e instanceof Error ? e.message : "Failed to load plans.");
-      } finally {
-        if (!cancelled) setLoadingPlans(false);
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [user?.id, type, router]);
+  }, [plans, selectedPlanId]);
 
   const buyNow = async () => {
     if (!selectedPlanId) {
@@ -352,30 +342,29 @@ export default function BuyInsurancePlansPage() {
         </h3>
       </div>
 
-      {loadingPlans && (
-        <ScreenLoading
-          variant="list"
-          showHeader={false}
-          rows={3}
-          label="Loading plans"
-        />
-      )}
-
-      {!loadingPlans && plans.length === 0 && (
-        <Card className="border-dashed">
-          <CardContent className="flex flex-col items-center justify-center gap-4 py-16 text-center">
-            <p className="text-lg font-semibold text-foreground">
-              No plans found
-            </p>
-            <p className="text-sm text-muted-foreground">
-              Try a different insurance type or complete the questionnaire
-              again.
-            </p>
-          </CardContent>
-        </Card>
-      )}
-
-      {!loadingPlans && plans.length > 0 && (
+      <PageLoadState
+        loading={loadingPlans}
+        onRetry={() => void refetch()}
+        variant="list"
+        showHeader={false}
+        rows={3}
+        label="Loading plans"
+        empty={!loadingPlans && plans.length === 0}
+        emptyState={
+          <Card className="border-dashed">
+            <CardContent className="flex flex-col items-center justify-center gap-4 py-16 text-center">
+              <p className="text-lg font-semibold text-foreground">
+                No plans found
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Try a different insurance type or complete the questionnaire
+                again.
+              </p>
+            </CardContent>
+          </Card>
+        }
+      >
+      {plans.length > 0 && (
         <div className="flex flex-col gap-4">
           {plans.map((plan) => (
             <PlanOptionCard
@@ -397,6 +386,7 @@ export default function BuyInsurancePlansPage() {
           </Button>
         </div>
       )}
+      </PageLoadState>
     </div>
   );
 }

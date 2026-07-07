@@ -1,6 +1,7 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Spinner } from "@/components/ui/spinner";
 
 export type ScreenLoadingVariant =
   | "full"
@@ -219,10 +220,7 @@ function ScreenLoading({
       >
         <LoadingLabel label={label} />
         <div className="flex flex-col items-center gap-3">
-          <div className="relative size-14" aria-hidden="true">
-            <div className="absolute inset-0 rounded-full border-2 border-primary/25" />
-            <div className="absolute inset-0 animate-spin rounded-full border-2 border-transparent border-t-primary" />
-          </div>
+          <Spinner size="xl" variant="amber" className="size-14" />
           <Skeleton className="h-4 w-36 rounded-md" />
           <Skeleton className="h-3 w-48 rounded-md" delay={80} />
         </div>

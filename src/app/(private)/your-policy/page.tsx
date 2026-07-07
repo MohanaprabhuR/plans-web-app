@@ -1,7 +1,5 @@
 "use client";
-import useAuth from "@/hooks/useAuth";
 import {
-  useCallback,
   ReactNode,
   useState,
   useEffect,
@@ -36,7 +34,8 @@ import { Badge } from "@/components/ui/badge";
 import useEmblaCarousel from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
 import { useRouter } from "next/navigation";
-import { ScreenLoading } from "@/components/ui/screen-loading";
+import { PageLoadState } from "@/components/ui/page-load-state";
+import { useUserFetch } from "@/hooks/useUserFetch";
 import {
   setPolicyPurchaseReturnTo,
   usePolicyPurchaseSuccessToast,
@@ -119,11 +118,23 @@ interface ApiResponse {
 const POLICIES_PAGE_SIZE = 5;
 
 const YourPolicyPage = () => {
-  const { user } = useAuth();
-  const userId = user?.id ?? "";
-  const [apiData, setApiData] = useState<ApiResponse | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const {
+    data: apiData,
+    loading,
+    error,
+    refetch: fetchPolicies,
+    setError,
+  } = useUserFetch<ApiResponse>("/api/policy", [], {
+    errorFallback: "Failed to load policies.",
+    onError: (errorMessage) => {
+      toast.custom(() => (
+        <Alert variant="error">
+          <CircleAlert className="size-4" />
+          <AlertTitle>Failed to load policies: {errorMessage}</AlertTitle>
+        </Alert>
+      ));
+    },
+  });
   const [currentPage, setCurrentPage] = useState(1);
   const router = useRouter();
 
@@ -141,44 +152,6 @@ const YourPolicyPage = () => {
   useEffect(() => {
     if (emblaApi) emblaApi.reInit();
   }, [apiData, emblaApi]);
-
-  const fetchPolicies = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const response = await fetch("/api/policy", {
-        cache: "no-store",
-        headers: { "X-User-Id": userId },
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(
-          `Failed to fetch policies: ${response.status} ${response.statusText}. ${errorText}`,
-        );
-      }
-
-      const data = await response.json();
-      setApiData(data);
-    } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : "An error occurred";
-      setError(errorMessage);
-
-      toast.custom(() => (
-        <Alert variant="error">
-          <CircleAlert className="size-4" />
-          <AlertTitle>Failed to load policies: {errorMessage}</AlertTitle>
-        </Alert>
-      ));
-    } finally {
-      setLoading(false);
-    }
-  }, [userId]);
-
-  useEffect(() => {
-    fetchPolicies();
-  }, [fetchPolicies]);
 
   usePolicyPurchaseSuccessToast(() => {
     void fetchPolicies();
@@ -213,45 +186,19 @@ const YourPolicyPage = () => {
       <h3 className="font-semibold text-3xl leading-8 tracking-4 text-accent-foreground">
         Your Policy
       </h3>
-      {loading && (
-        <ScreenLoading
-          variant="cards-row"
-          showHeader={false}
-          rows={2}
-          label="Loading policies"
-          className="pt-2"
-        />
-      )}
-      {error && !loading && (
-        <div className="flex items-center justify-center py-12">
-          <div className="text-center">
-            <p className="text-red-600 dark:text-red-400 mb-2">
-              Error: {error}
-            </p>
-            <Button
-              variant="outline"
-              onClick={() => {
-                setError(null);
-                setLoading(true);
-                fetch("/api/policy", {
-                  headers: { "X-User-Id": userId },
-                })
-                  .then((res) => res.json())
-                  .then((data) => {
-                    setApiData(data);
-                    setLoading(false);
-                  })
-                  .catch((err) => {
-                    setError(err.message);
-                    setLoading(false);
-                  });
-              }}
-            >
-              Retry
-            </Button>
-          </div>
-        </div>
-      )}
+      <PageLoadState
+        loading={loading}
+        error={error}
+        onRetry={() => {
+          setError(null);
+          void fetchPolicies();
+        }}
+        variant="cards-row"
+        showHeader={false}
+        rows={2}
+        label="Loading policies"
+        className="pt-2"
+      >
       {!loading && !error && (
         <div className="w-full flex gap-x-6 pt-8">
           <div className="w-full flex flex-col gap-y-6 max-w-[730px] ">
@@ -497,6 +444,7 @@ const YourPolicyPage = () => {
           </div>
         </div>
       )}
+      </PageLoadState>
     </>
   );
 };

@@ -1,14 +1,15 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
-import useAuth from "@/hooks/useAuth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
-import { ScreenLoading } from "@/components/ui/screen-loading";
+import { PageLoadState } from "@/components/ui/page-load-state";
+import { useUserFetch } from "@/hooks/useUserFetch";
+import useAuth from "@/hooks/useAuth";
 import {
   BriefcaseMedical,
   CalendarDays,
@@ -109,47 +110,27 @@ export default function RenewalPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const highlightPolicyId = searchParams.get("policyId");
-
-  const [renewals, setRenewals] = useState<Renewal[]>([]);
-  const [loading, setLoading] = useState(true);
   const [submittingId, setSubmittingId] = useState<string | null>(null);
 
-  const showError = (message: string) => {
+  const showError = useCallback((message: string) => {
     toast.custom(() => (
       <Alert variant="error">
         <CircleAlert className="size-4" />
         <AlertTitle>{message}</AlertTitle>
       </Alert>
     ));
-  };
+  }, []);
 
-  useEffect(() => {
-    if (!user?.id) {
-      setLoading(false);
-      return;
-    }
-    let cancelled = false;
+  const {
+    data,
+    loading,
+    refetch,
+  } = useUserFetch<{ renewals: Renewal[] }>("/api/renewal", [], {
+    errorFallback: "Failed to load renewals.",
+    onError: showError,
+  });
 
-    (async () => {
-      setLoading(true);
-      try {
-        const res = await fetch("/api/renewal", {
-          headers: { "X-User-Id": user.id },
-        });
-        if (!res.ok) throw new Error(await res.text());
-        const data = (await res.json()) as { renewals: Renewal[] };
-        if (!cancelled) setRenewals(data.renewals ?? []);
-      } catch (e) {
-        showError(e instanceof Error ? e.message : "Failed to load renewals.");
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [user?.id]);
+  const renewals = useMemo(() => data?.renewals ?? [], [data]);
 
   const sortedRenewals = useMemo(() => {
     const list = [...renewals];
@@ -196,8 +177,7 @@ export default function RenewalPage() {
         body: JSON.stringify({ ...item, status: "renewed" }),
       });
       if (!res.ok) throw new Error(await res.text());
-      const data = (await res.json()) as { renewals: Renewal[] };
-      setRenewals(data.renewals ?? []);
+      await refetch();
       toast.custom(() => (
         <Alert variant="success">
           <CheckCircle2 className="size-4" />
@@ -229,16 +209,15 @@ export default function RenewalPage() {
         </h3>
       </div>
 
-      {loading ? (
-        <ScreenLoading
-          variant="summary"
-          showHeader={false}
-          statCount={3}
-          rows={3}
-          label="Loading renewals"
-        />
-      ) : (
-        <>
+      <PageLoadState
+        loading={loading}
+        onRetry={() => void refetch()}
+        variant="summary"
+        showHeader={false}
+        statCount={3}
+        rows={3}
+        label="Loading renewals"
+      >
           <div className="grid gap-4 sm:grid-cols-3">
             <Card>
               <CardContent className="flex items-center gap-4">
@@ -425,8 +404,7 @@ export default function RenewalPage() {
               })}
             </div>
           )}
-        </>
-      )}
+      </PageLoadState>
     </div>
   );
 }

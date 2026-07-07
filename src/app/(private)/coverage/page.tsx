@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, type ReactNode } from "react";
+import React, { type ReactNode } from "react";
 import useAuth from "@/hooks/useAuth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Image from "next/image";
@@ -17,7 +17,8 @@ import {
   PlaneTakeoff,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ScreenLoading } from "@/components/ui/screen-loading";
+import { PageLoadState } from "@/components/ui/page-load-state";
+import { useUserFetch } from "@/hooks/useUserFetch";
 
 const GaugeComponent = dynamic(() => import("react-gauge-component"), {
   ssr: false,
@@ -61,40 +62,14 @@ type CoverageResponse = {
 
 export default function CoveragePage() {
   const { user } = useAuth();
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [data, setData] = useState<CoverageResponse | null>(null);
-
-  useEffect(() => {
-    if (!user?.id) {
-      setLoading(false);
-      return;
-    }
-    let cancelled = false;
-
-    (async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const res = await fetch("/api/coverage", {
-          headers: { "X-User-Id": user.id },
-        });
-        if (!res.ok) throw new Error(await res.text());
-        const json = (await res.json()) as CoverageResponse;
-        if (!cancelled) setData(json);
-      } catch (e) {
-        const message =
-          e instanceof Error ? e.message : "Failed to load coverage.";
-        if (!cancelled) setError(message);
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [user?.id]);
+  const {
+    data,
+    loading,
+    error,
+    refetch,
+  } = useUserFetch<CoverageResponse>("/api/coverage", [], {
+    errorFallback: "Failed to load coverage.",
+  });
 
   return (
     <>
@@ -102,21 +77,15 @@ export default function CoveragePage() {
         Coverage
       </h3>
       <div className="w-full pt-8">
-        {loading && (
-          <ScreenLoading
-            variant="detail"
-            showHeader={false}
-            label="Loading coverage"
-            className="py-4"
-          />
-        )}
-        {error && !loading && (
-          <div className="flex items-center justify-center py-12">
-            <p className="text-destructive">{error}</p>
-          </div>
-        )}
-
-        {!loading && data ? (
+        <PageLoadState
+          loading={loading}
+          error={error}
+          onRetry={() => void refetch()}
+          variant="detail"
+          showHeader={false}
+          label="Loading coverage"
+        >
+        {data ? (
           <>
             <Card className="flex items-center flex-row justify-between">
               <div className="w-1/2 flex items-center justify-center h-full">
@@ -495,6 +464,7 @@ export default function CoveragePage() {
             </div>
           </>
         ) : null}
+        </PageLoadState>
       </div>
     </>
   );

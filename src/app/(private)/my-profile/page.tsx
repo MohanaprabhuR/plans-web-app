@@ -18,6 +18,7 @@ import Image from "next/image";
 import client from "@/api/client";
 import { toast } from "sonner";
 import { Alert, AlertTitle } from "@/components/ui/alert";
+import { ScreenLoading } from "@/components/ui/screen-loading";
 
 const AVATAR_BUCKET = "avatars";
 
@@ -33,7 +34,7 @@ function parseFullName(fullName: string | undefined): {
 }
 
 const MyProfilePage = () => {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -337,6 +338,17 @@ const MyProfilePage = () => {
     user?.user_metadata?.avatar_url ||
     "https://mockmind-api.uifaces.co/content/human/80.jpg";
   const displaySrc = previewUrl || currentAvatarUrl;
+
+  if (authLoading) {
+    return (
+      <ScreenLoading
+        variant="detail"
+        showHeader={false}
+        label="Loading profile"
+        className="py-4"
+      />
+    );
+  }
 
   return (
     <>
