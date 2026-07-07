@@ -762,7 +762,11 @@ const DashboardPage = () => {
                     Age:32, Male
                   </p>
                 </div>
-                <Button variant="outline" size="md">
+                <Button
+                  variant="outline"
+                  size="md"
+                  onClick={() => router.push("/coverage")}
+                >
                   Check Risk Coverage
                 </Button>
               </div>
