@@ -212,11 +212,7 @@ export default function RenewalPage() {
       <PageLoadState
         loading={loading}
         onRetry={() => void refetch()}
-        variant="summary"
-        showHeader={false}
-        statCount={3}
-        rows={3}
-        label="Loading renewals"
+        preset="renewal"
       >
           <div className="grid gap-4 sm:grid-cols-3">
             <Card>

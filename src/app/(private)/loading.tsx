@@ -1,13 +1,5 @@
-import { ScreenLoading } from "@/components/ui/screen-loading";
+import { RouteLoading } from "@/components/ui/route-loading";
 
 export default function PrivateRouteLoading() {
-  return (
-    <ScreenLoading
-      variant="page"
-      showHeader
-      rows={4}
-      label="Loading page"
-      className="py-2"
-    />
-  );
+  return <RouteLoading preset="default" />;
 }

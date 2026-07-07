@@ -200,10 +200,7 @@ export default function NotificationsPage() {
         loading={loading}
         error={error}
         onRetry={() => void refetch()}
-        variant="list"
-        showHeader={false}
-        rows={5}
-        label="Loading notifications"
+        preset="notifications"
         empty={!loading && !error && notifications.length === 0}
         emptyState={
           <Card className="border-dashed">

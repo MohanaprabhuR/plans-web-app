@@ -81,9 +81,7 @@ export default function CoveragePage() {
           loading={loading}
           error={error}
           onRetry={() => void refetch()}
-          variant="detail"
-          showHeader={false}
-          label="Loading coverage"
+          preset="coverage"
         >
         {data ? (
           <>

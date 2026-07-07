@@ -1,18 +1,49 @@
+"use client";
+
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import {
+  downloadHealthCard,
+  type HealthCardMember,
+} from "@/lib/health-card-download";
+import { toast } from "sonner";
 import Image from "next/image";
-
-interface HealthCardMember {
-  id: string;
-  policy_number: string;
-  full_name: string;
-  relationship: string;
-  dob: string;
-  can_download: boolean;
-  avatar: string;
-}
+import { Alert, AlertTitle } from "@/components/ui/alert";
+import { CircleAlert, CircleCheck } from "lucide-react";
 
 const HealthCard = ({ card }: { card: HealthCardMember }) => {
+  const [downloading, setDownloading] = useState(false);
+
+  const handleDownload = async () => {
+    if (!card.can_download || downloading) return;
+
+    setDownloading(true);
+    try {
+      await downloadHealthCard(card);
+      toast.custom(() => (
+        <Alert variant="success">
+          <CircleCheck className="size-4" />
+          <AlertTitle>Downloaded health card for {card.full_name}.</AlertTitle>
+        </Alert>
+      ));
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Failed to download health card.";
+
+      toast.custom(() => (
+        <Alert variant="error">
+          <CircleAlert className="size-4" />
+          <AlertTitle>Failed to download health card: {message}.</AlertTitle>
+        </Alert>
+      ));
+    } finally {
+      setDownloading(false);
+    }
+  };
+
   return (
     <Card className="relative">
       <CardContent>
@@ -37,7 +68,12 @@ const HealthCard = ({ card }: { card: HealthCardMember }) => {
               </span>
             </div>
           </div>
-          <Button disabled={!card.can_download}>Download</Button>
+          <Button
+            disabled={!card.can_download || downloading}
+            onClick={() => void handleDownload()}
+          >
+            {downloading ? "Downloading…" : "Download"}
+          </Button>
         </div>
       </CardContent>
     </Card>

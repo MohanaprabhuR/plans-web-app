@@ -18,7 +18,7 @@ import Image from "next/image";
 import client from "@/api/client";
 import { toast } from "sonner";
 import { Alert, AlertTitle } from "@/components/ui/alert";
-import { ScreenLoading } from "@/components/ui/screen-loading";
+import { RouteLoading } from "@/components/ui/route-loading";
 
 const AVATAR_BUCKET = "avatars";
 
@@ -341,12 +341,7 @@ const MyProfilePage = () => {
 
   if (authLoading) {
     return (
-      <ScreenLoading
-        variant="detail"
-        showHeader={false}
-        label="Loading profile"
-        className="py-4"
-      />
+      <RouteLoading preset="my-profile" />
     );
   }
 

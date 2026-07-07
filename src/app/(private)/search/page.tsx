@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import {
   CheckCircle2,
   FileText,
@@ -14,6 +15,11 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import useAuth from "@/hooks/useAuth";
+import {
+  getPolicyChatContextFromSearchParams,
+  getPolicyChatIntroMessage,
+  getPolicyFileMetaFromContext,
+} from "@/lib/policy-chat";
 
 type UploadState = "none" | "uploading" | "success" | "failed";
 type ChatRole = "user" | "assistant";
@@ -21,6 +27,11 @@ type ChatMessage = { role: ChatRole; content: string };
 
 export default function SearchPage() {
   const { user } = useAuth();
+  const searchParams = useSearchParams();
+  const policyContext = useMemo(
+    () => getPolicyChatContextFromSearchParams(searchParams),
+    [searchParams],
+  );
   const userAvatar =
     (user?.user_metadata?.avatar_url as string | undefined) ?? "";
 
@@ -45,16 +56,23 @@ export default function SearchPage() {
   const policyUploaded = uploadState === "success";
 
   useEffect(() => {
+    if (!policyContext) return;
+
+    setPolicyFile(getPolicyFileMetaFromContext(policyContext));
+    setUploadState("success");
+    setUploadProgress(100);
+  }, [policyContext]);
+
+  useEffect(() => {
     if (!policyUploaded) return;
     if (messages.length > 0) return;
     setMessages([
       {
         role: "assistant",
-        content:
-          "Upload complete. Ask me anything about your policy — deductibles, coverage, exclusions, renewals, or claim steps.",
+        content: getPolicyChatIntroMessage(policyContext),
       },
     ]);
-  }, [messages.length, policyUploaded]);
+  }, [messages.length, policyContext, policyUploaded]);
 
   const openFilePicker = () => fileInputRef.current?.click();
 

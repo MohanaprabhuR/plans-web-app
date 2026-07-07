@@ -673,9 +673,7 @@ const DashboardPage = () => {
           setError(null);
           void fetchPolicies();
         }}
-        variant="cards-row"
-        rows={4}
-        label="Loading dashboard"
+        preset="dashboard"
         errorState={
           <div className="flex items-center justify-center py-12">
             <div className="text-center">

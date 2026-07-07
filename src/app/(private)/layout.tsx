@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
 import HeaderLayout from "@/components/BaseComponents/common/header";
-import { ScreenLoading } from "@/components/ui/screen-loading";
+import { RouteLoading } from "@/components/ui/route-loading";
 
 export default function PrivateLayout({
   children,
@@ -38,7 +38,7 @@ export default function PrivateLayout({
   }, [router, pathname]);
 
   if (checking) {
-    return <ScreenLoading variant="full" label="Checking session" />;
+    return <RouteLoading preset="session" />;
   }
 
   return (

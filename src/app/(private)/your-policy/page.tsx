@@ -193,11 +193,7 @@ const YourPolicyPage = () => {
           setError(null);
           void fetchPolicies();
         }}
-        variant="cards-row"
-        showHeader={false}
-        rows={2}
-        label="Loading policies"
-        className="pt-2"
+        preset="your-policy"
       >
       {!loading && !error && (
         <div className="w-full flex gap-x-6 pt-8">

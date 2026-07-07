@@ -345,10 +345,7 @@ export default function BuyInsurancePlansPage() {
       <PageLoadState
         loading={loadingPlans}
         onRetry={() => void refetch()}
-        variant="list"
-        showHeader={false}
-        rows={3}
-        label="Loading plans"
+        preset="plans"
         empty={!loadingPlans && plans.length === 0}
         emptyState={
           <Card className="border-dashed">

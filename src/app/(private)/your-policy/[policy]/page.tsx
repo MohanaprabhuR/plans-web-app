@@ -31,8 +31,10 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
-import React, { ReactNode, useMemo } from "react";
+import React, { ReactNode, useMemo, useState } from "react";
 import { toast } from "sonner";
+import { downloadPolicyDetails } from "@/lib/policy-details-download";
+import { buildPolicyChatSearchUrl } from "@/lib/policy-chat";
 import { usePolicyPurchaseSuccessToast } from "@/lib/policy-purchase";
 
 interface Policy {
@@ -110,6 +112,7 @@ interface ApiResponse {
 
 const PolicyDetailPage = () => {
   const router = useRouter();
+  const [downloadingPolicy, setDownloadingPolicy] = useState(false);
   const params = useParams<{ policy: string }>();
   const policyIdFromRoute = useMemo(() => {
     const raw = params?.policy ?? "";
@@ -149,6 +152,47 @@ const PolicyDetailPage = () => {
     () => policies.find((p) => p.policyId === policyIdFromRoute) ?? null,
     [policies, policyIdFromRoute],
   );
+
+  const handleDownloadPolicy = async () => {
+    if (!policy || downloadingPolicy) return;
+
+    setDownloadingPolicy(true);
+    try {
+      await downloadPolicyDetails(policy);
+      toast.custom(() => (
+        <Alert variant="success">
+          <CircleCheck className="size-4" />
+          <AlertTitle>
+            Downloaded policy details for {policy.provider}.
+          </AlertTitle>
+        </Alert>
+      ));
+    } catch (downloadError) {
+      const message =
+        downloadError instanceof Error
+          ? downloadError.message
+          : "Failed to download policy details.";
+      toast.custom(() => (
+        <Alert variant="error">
+          <CircleAlert className="size-4" />
+          <AlertTitle>Failed to download policy details: {message}.</AlertTitle>
+        </Alert>
+      ));
+    } finally {
+      setDownloadingPolicy(false);
+    }
+  };
+
+  const handleAskAboutPolicy = () => {
+    if (!policy) return;
+    router.push(
+      buildPolicyChatSearchUrl({
+        policyId: policy.policyId,
+        provider: policy.provider,
+        type: policy.type,
+      }),
+    );
+  };
 
   const coverage = [
     {
@@ -327,123 +371,131 @@ const PolicyDetailPage = () => {
             loading={loading}
             error={error}
             onRetry={() => void fetchPolicies()}
-            variant="detail"
-            showHeader={false}
-            label="Loading policy"
+            preset="policy-detail"
           >
-          {!policy ? (
-            <Alert variant="error">
-              <CircleAlert className="size-4" />
-              <AlertTitle>
-                Policy not found:{" "}
-                <span className="font-semibold">{policyIdFromRoute}</span>
-              </AlertTitle>
-            </Alert>
-          ) : (
-            <Card className="bg-[linear-gradient(180deg,#F5F0FF_0%,rgba(245,240,255,0)_80%)]">
-              <CardContent>
-                <div className="flex items-center justify-between pb-4 border-b border-dashed">
-                  <div className="flex items-center gap-x-4">
-                    <div className="p-0.5 bg-white rounded-lg">
-                      <Image
-                        src={
-                          policy.providerLogo ||
-                          "https://img.freepik.com/free-vector/insurance-policy-shield_603843-179.jpg"
-                        }
-                        alt={`${policy.provider}`}
-                        width={44}
-                        height={44}
-                        className="object-contain rounded-md overflow-hidden"
-                      />
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="font-semibold text-3xl leading-6 tracking-4 text-accent-foreground">
-                        {policy.provider}
-                      </span>
-                      <div className="flex items-center gap-x-1.5 pt-1.5">
-                        <div className="flex gap-x-1 items-center">
-                          {policy.type === "Health" && (
-                            <Hospital className="size-5 min-w-5 text-[#8E51FF]" />
-                          )}
-                          {policy.type === "Auto" && (
-                            <CarFront className="size-5 min-w-5 text-[#E12AFB]" />
-                          )}
-                          {policy.type === "Life" && (
-                            <LifeBuoy className="size-5 min-w-5 text-[#FE9A00]" />
-                          )}
-                          {policy.type === "Travel" && (
-                            <PlaneTakeoff className="size-5 min-w-5 text-[#FE9A00]" />
-                          )}
-                          {policy.type === "Home" && (
-                            <House className="size-5 min-w-5 text-[#FE9A00]" />
-                          )}
+            {!policy ? (
+              <Alert variant="error">
+                <CircleAlert className="size-4" />
+                <AlertTitle>
+                  Policy not found:{" "}
+                  <span className="font-semibold">{policyIdFromRoute}</span>
+                </AlertTitle>
+              </Alert>
+            ) : (
+              <Card className="bg-[linear-gradient(180deg,#F5F0FF_0%,rgba(245,240,255,0)_80%)]">
+                <CardContent>
+                  <div className="flex items-center justify-between pb-4 border-b border-dashed">
+                    <div className="flex items-center gap-x-4">
+                      <div className="p-0.5 bg-white rounded-lg">
+                        <Image
+                          src={
+                            policy.providerLogo ||
+                            "https://img.freepik.com/free-vector/insurance-policy-shield_603843-179.jpg"
+                          }
+                          alt={`${policy.provider}`}
+                          width={44}
+                          height={44}
+                          className="object-contain rounded-md overflow-hidden"
+                        />
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="font-semibold text-3xl leading-6 tracking-4 text-accent-foreground">
+                          {policy.provider}
+                        </span>
+                        <div className="flex items-center gap-x-1.5 pt-1.5">
+                          <div className="flex gap-x-1 items-center">
+                            {policy.type === "Health" && (
+                              <Hospital className="size-5 min-w-5 text-[#8E51FF]" />
+                            )}
+                            {policy.type === "Auto" && (
+                              <CarFront className="size-5 min-w-5 text-[#E12AFB]" />
+                            )}
+                            {policy.type === "Life" && (
+                              <LifeBuoy className="size-5 min-w-5 text-[#FE9A00]" />
+                            )}
+                            {policy.type === "Travel" && (
+                              <PlaneTakeoff className="size-5 min-w-5 text-[#FE9A00]" />
+                            )}
+                            {policy.type === "Home" && (
+                              <House className="size-5 min-w-5 text-[#FE9A00]" />
+                            )}
+                            <span className="text-base font-medium leading-5 tracking-4 text-accent-foreground">
+                              {policy.type}
+                            </span>
+                          </div>
+                          <div className="size-1 rounded-full bg-[#757575]"></div>
                           <span className="text-base font-medium leading-5 tracking-4 text-accent-foreground">
-                            {policy.type}
+                            {policy.policyId}
                           </span>
                         </div>
-                        <div className="size-1 rounded-full bg-[#757575]"></div>
-                        <span className="text-base font-medium leading-5 tracking-4 text-accent-foreground">
-                          {policy.policyId}
-                        </span>
                       </div>
                     </div>
-                  </div>
 
-                  <Button variant="outline" size="md">
-                    <Download />
-                    Download Policy
-                  </Button>
-                </div>
-                <div className="flex items-center justify-between pt-4">
-                  <div className="flex text-sm flex-col">
-                    <span className="text-muted-foreground text-base font-medium leading-5 tracking-4">
-                      Coverage Amount
-                    </span>
-                    <span className="text-accent-foreground text-lg font-medium leading-6 tracking-4">
-                      {policy.coverage}
-                    </span>
+                    <Button
+                      variant="outline"
+                      size="md"
+                      disabled={downloadingPolicy}
+                      onClick={() => void handleDownloadPolicy()}
+                    >
+                      <Download />
+                      {downloadingPolicy ? "Downloading…" : "Download Policy"}
+                    </Button>
                   </div>
+                  <div className="flex items-center justify-between pt-4">
+                    <div className="flex text-sm flex-col">
+                      <span className="text-muted-foreground text-base font-medium leading-5 tracking-4">
+                        Coverage Amount
+                      </span>
+                      <span className="text-accent-foreground text-lg font-medium leading-6 tracking-4">
+                        {policy.coverage}
+                      </span>
+                    </div>
 
-                  <div className="flex text-sm flex-col">
-                    <span className="text-muted-foreground text-base font-medium leading-5 tracking-4">
-                      Premium
-                    </span>
-                    <span className="text-accent-foreground text-lg font-medium leading-6 tracking-4">
-                      {policy.premium}
-                    </span>
+                    <div className="flex text-sm flex-col">
+                      <span className="text-muted-foreground text-base font-medium leading-5 tracking-4">
+                        Premium
+                      </span>
+                      <span className="text-accent-foreground text-lg font-medium leading-6 tracking-4">
+                        {policy.premium}
+                      </span>
+                    </div>
+                    <div className="flex text-sm flex-col">
+                      <span className="text-muted-foreground">Claims Amt</span>
+                      <span className="font-medium">{policy.claimAmount}</span>
+                    </div>
+                    <div className="flex text-sm flex-col">
+                      <span className="text-muted-foreground">Valid on</span>
+                      <span className="font-medium">{policy.renewalDate}</span>
+                    </div>
+                    <div className="flex text-sm flex-col">
+                      <span className="text-muted-foreground">Members</span>
+                      <AvatarGroup max={3} size="md">
+                        {policy.members.map((member, index) => (
+                          <Avatar key={index} size="md">
+                            <AvatarImage src={member.avatar} />
+                            <AvatarFallback>
+                              {member.name.charAt(0)}
+                            </AvatarFallback>
+                          </Avatar>
+                        ))}
+                      </AvatarGroup>
+                    </div>
                   </div>
-                  <div className="flex text-sm flex-col">
-                    <span className="text-muted-foreground">Claims Amt</span>
-                    <span className="font-medium">{policy.claimAmount}</span>
-                  </div>
-                  <div className="flex text-sm flex-col">
-                    <span className="text-muted-foreground">Valid on</span>
-                    <span className="font-medium">{policy.renewalDate}</span>
-                  </div>
-                  <div className="flex text-sm flex-col">
-                    <span className="text-muted-foreground">Members</span>
-                    <AvatarGroup max={3} size="md">
-                      {policy.members.map((member, index) => (
-                        <Avatar key={index} size="md">
-                          <AvatarImage src={member.avatar} />
-                          <AvatarFallback>
-                            {member.name.charAt(0)}
-                          </AvatarFallback>
-                        </Avatar>
-                      ))}
-                    </AvatarGroup>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
+                </CardContent>
+              </Card>
+            )}
           </PageLoadState>
           <div className="w-full flex items-center justify-between pt-2">
             <h3 className="font-semibold text-xl leading-6 tracking-4">
               Know Your Coverage
             </h3>
 
-            <Button variant="outline" size="md">
+            <Button
+              variant="outline"
+              size="md"
+              disabled={!policy}
+              onClick={handleAskAboutPolicy}
+            >
               <SearchIcon />
               Ask about your policy
             </Button>

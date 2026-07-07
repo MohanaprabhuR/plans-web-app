@@ -1,13 +1,5 @@
-import { ScreenLoading } from "@/components/ui/screen-loading";
+import { RouteLoading } from "@/components/ui/route-loading";
 
 export default function YourPolicyLoading() {
-  return (
-    <ScreenLoading
-      variant="cards-row"
-      showHeader={false}
-      rows={2}
-      label="Loading policies"
-      className="pt-2"
-    />
-  );
+  return <RouteLoading preset="your-policy" />;
 }

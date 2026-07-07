@@ -1,13 +1,5 @@
-import { ScreenLoading } from "@/components/ui/screen-loading";
+import { RouteLoading } from "@/components/ui/route-loading";
 
 export default function RenewalLoading() {
-  return (
-    <ScreenLoading
-      variant="summary"
-      showHeader={false}
-      statCount={3}
-      rows={3}
-      label="Loading renewals"
-    />
-  );
+  return <RouteLoading preset="renewal" />;
 }

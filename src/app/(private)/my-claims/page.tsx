@@ -113,11 +113,7 @@ const MyClaimsPage = () => {
         loading={loading}
         error={error}
         onRetry={() => void refetch()}
-        variant="summary"
-        showHeader={false}
-        statCount={4}
-        rows={3}
-        label="Loading claims"
+        preset="my-claims"
         empty={!loading && !error && claims.length === 0}
         emptyState={
           <div className="flex flex-col items-center justify-center gap-3 py-20">
