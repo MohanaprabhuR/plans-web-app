@@ -55,6 +55,7 @@ import {
   DrawerClose,
   DrawerContent,
   DrawerHeader,
+  DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import HealthCard from "@/components/BaseComponents/common/healthCard";
@@ -1103,7 +1104,7 @@ const DashboardPage = () => {
 
                           <DrawerContent className="space-y-[36px] p-6">
                             <DrawerHeader className="flex flex-row items-center justify-between w-full p-0 mb-[44px]">
-                              Download Health Cards
+                              <DrawerTitle>Download Health Cards</DrawerTitle>
                               <DrawerClose>
                                 <XIcon className="size-4" />
                               </DrawerClose>
