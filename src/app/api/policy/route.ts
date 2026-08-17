@@ -1,6 +1,10 @@
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import {
+  createSupabaseServerClient,
+  getAccessTokenFromRequest,
+  isSupabaseConfigured,
+} from "@/lib/supabase/server";
 
 type Policy = {
   policyId: string;
@@ -16,20 +20,10 @@ type Policy = {
   renewalDate: string; // YYYY-MM-DD
 };
 
-const supabaseUrl = (process.env.NEXT_PUBLIC_SUPABASE_URL || "").trim();
-const supabaseAnonKey = (
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
-  process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY ||
-  ""
-).trim();
-const supabaseConfigured =
-  supabaseUrl.length > 0 &&
-  supabaseAnonKey.length > 0 &&
-  !supabaseUrl.includes("placeholder");
+const POLICIES_TABLE = "user_policies";
 
-function getSupabase() {
-  if (!supabaseConfigured) return null;
-  return createClient(supabaseUrl, supabaseAnonKey);
+function getSupabase(accessToken?: string) {
+  return createSupabaseServerClient(accessToken);
 }
 
 function rowToPolicy(row: Record<string, unknown>): Policy {
@@ -52,11 +46,12 @@ function rowToPolicy(row: Record<string, unknown>): Policy {
 
 async function getPoliciesFromSupabase(
   userId: string,
+  accessToken?: string,
 ): Promise<Policy[] | null> {
-  const supabase = getSupabase();
+  const supabase = getSupabase(accessToken);
   if (!supabase) return null;
   const { data, error } = await supabase
-    .from("policies")
+    .from(POLICIES_TABLE)
     .select("*")
     .eq("user_id", userId)
     .order("created_at", { ascending: false });
@@ -67,10 +62,11 @@ async function getPoliciesFromSupabase(
 async function addPolicyToSupabase(
   userId: string,
   policy: Policy,
-): Promise<boolean> {
-  const supabase = getSupabase();
-  if (!supabase) return false;
-  const { error } = await supabase.from("policies").insert({
+  accessToken?: string,
+): Promise<{ ok: boolean; error?: string }> {
+  const supabase = getSupabase(accessToken);
+  if (!supabase) return { ok: false, error: "Supabase not configured" };
+  const { error } = await supabase.from(POLICIES_TABLE).insert({
     user_id: userId,
     policy_id: policy.policyId,
     type: policy.type,
@@ -84,18 +80,20 @@ async function addPolicyToSupabase(
     days_left: policy.daysLeft,
     renewal_date: policy.renewalDate,
   });
-  return !error;
+  if (error) return { ok: false, error: error.message };
+  return { ok: true };
 }
 
 async function updatePolicyInSupabase(
   userId: string,
   policy: Policy,
-): Promise<boolean> {
-  const supabase = getSupabase();
-  if (!supabase) return false;
+  accessToken?: string,
+): Promise<{ ok: boolean; error?: string }> {
+  const supabase = getSupabase(accessToken);
+  if (!supabase) return { ok: false, error: "Supabase not configured" };
 
   const { error } = await supabase
-    .from("policies")
+    .from(POLICIES_TABLE)
     .update({
       type: policy.type,
       status: policy.status,
@@ -107,19 +105,24 @@ async function updatePolicyInSupabase(
       members: policy.members,
       days_left: policy.daysLeft,
       renewal_date: policy.renewalDate,
+      updated_at: new Date().toISOString(),
     })
     .eq("user_id", userId)
     .eq("policy_id", policy.policyId);
 
-  return !error;
+  if (error) return { ok: false, error: error.message };
+  return { ok: true };
 }
 
 // In-memory fallback when Supabase is not configured (e.g. local dev without env)
 const policiesStore: Record<string, Policy[]> = {};
 
-async function getPoliciesForUser(userId: string): Promise<Policy[]> {
+async function getPoliciesForUser(
+  userId: string,
+  accessToken?: string,
+): Promise<Policy[]> {
   if (!userId) return [];
-  const fromDb = await getPoliciesFromSupabase(userId);
+  const fromDb = await getPoliciesFromSupabase(userId, accessToken);
   if (fromDb !== null) return fromDb;
   if (!policiesStore[userId]) policiesStore[userId] = [];
   return policiesStore[userId];
@@ -129,7 +132,8 @@ export async function GET(req: Request) {
   const headersList = await headers();
   const userId =
     headersList.get("X-User-Id") ?? req.headers.get("X-User-Id") ?? "";
-  const userPolicies = await getPoliciesForUser(userId);
+  const accessToken = getAccessTokenFromRequest(req);
+  const userPolicies = await getPoliciesForUser(userId, accessToken);
   const apiDocumentation = {
     apiVersion: "1.0.0",
     baseUrl: "https://api.plans.com/v1",
@@ -598,6 +602,8 @@ export async function POST(req: Request) {
       );
     }
 
+    const accessToken = getAccessTokenFromRequest(req);
+
     const body = (await req.json()) as Partial<Policy & { userId?: string }>;
     const policyId = body.policyId?.toString().trim();
     const type = body.type?.toString().trim();
@@ -611,7 +617,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const userPolicies = await getPoliciesForUser(userId);
+    const userPolicies = await getPoliciesForUser(userId, accessToken);
     if (userPolicies.some((p) => p.policyId === policyId)) {
       return NextResponse.json(
         { error: "Policy with this ID already exists" },
@@ -638,11 +644,11 @@ export async function POST(req: Request) {
       renewalDate: body.renewalDate?.toString().trim() || "2026-02-11",
     };
 
-    if (supabaseConfigured) {
-      const inserted = await addPolicyToSupabase(userId, newPolicy);
-      if (!inserted) {
+    if (isSupabaseConfigured()) {
+      const inserted = await addPolicyToSupabase(userId, newPolicy, accessToken);
+      if (!inserted.ok) {
         return NextResponse.json(
-          { error: "Failed to save policy" },
+          { error: inserted.error || "Failed to save policy" },
           { status: 500 },
         );
       }
@@ -650,7 +656,7 @@ export async function POST(req: Request) {
       policiesStore[userId] = [newPolicy, ...userPolicies];
     }
 
-    const updatedList = await getPoliciesForUser(userId);
+    const updatedList = await getPoliciesForUser(userId, accessToken);
     return NextResponse.json({
       ok: true,
       policy: newPolicy,
@@ -674,6 +680,8 @@ export async function PUT(req: Request) {
       );
     }
 
+    const accessToken = getAccessTokenFromRequest(req);
+
     const body = (await req.json()) as Partial<Policy>;
     const policyId = body.policyId?.toString().trim();
     const type = body.type?.toString().trim();
@@ -687,7 +695,7 @@ export async function PUT(req: Request) {
       );
     }
 
-    const userPolicies = await getPoliciesForUser(userId);
+    const userPolicies = await getPoliciesForUser(userId, accessToken);
     const existing = userPolicies.find((p) => p.policyId === policyId);
 
     if (!existing) {
@@ -716,11 +724,15 @@ export async function PUT(req: Request) {
       renewalDate: body.renewalDate?.toString().trim() || existing.renewalDate,
     };
 
-    if (supabaseConfigured) {
-      const updated = await updatePolicyInSupabase(userId, updatedPolicy);
-      if (!updated) {
+    if (isSupabaseConfigured()) {
+      const updated = await updatePolicyInSupabase(
+        userId,
+        updatedPolicy,
+        accessToken,
+      );
+      if (!updated.ok) {
         return NextResponse.json(
-          { error: "Failed to update policy" },
+          { error: updated.error || "Failed to update policy" },
           { status: 500 },
         );
       }
@@ -730,7 +742,7 @@ export async function PUT(req: Request) {
       );
     }
 
-    const updatedList = await getPoliciesForUser(userId);
+    const updatedList = await getPoliciesForUser(userId, accessToken);
     return NextResponse.json({
       ok: true,
       policy: updatedPolicy,

@@ -1,6 +1,22 @@
+import { supabase } from "@/lib/supabase/client";
+
 type FetchWithUserInit = RequestInit & {
   signal?: AbortSignal;
 };
+
+async function authHeaders(userId: string, headers?: HeadersInit) {
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
+  return {
+    "X-User-Id": userId,
+    ...(session?.access_token
+      ? { Authorization: `Bearer ${session.access_token}` }
+      : {}),
+    ...headers,
+  };
+}
 
 export async function fetchWithUser(
   url: string,
@@ -11,10 +27,7 @@ export async function fetchWithUser(
   return fetch(url, {
     cache: "no-store",
     ...rest,
-    headers: {
-      "X-User-Id": userId,
-      ...headers,
-    },
+    headers: await authHeaders(userId, headers),
   });
 }
 

@@ -27,6 +27,7 @@ import {
 import { supabase } from "@/lib/supabase/client";
 import { toast } from "sonner";
 import { Card, CardContent } from "../ui/card";
+import { Alert, AlertTitle } from "../ui/alert";
 
 const CATEGORY_ICONS: Record<string, React.ReactNode> = {
   welcome: null,
@@ -92,7 +93,13 @@ export function OnboardingStepForm() {
       await supabase.auth.updateUser({
         data: { onboarding_complete: true },
       });
-      toast.success("Your risk profile has been saved.");
+
+      toast.custom(() => (
+        <Alert variant="success">
+          <Check className="size-4" />
+          <AlertTitle>Your risk profile has been saved.</AlertTitle>
+        </Alert>
+      ));
     } finally {
       setIsSubmitting(false);
     }

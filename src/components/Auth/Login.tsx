@@ -8,6 +8,7 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Field, FieldGroup, FieldLabel } from "../ui/field";
 import { supabase } from "@/lib/supabase/client";
+import { isEmailNotConfirmedError } from "@/lib/auth-errors";
 import { isValidEmail } from "@/lib/utils";
 import { toast } from "sonner";
 import { Alert, AlertTitle } from "../ui/alert";
@@ -47,6 +48,33 @@ export default function LoginScreen({ onSwitchToSignup }: LoginScreenProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [needsEmailConfirmation, setNeedsEmailConfirmation] = useState(false);
+  const [resending, setResending] = useState(false);
+
+  const handleResendConfirmation = async () => {
+    if (!isValidEmail(email)) return;
+    setResending(true);
+    const { error } = await supabase.auth.resend({
+      type: "signup",
+      email: email.trim(),
+    });
+    setResending(false);
+    if (error) {
+      toast.custom(() => (
+        <Alert variant="error">
+          <CircleAlert className="size-4" />
+          <AlertTitle>{error.message}</AlertTitle>
+        </Alert>
+      ));
+      return;
+    }
+    toast.custom(() => (
+      <Alert variant="success">
+        <CircleAlert className="size-4" />
+        <AlertTitle>Confirmation email sent. Check your inbox.</AlertTitle>
+      </Alert>
+    ));
+  };
 
   const handleLogIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,35 +90,57 @@ export default function LoginScreen({ onSwitchToSignup }: LoginScreenProps) {
     }
 
     setLoading(true);
+    setNeedsEmailConfirmation(false);
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
     setLoading(false);
     if (error) {
+      if (isEmailNotConfirmedError(error.message)) {
+        setNeedsEmailConfirmation(true);
+      }
       toast.custom(() => (
         <Alert variant="error">
           <CircleAlert className="size-4" />
-          <AlertTitle>{error.message}</AlertTitle>
+          <AlertTitle>
+            {isEmailNotConfirmedError(error.message)
+              ? "Please confirm your email before logging in."
+              : error.message}
+          </AlertTitle>
+        </Alert>
+      ));
+      return;
+    }
+
+    if (!data.session) {
+      setNeedsEmailConfirmation(true);
+      toast.custom(() => (
+        <Alert variant="error">
+          <CircleAlert className="size-4" />
+          <AlertTitle>
+            Please confirm your email before logging in.
+          </AlertTitle>
         </Alert>
       ));
       return;
     }
 
     const onboardingComplete =
-      data.session?.user.user_metadata?.onboarding_complete === true;
+      data.session.user.user_metadata?.onboarding_complete === true;
 
     toast.custom(() => (
       <Alert variant="success">
         <CircleAlert className="size-4" />
         <AlertTitle>
           Logged in successfully. Welcome,
-          {data.session?.user.user_metadata?.full_name}!
+          {data.session.user.user_metadata?.full_name}!
         </AlertTitle>
       </Alert>
     ));
 
-    router.push(onboardingComplete ? "/dashboard" : "/onboarding");
+    router.refresh();
+    router.replace(onboardingComplete ? "/dashboard" : "/onboarding");
   };
 
   return (
@@ -160,6 +210,21 @@ export default function LoginScreen({ onSwitchToSignup }: LoginScreenProps) {
         >
           {loading ? "Logging in…" : "Log In"}
         </Button>
+        {needsEmailConfirmation && (
+          <div className="rounded-xl border border-orange-200 bg-orange-50 px-4 py-3 text-sm text-accent-foreground">
+            <p>Check your inbox for the confirmation link, then log in again.</p>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="mt-3 w-full bg-background"
+              disabled={resending}
+              onClick={() => void handleResendConfirmation()}
+            >
+              {resending ? "Sending…" : "Resend confirmation email"}
+            </Button>
+          </div>
+        )}
         <Label className="text-center">
           Not registered yet?
           <button

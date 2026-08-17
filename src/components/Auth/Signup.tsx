@@ -100,18 +100,33 @@ export default function SignupScreen({ onSwitchToLogin }: SignupScreenProps) {
       return;
     }
     const displayName = data?.user?.user_metadata?.full_name ?? fullName;
+
+    if (!data.session) {
+      toast.custom(() => (
+        <Alert variant="success">
+          <CircleAlert className="size-4" />
+          <AlertTitle>
+            Account created, {displayName}. Check your email to confirm your
+            account, then log in.
+          </AlertTitle>
+        </Alert>
+      ));
+      onSwitchToLogin?.();
+      return;
+    }
+
     toast.custom(() => (
       <Alert variant="success">
         <CircleAlert className="size-4" />
         <AlertTitle>Account created. Welcome, {displayName}!</AlertTitle>
       </Alert>
     ));
-    // If the new user somehow already has onboarding_complete, go to dashboard; otherwise onboarding.
-    const { data: sessionData } = await supabase.auth.getSession();
-    const onboardingComplete =
-      sessionData.session?.user.user_metadata?.onboarding_complete === true;
 
-    router.push(onboardingComplete ? "/dashboard" : "/onboarding");
+    const onboardingComplete =
+      data.session.user.user_metadata?.onboarding_complete === true;
+
+    router.refresh();
+    router.replace(onboardingComplete ? "/dashboard" : "/onboarding");
   };
 
   return (

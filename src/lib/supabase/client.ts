@@ -14,7 +14,13 @@ const globalForSupabase = globalThis as typeof globalThis & {
 };
 
 function createSupabaseClient() {
-  return createClient(supabaseUrl, supabaseAnonKey);
+  return createClient(supabaseUrl, supabaseAnonKey, {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: typeof window !== "undefined",
+    },
+  });
 }
 
 export const supabase = globalForSupabase.supabase ?? createSupabaseClient();

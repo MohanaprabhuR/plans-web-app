@@ -22,6 +22,19 @@ import { RouteLoading } from "@/components/ui/route-loading";
 
 const AVATAR_BUCKET = "avatars";
 
+type ProfileRow = {
+  first_name?: string | null;
+  last_name?: string | null;
+  full_name?: string | null;
+  email?: string | null;
+  phone_number?: string | null;
+  address?: string | null;
+  city?: string | null;
+  state?: string | null;
+  zip_code?: string | null;
+  avatar_url?: string | null;
+};
+
 function parseFullName(fullName: string | undefined): {
   first: string;
   last: string;
@@ -59,31 +72,56 @@ const MyProfilePage = () => {
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [profileRow, setProfileRow] = useState<ProfileRow | null>(null);
+
+  const applyUserToForm = (row?: ProfileRow | null) => {
+    if (!user) return;
+    const metaName = parseFullName(user.user_metadata?.full_name);
+    const rowName = parseFullName(row?.full_name ?? undefined);
+    setFirstName(row?.first_name || rowName.first || metaName.first);
+    setLastName(row?.last_name || rowName.last || metaName.last);
+    setEmail(row?.email || user.email || "");
+    setPhone(
+      row?.phone_number ||
+        (user.user_metadata?.phone_number as string) ||
+        "",
+    );
+    setAddress(
+      row?.address || (user.user_metadata?.address as string) || "",
+    );
+    setCity(row?.city || (user.user_metadata?.city as string) || "");
+    setState(row?.state || (user.user_metadata?.state as string) || "");
+    setZipCode(
+      row?.zip_code || (user.user_metadata?.zip_code as string) || "",
+    );
+  };
 
   useEffect(() => {
     if (!user) return;
-    const { first, last } = parseFullName(user.user_metadata?.full_name);
-    setFirstName(first);
-    setLastName(last);
-    setEmail(user.email ?? "");
-    setPhone((user.user_metadata?.phone_number as string) ?? "");
-    setAddress((user.user_metadata?.address as string) ?? "");
-    setCity((user.user_metadata?.city as string) ?? "");
-    setState((user.user_metadata?.state as string) ?? "");
-    setZipCode((user.user_metadata?.zip_code as string) ?? "");
+    applyUserToForm(null);
+
+    let cancelled = false;
+    (async () => {
+      const { data } = await client
+        .from("profiles")
+        .select(
+          "first_name, last_name, full_name, email, phone_number, address, city, state, zip_code, avatar_url",
+        )
+        .eq("id", user.id)
+        .maybeSingle();
+      if (cancelled || !data) return;
+      setProfileRow(data);
+      applyUserToForm(data);
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- hydrate when auth user changes
   }, [user]);
 
   const cancelEditing = () => {
-    if (!user) return;
-    const { first, last } = parseFullName(user.user_metadata?.full_name);
-    setFirstName(first);
-    setLastName(last);
-    setEmail(user.email ?? "");
-    setPhone((user.user_metadata?.phone_number as string) ?? "");
-    setAddress((user.user_metadata?.address as string) ?? "");
-    setCity((user.user_metadata?.city as string) ?? "");
-    setState((user.user_metadata?.state as string) ?? "");
-    setZipCode((user.user_metadata?.zip_code as string) ?? "");
+    applyUserToForm(profileRow);
     setIsEditing(false);
   };
 
@@ -200,6 +238,24 @@ const MyProfilePage = () => {
         ));
         return;
       }
+
+      const profilePayload = {
+        id: user.id,
+        email: newEmail || user.email || null,
+        full_name: fullName || null,
+        first_name: firstName.trim() || null,
+        last_name: lastName.trim() || null,
+        phone_number: phone.trim() || null,
+        address: address.trim() || null,
+        city: city.trim() || null,
+        state: state.trim() || null,
+        zip_code: zipCode.trim() || null,
+      };
+      const { error: profileError } = await client
+        .from("profiles")
+        .upsert(profilePayload, { onConflict: "id" });
+      if (!profileError) setProfileRow((prev) => ({ ...prev, ...profilePayload }));
+
       await client.auth.refreshSession();
       toast.custom(() => (
         <Alert variant="success">
@@ -321,6 +377,11 @@ const MyProfilePage = () => {
         return;
       }
 
+      await client
+        .from("profiles")
+        .upsert({ id: user.id, avatar_url: avatarUrl }, { onConflict: "id" });
+      setProfileRow((prev) => ({ ...prev, avatar_url: avatarUrl }));
+
       await client.auth.refreshSession();
       toast.custom(() => (
         <Alert variant="success">
@@ -335,6 +396,7 @@ const MyProfilePage = () => {
   };
 
   const currentAvatarUrl =
+    profileRow?.avatar_url ||
     user?.user_metadata?.avatar_url ||
     "https://mockmind-api.uifaces.co/content/human/80.jpg";
   const displaySrc = previewUrl || currentAvatarUrl;

@@ -9,7 +9,7 @@ import { toast } from "sonner";
 import { Alert, AlertTitle } from "@/components/ui/alert";
 import { PageLoadState } from "@/components/ui/page-load-state";
 import { useAsyncData } from "@/hooks/useAsyncData";
-import { fetchJsonWithUser } from "@/lib/fetch-with-user";
+import { fetchJsonWithUser, fetchWithUser } from "@/lib/fetch-with-user";
 import { cn } from "@/lib/utils";
 import {
   buildPolicyPurchaseSuccessUrl,
@@ -283,11 +283,10 @@ export default function BuyInsurancePlansPage() {
       renewalDate.setFullYear(now.getFullYear() + 1);
       const policyId = `POL-${selectedPlan.planId}-${Date.now().toString().slice(-6)}`;
 
-      const createPolicyRes = await fetch("/api/policy", {
+      const createPolicyRes = await fetchWithUser("/api/policy", user.id, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-User-Id": user.id,
         },
         body: JSON.stringify({
           policyId,

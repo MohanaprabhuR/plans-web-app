@@ -168,37 +168,41 @@ export default function BuyInsurancePage() {
     hydratedRef.current = true;
 
     (async () => {
-      const res = await fetch("/api/insurance/progress", {
-        headers: { "X-User-Id": user.id },
-      });
-      if (!res.ok) return;
-      const data = (await res.json()) as {
-        ok: boolean;
-        progress: {
-          step_index?: number;
-          mode?: "questions" | "plans" | "success";
-          answers?: Partial<Answers>;
-        } | null;
-      };
-      if (!data.progress) return;
+      try {
+        const res = await fetch("/api/insurance/progress", {
+          headers: { "X-User-Id": user.id },
+        });
+        if (!res.ok) return;
+        const data = (await res.json()) as {
+          ok: boolean;
+          progress: {
+            step_index?: number;
+            mode?: "questions" | "plans" | "success";
+            answers?: Partial<Answers>;
+          } | null;
+        };
+        if (!data.progress) return;
 
-      if (typeof data.progress.step_index === "number") {
-        setStepIndex(
-          Math.max(0, Math.min(STEPS.length - 1, data.progress.step_index)),
-        );
-      }
-      if (
-        data.progress.mode === "questions" ||
-        data.progress.mode === "plans" ||
-        data.progress.mode === "success"
-      ) {
-        setMode(data.progress.mode);
-      }
-      if (data.progress.answers && typeof data.progress.answers === "object") {
-        setAnswers((p) => ({
-          ...p,
-          ...(data.progress!.answers as Partial<Answers>),
-        }));
+        if (typeof data.progress.step_index === "number") {
+          setStepIndex(
+            Math.max(0, Math.min(STEPS.length - 1, data.progress.step_index)),
+          );
+        }
+        if (
+          data.progress.mode === "questions" ||
+          data.progress.mode === "plans" ||
+          data.progress.mode === "success"
+        ) {
+          setMode(data.progress.mode);
+        }
+        if (data.progress.answers && typeof data.progress.answers === "object") {
+          setAnswers((p) => ({
+            ...p,
+            ...(data.progress!.answers as Partial<Answers>),
+          }));
+        }
+      } catch {
+        // Offline / stale HMR — keep the default form state.
       }
     })();
   }, [user?.id]);

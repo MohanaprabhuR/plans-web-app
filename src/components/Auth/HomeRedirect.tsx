@@ -2,33 +2,27 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase/client";
 import AuthScreen from "./Auth";
+import useAuth from "@/hooks/useAuth";
 
 export default function HomeRedirect() {
   const router = useRouter();
-  const [checking, setChecking] = useState(true);
+  const { user, loading: authLoading } = useAuth();
+  const [showAuth, setShowAuth] = useState(false);
 
   useEffect(() => {
-    const run = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      if (!session?.user) {
-        setChecking(false);
-        return;
-      }
-      const complete = session.user.user_metadata?.onboarding_complete === true;
-      if (complete) {
-        router.replace("/dashboard");
-        return;
-      }
-      router.replace("/onboarding");
-    };
-    run();
-  }, [router]);
+    if (authLoading) return;
 
-  if (checking) {
+    if (!user) {
+      setShowAuth(true);
+      return;
+    }
+
+    const complete = user.user_metadata?.onboarding_complete === true;
+    router.replace(complete ? "/dashboard" : "/onboarding");
+  }, [authLoading, user, router]);
+
+  if (authLoading || (!showAuth && user)) {
     return (
       <div className="flex h-screen items-center justify-center">
         <div className="size-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />

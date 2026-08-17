@@ -41,6 +41,7 @@ import {
 } from "@/components/ui/select";
 import PolicyCard from "@/components/BaseComponents/common/policyCard";
 import useAuth from "@/hooks/useAuth";
+import { fetchWithUser } from "@/lib/fetch-with-user";
 import { Alert, AlertTitle } from "@/components/ui/alert";
 import {
   Card,
@@ -410,11 +411,10 @@ const DashboardPage = () => {
         }))
         .filter((m) => m.name);
 
-      const response = await fetch("/api/policy", {
+      const response = await fetchWithUser("/api/policy", userId, {
         method: isEdit ? "PUT" : "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-User-Id": userId,
         },
         body: JSON.stringify({
           policyId,
@@ -431,10 +431,15 @@ const DashboardPage = () => {
       });
 
       if (!response.ok) {
-        const msg = await response.text();
-        throw new Error(
-          msg || (isEdit ? "Failed to update policy" : "Failed to add policy"),
-        );
+        let message = isEdit ? "Failed to update policy" : "Failed to add policy";
+        const text = await response.text();
+        try {
+          const payload = JSON.parse(text) as { error?: string };
+          if (payload.error) message = payload.error;
+        } catch {
+          if (text) message = text;
+        }
+        throw new Error(message);
       }
       toast.custom(() => (
         <Alert variant="success">
@@ -454,7 +459,11 @@ const DashboardPage = () => {
         <Alert variant="error">
           <CircleAlert className="size-4" />
           <AlertTitle>
-            {isEdit ? "Failed to update policy" : "Failed to add policy"}
+            {error instanceof Error
+              ? error.message
+              : isEdit
+                ? "Failed to update policy"
+                : "Failed to add policy"}
           </AlertTitle>
         </Alert>
       ));
