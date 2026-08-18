@@ -25,21 +25,27 @@ function isOpenAIKey(key: string): boolean {
   return key.startsWith("sk-") && !isAnthropicKey(key);
 }
 
+/**
+ * Anthropic (Claude) is the primary provider — see .env.example, which lists
+ * ANTHROPIC_API_KEY as the key required for the chatbot. A valid `sk-ant-` key
+ * therefore wins even when OPENAI_API_KEY is also present, so switching
+ * providers does not require deleting the other key. OpenAI remains a fallback.
+ */
 function resolveProvider(): { provider: Provider; apiKey: string } | null {
   const openaiKey = process.env.OPENAI_API_KEY?.trim();
   const anthropicKey = process.env.ANTHROPIC_API_KEY?.trim();
 
-  if (openaiKey && isOpenAIKey(openaiKey)) {
-    return { provider: "openai", apiKey: openaiKey };
-  }
   if (anthropicKey && isAnthropicKey(anthropicKey)) {
     return { provider: "anthropic", apiKey: anthropicKey };
   }
-  if (openaiKey) {
+  if (openaiKey && isOpenAIKey(openaiKey)) {
     return { provider: "openai", apiKey: openaiKey };
   }
   if (anthropicKey) {
     return { provider: "anthropic", apiKey: anthropicKey };
+  }
+  if (openaiKey) {
+    return { provider: "openai", apiKey: openaiKey };
   }
   return null;
 }
@@ -51,54 +57,16 @@ function extractAnthropicText(content: Anthropic.Message["content"]): string {
     .join("");
 }
 
-function getLastUserMessage(messages: ChatMessage[]): string {
-  for (let i = messages.length - 1; i >= 0; i -= 1) {
-    if (messages[i]?.role === "user") return messages[i].content;
-  }
-  return messages[messages.length - 1]?.content ?? "";
-}
-
-function getDemoResponse(userMessage: string): string {
-  const lower = userMessage.toLowerCase();
-  if (lower.includes("deductible")) {
-    return "Your deductible is the amount you pay out of pocket before your insurer starts covering eligible claims. Check your policy schedule for the exact figure for this plan year.";
-  }
-  if (lower.includes("renew")) {
-    return "To renew your policy, review your renewal notice, confirm coverage and premium details, and complete payment before the due date. I can walk you through each step if you share your policy type.";
-  }
-  if (lower.includes("claim")) {
-    return "To file a claim, gather bills or incident details, submit through your insurer's claims portal or app, and keep your policy number handy. You'll typically get a claim reference number after submission.";
-  }
-  return "I'm answering in demo mode because no AI provider is available right now. Add a valid `OPENAI_API_KEY` or `ANTHROPIC_API_KEY` in `.env.local`, or add billing/credits to your provider account, then restart the server.";
-}
-
-function isQuotaOrAuthError(error: string): boolean {
-  const lower = error.toLowerCase();
-  return (
-    lower.includes("ai_auth_error") ||
-    lower.includes("ai_quota_exceeded") ||
-    lower.includes("insufficient_quota") ||
-    lower.includes("invalid") ||
-    lower.includes("authentication") ||
-    lower.includes("billing") ||
-    lower.includes("credit")
-  );
-}
-
-function demoFallback(
-  messages: ChatMessage[],
-  failure: { ok: false; error: string; status: number },
-) {
-  if (process.env.NODE_ENV === "production" || !isQuotaOrAuthError(failure.error)) {
-    return NextResponse.json(failure, { status: failure.status });
-  }
-
-  const userMessage = getLastUserMessage(messages);
-  return NextResponse.json({
-    ok: true,
-    message: { role: "assistant", content: getDemoResponse(userMessage) },
-    demo: true,
-  });
+/**
+ * Report a provider failure to the client.
+ *
+ * This used to fall back to canned "demo mode" answers in development, which
+ * made a misconfigured provider look like a working assistant — users received
+ * confident insurance guidance that no model produced. Failures are now always
+ * surfaced; the client maps these AI_* codes to actionable messages.
+ */
+function failure(error: string, status: number) {
+  return NextResponse.json({ ok: false, error }, { status });
 }
 
 async function chatWithOpenAI(
@@ -128,8 +96,8 @@ async function chatWithAnthropic(
   const client = new Anthropic({ apiKey });
   const response = await client.messages.create(
     {
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 1024,
+      model: "claude-sonnet-5",
+      max_tokens: 2048,
       system: SYSTEM_PROMPT,
       messages: messages.map((m) => ({
         role: m.role,
@@ -142,11 +110,9 @@ async function chatWithAnthropic(
 }
 
 export async function POST(req: Request) {
-  let messages: ChatMessage[] = [];
-
   try {
     const body = (await req.json()) as { messages: ChatMessage[] };
-    messages = body.messages;
+    const messages = body.messages;
 
     if (!Array.isArray(messages) || messages.length === 0) {
       return NextResponse.json({ error: "messages required" }, { status: 400 });
@@ -193,12 +159,10 @@ export async function POST(req: Request) {
     const lower = message.toLowerCase();
 
     if (e instanceof AnthropicAuthError) {
-      return demoFallback(messages, {
-        ok: false,
-        error:
-          "AI_AUTH_ERROR: Your ANTHROPIC_API_KEY is invalid. Anthropic keys start with `sk-ant-`.",
-        status: 401,
-      });
+      return failure(
+        "AI_AUTH_ERROR: Your ANTHROPIC_API_KEY is invalid. Anthropic keys start with `sk-ant-`.",
+        401,
+      );
     }
 
     if (e instanceof AnthropicRateLimitError) {
@@ -238,12 +202,10 @@ export async function POST(req: Request) {
         detailLower.includes("quota") ||
         status === 402
       ) {
-        return demoFallback(messages, {
-          ok: false,
-          error:
-            "AI_QUOTA_EXCEEDED: Your Anthropic account has no credits or billing is inactive.",
-          status: 402,
-        });
+        return failure(
+          "AI_QUOTA_EXCEEDED: Your Anthropic account has no credits or billing is inactive.",
+          402,
+        );
       }
 
       return NextResponse.json(
@@ -266,12 +228,10 @@ export async function POST(req: Request) {
       lower.includes("401");
 
     if (isAuthError) {
-      return demoFallback(messages, {
-        ok: false,
-        error:
-          "AI_AUTH_ERROR: Your OPENAI_API_KEY is missing or invalid. Update it and restart the server.",
-        status: 401,
-      });
+      return failure(
+        "AI_AUTH_ERROR: Your OPENAI_API_KEY is missing or invalid. Update it and restart the server.",
+        401,
+      );
     }
 
     if (e instanceof OpenAI.APIError) {
@@ -299,12 +259,10 @@ export async function POST(req: Request) {
         code === "insufficient_quota" ||
         (status === 429 && detailLower.includes("quota"))
       ) {
-        return demoFallback(messages, {
-          ok: false,
-          error:
-            "AI_QUOTA_EXCEEDED: Your OpenAI account has no credits or billing is inactive.",
-          status: 402,
-        });
+        return failure(
+          "AI_QUOTA_EXCEEDED: Your OpenAI account has no credits or billing is inactive.",
+          402,
+        );
       }
 
       if (status === 429 && !detailLower.includes("quota")) {

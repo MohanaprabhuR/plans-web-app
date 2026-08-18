@@ -571,16 +571,15 @@ const PolicyDetailPage = () => {
                   key={`${member.name}-${idx}`}
                   className="flex gap-x-3 border-b py-4 first:border-t-0 last:border-b-0 first:pt-0 last:pb-0"
                 >
-                  <Image
-                    src={
-                      member.avatar ||
-                      "https://mockmind-api.uifaces.co/content/human/185.jpg"
-                    }
-                    alt={member.name || "avatar"}
-                    width={42}
-                    height={42}
-                    className="object-cover w-[42px] h-[42px] min-w-[42px] min-h-[42px] rounded-full overflow-hidden"
-                  />
+                  <Avatar size="2xl" className="size-[42px] min-w-[42px]">
+                    <AvatarImage
+                      src={member.avatar}
+                      alt={member.name || "avatar"}
+                    />
+                    <AvatarFallback>
+                      {member.name?.charAt(0) || "?"}
+                    </AvatarFallback>
+                  </Avatar>
                   <div>
                     <p className="text-xl font-semibold leading-6 tracking-4 text-accent-foreground">
                       {member.name}

@@ -3,9 +3,8 @@
   "configurations": [
     {
       "name": "plans-web-app",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
-      "autoPort": true
+      "url": "http://localhost:3001",
+      "port": 3001
     }
   ]
 }

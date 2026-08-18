@@ -4,16 +4,25 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import {
   CheckCircle2,
+  ChevronDown,
+  File as FileGlyph,
   FileText,
-  FileUp,
   Send,
   Sparkles,
   X,
 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import { Markdown } from "@/components/ui/markdown";
 import useAuth from "@/hooks/useAuth";
 import {
   getPolicyChatContextFromSearchParams,
@@ -37,6 +46,7 @@ export default function SearchPage() {
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [uploadState, setUploadState] = useState<UploadState>("none");
+  const [isDragging, setIsDragging] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [policyFile, setPolicyFile] = useState<{
     name: string;
@@ -85,9 +95,11 @@ export default function SearchPage() {
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  const scrollToBottom = () => {
+  // Keep the newest message in view as the conversation grows.
+  useEffect(() => {
+    if (messages.length === 0) return;
     bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
-  };
+  }, [messages, sending]);
 
   const startUploadSimulation = (file: { name: string; sizeMb: number }) => {
     setUploadState("uploading");
@@ -170,7 +182,6 @@ export default function SearchPage() {
       ]);
     } finally {
       setSending(false);
-      setTimeout(scrollToBottom, 0);
     }
   };
 
@@ -197,60 +208,113 @@ export default function SearchPage() {
         </div>
       </div>
 
+      {/* Status row — replaces the card header once a policy is uploaded */}
+      {policyUploaded && (
+        <div className="flex items-center justify-between">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                type="button"
+                className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+              >
+                Recent Chats
+                <ChevronDown className="size-4" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start">
+              <DropdownMenuItem disabled>No recent chats</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 text-sm text-emerald-600">
+              <CheckCircle2 className="size-4" />
+              Policy Uploaded
+            </span>
+            <Badge
+              variant="outline"
+              size="md"
+              className="text-[#FF5E00] outline-[#FF5E00]/35"
+            >
+              Required
+            </Badge>
+          </div>
+        </div>
+      )}
+
       {/* Upload / Chat Card */}
       <Card className="border-border/70">
         <CardContent className="p-6 space-y-4">
-          {/* Card header */}
-          <div className="flex items-center justify-between">
-            <div className="font-semibold text-foreground">Upload Policy</div>
-            <div className="text-sm text-muted-foreground">
-              {policyUploaded ? (
-                <span className="inline-flex items-center gap-2 text-emerald-700">
-                  <CheckCircle2 className="size-4" />
-                  Policy Uploaded
-                </span>
-              ) : (
-                "No Policy Uploaded"
-              )}
-            </div>
-          </div>
-
-          {/* ── Screen 1 & 2 & 3: Upload area (none / uploading / failed) ── */}
+          {/* Card header — only before upload */}
           {!policyUploaded && (
-            <div
-              className="rounded-xl border border-dashed p-10 text-center bg-muted/10 cursor-pointer"
-              onDragOver={(e) => e.preventDefault()}
-              onDrop={(e) => {
-                e.preventDefault();
-                onPickFile(e.dataTransfer.files?.[0] ?? null);
-              }}
-              onClick={uploadState === "none" ? openFilePicker : undefined}
-            >
-              {/* Icon */}
-              <div className="mx-auto mb-4 size-14 rounded-xl bg-amber-300/70 flex items-center justify-center">
-                <FileUp className="size-7 text-amber-900" />
+            <div className="flex items-center justify-between">
+              <div className="font-semibold text-foreground">Upload Policy</div>
+              <div className="text-sm text-muted-foreground">
+                No Policy Uploaded
               </div>
+            </div>
+          )}
 
-              {/* Screen 2: Uploading */}
-              {uploadState === "uploading" && (
-                <div className="space-y-3">
+          {/* ── Upload panel: progress fills the panel left→right ── */}
+          {!policyUploaded && (
+          <div
+            className={`relative overflow-hidden rounded-xl border text-center transition-colors ${
+              isDragging
+                ? "border-[#FF5E00]"
+                : uploadState === "failed"
+                  ? "border-destructive/40 bg-destructive/5"
+                  : uploadState === "uploading"
+                    ? "border-orange-200"
+                    : "border-dashed bg-muted/10"
+            } ${uploadState === "none" && !isDragging ? "cursor-pointer" : ""}`}
+            onDragOver={(e) => {
+              e.preventDefault();
+              if (uploadState !== "uploading") setIsDragging(true);
+            }}
+            onDragLeave={() => setIsDragging(false)}
+            onDrop={(e) => {
+              e.preventDefault();
+              setIsDragging(false);
+              onPickFile(e.dataTransfer.files?.[0] ?? null);
+            }}
+            onClick={uploadState === "none" ? openFilePicker : undefined}
+          >
+            {/* Progress fill */}
+            {(uploadState === "uploading" || isDragging) && (
+              <div
+                aria-hidden
+                className={`absolute inset-y-0 left-0 transition-[width] duration-300 ease-out ${
+                  isDragging ? "bg-[#FF5E00]/5" : "bg-orange-100"
+                }`}
+                style={{ width: isDragging ? "100%" : `${uploadProgress}%` }}
+              />
+            )}
+
+            <div className="relative p-10">
+              {/* Document icon */}
+              <FileGlyph
+                strokeWidth={1.5}
+                className={`mx-auto mb-4 size-11 ${
+                  isDragging
+                    ? "fill-[#FF5E00]/20 text-[#FF5E00]"
+                    : "fill-amber-200 text-amber-400"
+                }`}
+              />
+
+              {isDragging ? (
+                <div className="font-medium text-foreground">
+                  Drop your policy PDF here
+                </div>
+              ) : uploadState === "uploading" ? (
+                <div className="space-y-1">
                   <div className="font-medium text-foreground">
-                    Uploading Policy… {uploadProgress}%
-                  </div>
-                  <div className="mx-auto h-2 w-64 rounded-full bg-muted overflow-hidden">
-                    <div
-                      className="h-full bg-[#FF5E00] transition-all duration-300"
-                      style={{ width: `${uploadProgress}%` }}
-                    />
+                    Uploading Policy...{uploadProgress}%
                   </div>
                   <div className="text-sm text-muted-foreground">
-                    {policyFile?.name}
+                    Only PDFs, up to 25MB
                   </div>
                 </div>
-              )}
-
-              {/* Screen 3: Failed */}
-              {uploadState === "failed" && (
+              ) : uploadState === "failed" ? (
                 <div className="space-y-1">
                   <div className="font-medium text-foreground">
                     Upload Failed!
@@ -270,10 +334,7 @@ export default function SearchPage() {
                     </button>
                   </div>
                 </div>
-              )}
-
-              {/* Screen 1: Default */}
-              {uploadState === "none" && (
+              ) : (
                 <div className="space-y-1">
                   <div className="font-medium text-foreground">
                     Drag &amp; Drop or{" "}
@@ -294,30 +355,33 @@ export default function SearchPage() {
                 </div>
               )}
             </div>
+          </div>
           )}
 
-          {/* ── Screen 4: Chat interface (after upload success) ── */}
+          {/* ── Chat interface (after upload success) ── */}
           {policyUploaded && (
             <div className="space-y-5">
-              {/* Uploaded policy (single) */}
+              {/* Uploaded policy chip */}
               {policyFile && (
-                <div className="inline-flex items-center gap-3 rounded-lg bg-muted/30 border px-3 py-2">
-                  <div className="size-9 rounded-md bg-sky-100 flex items-center justify-center">
-                    <FileText className="size-4 text-sky-700" />
+                <div className="inline-flex items-center gap-2.5 rounded-lg border bg-background py-2 pl-2.5 pr-3">
+                  <div className="flex size-8 shrink-0 items-center justify-center rounded-md bg-red-50">
+                    <FileText className="size-4 text-red-600" />
                   </div>
-                  <div className="text-sm">
-                    <div className="font-medium">{policyFile.name}</div>
-                    <div className="text-muted-foreground text-xs">
-                      {policyFile.sizeMb} MB
+                  <div className="min-w-0 text-left">
+                    <div className="truncate text-sm font-medium text-foreground">
+                      {policyFile.name}
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      Size: {policyFile.sizeMb} MB
                     </div>
                   </div>
                   <button
                     type="button"
-                    className="ml-2 text-muted-foreground hover:text-foreground"
+                    className="ml-1 text-muted-foreground hover:text-foreground"
                     onClick={resetUpload}
                     aria-label="Remove policy"
                   >
-                    <X className="size-4" />
+                    <X className="size-3.5" />
                   </button>
                 </div>
               )}
@@ -349,11 +413,15 @@ export default function SearchPage() {
                       <div
                         className={
                           m.role === "assistant"
-                            ? "rounded-xl bg-muted/40 p-2 text-sm leading-5 tracking-4 text-foreground"
+                            ? "rounded-xl bg-muted/40 px-3 py-2.5 text-sm leading-relaxed tracking-4 text-foreground"
                             : "rounded-xl border bg-background p-2 text-sm text-foreground leading-5 tracking-4"
                         }
                       >
-                        {m.content}
+                        {m.role === "assistant" ? (
+                          <Markdown content={m.content} />
+                        ) : (
+                          m.content
+                        )}
                       </div>
                     </div>
                   </div>
