@@ -7,7 +7,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Camera, CircleAlert, Eye, EyeOff } from "lucide-react";
+import {
+  Camera,
+  CircleAlert,
+  Eye,
+  EyeOff,
+  SlidersHorizontal,
+} from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -15,6 +21,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import Image from "next/image";
+import Link from "next/link";
 import client from "@/api/client";
 import { toast } from "sonner";
 import { Alert, AlertTitle } from "@/components/ui/alert";
@@ -82,18 +89,12 @@ const MyProfilePage = () => {
     setLastName(row?.last_name || rowName.last || metaName.last);
     setEmail(row?.email || user.email || "");
     setPhone(
-      row?.phone_number ||
-        (user.user_metadata?.phone_number as string) ||
-        "",
+      row?.phone_number || (user.user_metadata?.phone_number as string) || "",
     );
-    setAddress(
-      row?.address || (user.user_metadata?.address as string) || "",
-    );
+    setAddress(row?.address || (user.user_metadata?.address as string) || "");
     setCity(row?.city || (user.user_metadata?.city as string) || "");
     setState(row?.state || (user.user_metadata?.state as string) || "");
-    setZipCode(
-      row?.zip_code || (user.user_metadata?.zip_code as string) || "",
-    );
+    setZipCode(row?.zip_code || (user.user_metadata?.zip_code as string) || "");
   };
 
   useEffect(() => {
@@ -254,7 +255,8 @@ const MyProfilePage = () => {
       const { error: profileError } = await client
         .from("profiles")
         .upsert(profilePayload, { onConflict: "id" });
-      if (!profileError) setProfileRow((prev) => ({ ...prev, ...profilePayload }));
+      if (!profileError)
+        setProfileRow((prev) => ({ ...prev, ...profilePayload }));
 
       await client.auth.refreshSession();
       toast.custom(() => (
@@ -402,9 +404,7 @@ const MyProfilePage = () => {
   const displaySrc = previewUrl || currentAvatarUrl;
 
   if (authLoading) {
-    return (
-      <RouteLoading preset="my-profile" />
-    );
+    return <RouteLoading preset="my-profile" />;
   }
 
   return (
@@ -499,6 +499,12 @@ const MyProfilePage = () => {
               {user?.user_metadata?.email}
             </p>
           </div>
+          <Button asChild variant="outline" size="md" className="w-full">
+            <Link href="/onboarding/edit">
+              <SlidersHorizontal />
+              Edit risk profile
+            </Link>
+          </Button>
         </div>
         <div className="min-w-0 w-full max-w-[800px]">
           <Tabs

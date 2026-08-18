@@ -10,6 +10,7 @@ import { Label } from "../ui/label";
 import { Field, FieldGroup, FieldLabel } from "../ui/field";
 import { supabase } from "@/lib/supabase/client";
 import { isValidEmail } from "@/lib/utils";
+import { getAuthErrorMessage } from "@/lib/auth-errors";
 import { toast } from "sonner";
 import { Alert, AlertTitle } from "../ui/alert";
 import { CircleAlert } from "lucide-react";
@@ -85,7 +86,7 @@ export default function SignupScreen({ onSwitchToLogin }: SignupScreenProps) {
       toast.custom(() => (
         <Alert variant="error">
           <CircleAlert className="size-4" />
-          <AlertTitle>{error.message}</AlertTitle>
+          <AlertTitle>{getAuthErrorMessage(error.message)}</AlertTitle>
         </Alert>
       ));
       return;

@@ -16,6 +16,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 import {
   type OnboardingFormData,
+  type StepCategory,
   type StepConfig,
   ONBOARDING_STEPS,
   getStoredOnboardingData,
@@ -26,7 +27,6 @@ import {
 } from "@/lib/onboarding";
 import { supabase } from "@/lib/supabase/client";
 import { toast } from "sonner";
-import { Card, CardContent } from "../ui/card";
 import { Alert, AlertTitle } from "../ui/alert";
 
 const CATEGORY_ICONS: Record<string, React.ReactNode> = {
@@ -38,6 +38,18 @@ const CATEGORY_ICONS: Record<string, React.ReactNode> = {
   confirmation: null,
 };
 
+/** The four answerable categories, in order — drives the progress bar. */
+const PROGRESS_CATEGORIES: StepCategory[] = [
+  "personal",
+  "lifestyle",
+  "medical",
+  "financial",
+];
+
+const STEP_EASE = "ease-[cubic-bezier(0.22,1,0.36,1)]";
+const STEP_MOTION =
+  "motion-safe:animate-in motion-safe:fade-in motion-safe:duration-400 motion-reduce:animate-none";
+
 export function OnboardingStepForm() {
   const router = useRouter();
   const [stepIndex, setStepIndex] = useState(0);
@@ -46,12 +58,10 @@ export function OnboardingStepForm() {
   );
   const [direction, setDirection] = useState<"next" | "back">("next");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isAnimating, setIsAnimating] = useState(false);
 
   const step = ONBOARDING_STEPS[stepIndex];
   const categoryProgress = step ? getCategoryProgress(step.id) : null;
 
-  // Persist to localStorage whenever formData changes (except initial load)
   useEffect(() => {
     if (Object.keys(formData).length > 0) {
       setStoredOnboardingData(formData);
@@ -73,6 +83,22 @@ export function OnboardingStepForm() {
         data: { session },
       } = await supabase.auth.getSession();
       const userId = session?.user?.id ?? null;
+
+      // The RLS policy on onboarding_responses only allows a write when
+      // user_id === auth.uid(), so without a session the insert is rejected
+      // ("new row violates row-level security policy"). This happens on the
+      // dev-only /onboarding-preview route, which has no auth. Skip the write
+      // in dev so the flow can still be previewed end-to-end; in production
+      // (where the auth guard guarantees a session) surface a clear message.
+      if (!userId) {
+        if (process.env.NODE_ENV !== "production") {
+          clearStoredOnboardingData();
+          return;
+        }
+        const message = "Please sign in to save your responses.";
+        toast.error(message);
+        throw new Error(message);
+      }
 
       const upsertPayload = {
         ...payload,
@@ -110,37 +136,27 @@ export function OnboardingStepForm() {
       const currentStep = step;
       if (!currentStep) return;
 
-      // Last question: save data, then move to confirmation screen
       if (currentStep.id === "insuranceTypesOwned") {
         try {
           await saveOnboarding();
         } catch {
-          return; // stay on this step if save fails
+          return;
         }
       }
 
-      // Confirmation: just go to dashboard (data already saved)
       if (currentStep.id === "confirmation") {
         router.push("/dashboard");
         return;
       }
 
       setDirection("next");
-      setIsAnimating(true);
-      requestAnimationFrame(() => {
-        setStepIndex((i) => Math.min(i + 1, ONBOARDING_STEPS.length - 1));
-        setTimeout(() => setIsAnimating(false), 320);
-      });
+      setStepIndex((i) => Math.min(i + 1, ONBOARDING_STEPS.length - 1));
     })();
   }, [step, saveOnboarding, router]);
 
   const goBack = useCallback(() => {
     setDirection("back");
-    setIsAnimating(true);
-    requestAnimationFrame(() => {
-      setStepIndex((i) => Math.max(i - 1, 0));
-      setTimeout(() => setIsAnimating(false), 320);
-    });
+    setStepIndex((i) => Math.max(i - 1, 0));
   }, []);
 
   const isCategoryEndWithAnswer = (
@@ -148,7 +164,7 @@ export function OnboardingStepForm() {
     data: OnboardingFormData,
   ): boolean => {
     if (!s || s.id === "welcome" || s.id === "confirmation") return false;
-    if (!s.nextButtonLabel) return false; // only section-end steps have this
+    if (!s.nextButtonLabel) return false;
     const key = s.id as keyof OnboardingFormData;
     const val = data[key];
     if (s.type === "multiple") return Array.isArray(val) && val.length > 0;
@@ -157,49 +173,103 @@ export function OnboardingStepForm() {
 
   if (!step) return null;
 
-  const animationClass =
+  const isIntroStep = step.id === "welcome" || step.id === "confirmation";
+  const showBottomCta =
+    step.id === "welcome" ||
+    step.id === "confirmation" ||
+    isCategoryEndWithAnswer(step, formData);
+
+  const enterClass = cn(
+    STEP_MOTION,
+    STEP_EASE,
     direction === "next"
-      ? "animate-in fade-in slide-in-from-right duration-300"
-      : "animate-in fade-in slide-in-from-left duration-300";
+      ? "motion-safe:slide-in-from-right-4"
+      : "motion-safe:slide-in-from-left-4",
+  );
 
   return (
-    <div className="min-h-screen bg-background flex-col max-w-lg mx-auto flex justify-center">
-      {/* Header: back + category title + progress */}
-      {step.id !== "welcome" && step.id !== "confirmation" && (
-        <header className="flex items-center justify-between gap-2 px-4 py-3 border-b border-border shrink-0 mb-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="rounded-full p-2"
-            onClick={goBack}
-            aria-label="Go back"
-          >
-            <ChevronLeft className="size-5" />
-          </Button>
-          <span className="font-medium text-accent-foreground truncate">
-            {step.categoryLabel}
-          </span>
-          {categoryProgress && (
-            <span className="text-muted-foreground text-sm tabular-nums shrink-0">
-              {categoryProgress.current}/{categoryProgress.total}
-            </span>
-          )}
-        </header>
-      )}
+    <div className="relative mx-auto flex h-dvh w-full max-w-lg flex-col overflow-hidden bg-background">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-56 bg-linear-to-b from-orange-50 to-transparent dark:from-orange-950/25"
+      />
 
-      <Card>
-        <CardContent>
-          <div
-            key={step.id}
-            className={cn("flex flex-col ", isAnimating && animationClass)}
-          >
+      <header className="relative z-10 shrink-0 px-5 pt-[max(1.25rem,env(safe-area-inset-top))]">
+        <div className="flex min-h-14 items-center gap-3">
+          {!isIntroStep ? (
+            <>
+              <Button
+                variant="ghost"
+                size="sm"
+                iconOnly
+                className="-ml-1.5 rounded-full"
+                onClick={goBack}
+                aria-label="Go back"
+              >
+                <ChevronLeft />
+              </Button>
+              <ProgressBar
+                activeCategory={step.category}
+                progress={categoryProgress}
+              />
+            </>
+          ) : (
+            <div className="h-8 w-full" />
+          )}
+        </div>
+        <div
+          className={cn(
+            "grid transition-[grid-template-rows,opacity,margin] duration-300 ease-out",
+            isIntroStep
+              ? "mb-0 grid-rows-[0fr] opacity-0"
+              : "mb-1 grid-rows-[1fr] opacity-100",
+          )}
+        >
+          <div className="overflow-hidden">
+            <div className="flex items-baseline justify-between pb-1">
+              <span
+                key={step.categoryLabel}
+                className={cn(
+                  "text-sm font-medium text-muted-foreground",
+                  STEP_MOTION,
+                )}
+              >
+                {step.categoryLabel}
+              </span>
+              {categoryProgress && (
+                <span
+                  key={`${step.category}-${categoryProgress.current}`}
+                  className={cn(
+                    "text-xs tabular-nums text-muted-foreground",
+                    STEP_MOTION,
+                  )}
+                >
+                  {categoryProgress.current} of {categoryProgress.total}
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main
+        className={cn(
+          "relative z-10 flex min-h-0 flex-1 flex-col overflow-y-auto px-5",
+          isIntroStep ? "justify-center py-4" : "justify-start py-2",
+        )}
+      >
+        <div className="overflow-x-hidden">
+          {/* Intro steps animate as a block; question steps cascade their
+              own children in, so the container stays still for them. */}
+          <div key={step.id} className={isIntroStep ? enterClass : undefined}>
             {step.id === "welcome" && <WelcomeStep />}
 
             {step.id === "confirmation" && <ConfirmationStep />}
 
-            {step.id !== "welcome" && step.id !== "confirmation" && (
+            {!isIntroStep && (
               <QuestionStep
                 step={step}
+                direction={direction}
                 formData={formData}
                 updateField={updateField}
                 onAutoNext={goNext}
@@ -208,66 +278,121 @@ export function OnboardingStepForm() {
               />
             )}
           </div>
+        </div>
+      </main>
 
-          {/* Bottom CTA: welcome, confirmation, or end-of-section (e.g. "Continue to Lifestyle") */}
-          {(step.id === "welcome" ||
-            step.id === "confirmation" ||
-            isCategoryEndWithAnswer(step, formData)) && (
-            <div className="pt-4 shrink-0">
-              <Button
-                size="lg"
-                className="w-full rounded-xl"
-                onClick={goNext}
-                disabled={isSubmitting}
-              >
-                {isSubmitting
-                  ? "Saving…"
-                  : (step.nextButtonLabel ?? "Let's Get Started")}
-              </Button>
-            </div>
+      <footer className="relative z-10 shrink-0 px-5 pt-2 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
+        <div className="flex min-h-14 items-stretch">
+          {showBottomCta && (
+            <Button
+              size="lg"
+              className={cn(
+                "h-12 w-full rounded-xl",
+                STEP_MOTION,
+                "motion-safe:slide-in-from-bottom-2",
+              )}
+              onClick={goNext}
+              disabled={isSubmitting}
+            >
+              {isSubmitting
+                ? "Saving…"
+                : (step.nextButtonLabel ?? "Let's Get Started")}
+            </Button>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </footer>
+    </div>
+  );
+}
+
+function ProgressBar({
+  activeCategory,
+  progress,
+}: {
+  activeCategory: StepCategory;
+  progress: { current: number; total: number } | null;
+}) {
+  const activeIndex = PROGRESS_CATEGORIES.indexOf(activeCategory);
+
+  return (
+    <div className="flex flex-1 items-center gap-1.5" aria-hidden>
+      {PROGRESS_CATEGORIES.map((category, index) => {
+        let fill = 0;
+        if (index < activeIndex) fill = 100;
+        else if (index === activeIndex && progress)
+          fill = (progress.current / progress.total) * 100;
+
+        return (
+          <div
+            key={category}
+            className="h-1.5 flex-1 overflow-hidden rounded-full bg-secondary"
+          >
+            <div
+              className="h-full origin-left rounded-full bg-primary transition-[width] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+              style={{ width: `${fill}%` }}
+            />
+          </div>
+        );
+      })}
     </div>
   );
 }
 
 function WelcomeStep() {
+  const features = [
+    { label: "Personal Information", icon: Activity },
+    { label: "Lifestyle", icon: Heart },
+    { label: "Medical History", icon: Shield },
+    { label: "Financial", icon: Wallet },
+  ];
+
   return (
-    <>
-      <div className=" flex flex-col justify-center text-center">
-        <h1 className="text-2xl font-semibold text-accent-foreground mb-2">
-          Crafting Your Personalized Risk Portfolio
-        </h1>
-        <p className="text-muted-foreground mb-8">Setup takes only 2-3 mins</p>
-        <div className="grid grid-cols-2 gap-3 text-left">
-          {[
-            { label: "Personal Information", icon: Activity },
-            { label: "Lifestyle", icon: Heart },
-            { label: "Medical History", icon: Shield },
-            { label: "Financial", icon: Wallet },
-          ].map(({ label, icon: Icon }) => (
-            <div
-              key={label}
-              className="flex items-center gap-3 p-4 rounded-xl border border-border bg-card"
-            >
-              <Icon className="size-6 text-primary shrink-0" />
-              <span className="font-medium text-accent-foreground">
-                {label}
-              </span>
-            </div>
-          ))}
-        </div>
+    <div className="flex flex-col text-center">
+      <h1 className="mb-2 text-balance text-2xl font-semibold tracking-tight text-accent-foreground">
+        Crafting Your Personalized Risk Portfolio
+      </h1>
+      <p className="mb-8 text-muted-foreground">Setup takes only 2-3 mins</p>
+      <div className="grid grid-cols-2 gap-3 text-left">
+        {features.map(({ label, icon: Icon }, i) => (
+          <div
+            key={label}
+            className="flex min-h-20 items-center gap-3 rounded-2xl border border-border bg-card p-4 shadow-xs motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-3 motion-safe:duration-500 motion-safe:fill-mode-both motion-reduce:animate-none"
+            style={{ animationDelay: `${80 + i * 80}ms` }}
+          >
+            <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10">
+              <Icon className="size-5 text-primary" />
+            </span>
+            <span className="text-sm font-medium leading-snug text-accent-foreground">
+              {label}
+            </span>
+          </div>
+        ))}
       </div>
-    </>
+    </div>
   );
 }
 
-const AUTO_NEXT_DELAY_SINGLE = 400;
+const AUTO_NEXT_DELAY_SINGLE = 420;
 const AUTO_NEXT_DELAY_MULTIPLE = 800;
+
+function optionCardClass(selected: boolean) {
+  return cn(
+    "flex min-h-14 w-full items-center gap-3 rounded-2xl border px-4 py-3.5 text-left",
+    "transition-[border-color,background-color,box-shadow,transform] duration-200",
+    "cursor-pointer select-none active:scale-[0.985]",
+    "motion-reduce:transition-none motion-reduce:active:scale-100",
+    selected
+      ? "border-primary bg-primary/5 shadow-xs"
+      : "border-border bg-card hover:border-primary/40 hover:bg-accent/40",
+  );
+}
+
+/** Per-item entrance for a freshly-arrived question. */
+const ARRIVE_STEP_MS = 70;
 
 function QuestionStep({
   step,
+  direction,
   formData,
   updateField,
   onAutoNext,
@@ -275,6 +400,7 @@ function QuestionStep({
   isCategoryEnd,
 }: {
   step: StepConfig;
+  direction: "next" | "back";
   formData: OnboardingFormData;
   updateField: (
     field: keyof OnboardingFormData,
@@ -325,120 +451,149 @@ function QuestionStep({
 
   const currentSingle = (value as string | undefined) ?? "";
 
+  // Each part of the question "arrives" in sequence: icon, heading, then the
+  // options cascade in. Direction-aware, and disabled under reduced motion.
+  const arrive = cn(
+    "motion-safe:animate-in motion-safe:fade-in motion-safe:fill-mode-both motion-safe:duration-400 motion-reduce:animate-none",
+    STEP_EASE,
+    direction === "next"
+      ? "motion-safe:slide-in-from-right-4"
+      : "motion-safe:slide-in-from-left-4",
+  );
+  const arriveDelay = (i: number): React.CSSProperties => ({
+    animationDelay: `${i * ARRIVE_STEP_MS}ms`,
+  });
+
   return (
-    <>
-      <div className="flex-1 flex flex-col">
-        {categoryIcon && (
-          <div className="mb-4 flex items-center justify-center size-12 rounded-full bg-primary/10">
-            {categoryIcon}
-          </div>
+    <div className="flex flex-col">
+      {categoryIcon && (
+        <div
+          className={cn(
+            "mb-4 flex size-12 items-center justify-center rounded-full bg-primary/10",
+            arrive,
+          )}
+          style={arriveDelay(0)}
+        >
+          {categoryIcon}
+        </div>
+      )}
+      <h2
+        className={cn(
+          "mb-6 text-balance text-xl font-semibold tracking-tight text-accent-foreground",
+          arrive,
         )}
-        <h2 className="text-xl font-semibold text-accent-foreground mb-6">
-          {step.question}
-        </h2>
+        style={arriveDelay(1)}
+      >
+        {step.question}
+      </h2>
 
-        {step.type === "single" && step.options && (
-          <RadioGroup
-            value={currentSingle}
-            onValueChange={handleSingleChange}
-            className="flex flex-col gap-3"
-          >
-            {step.options.map((opt) => (
-              <div
+      {step.type === "single" && step.options && (
+        <RadioGroup
+          value={currentSingle}
+          onValueChange={handleSingleChange}
+          className="flex flex-col gap-2.5"
+        >
+          {step.options.map((opt, i) => {
+            const selected = currentSingle === opt.value;
+            const id = `${step.id}-${opt.value}`;
+            return (
+              <label
                 key={opt.value}
+                htmlFor={id}
                 onClick={() => {
-                  if (currentSingle === opt.value) onAutoNext();
+                  if (selected) onAutoNext();
                 }}
-                className="cursor-pointer"
+                className={cn(optionCardClass(selected), arrive)}
+                style={arriveDelay(i + 2)}
               >
-                <RadioGroupItem
-                  id={`${step.id}-${opt.value}`}
-                  value={opt.value}
-                  label={opt.label}
-                  size="md"
-                  labelPadding="md"
-                />
-              </div>
-            ))}
-          </RadioGroup>
-        )}
+                <span className="flex-1 font-medium text-accent-foreground">
+                  {opt.label}
+                </span>
+                <RadioGroupItem id={id} value={opt.value} size="md" />
+              </label>
+            );
+          })}
+        </RadioGroup>
+      )}
 
-        {step.type === "multiple" && step.options && (
-          <div className="flex flex-col gap-3">
-            {step.options.map((opt) => {
-              const arr = (value as string[] | undefined) ?? [];
-              const checked = arr.includes(opt.value);
-              const toggle = () => {
-                if (opt.value === "None") {
-                  handleMultipleChange(["None"]);
-                  return;
-                }
-                const next = checked
-                  ? arr.filter((x) => x !== opt.value)
-                  : [...arr.filter((x) => x !== "None"), opt.value];
-                handleMultipleChange(next.length ? next : []);
-              };
-              return (
-                <label
-                  key={opt.value}
-                  className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-accent/50 cursor-pointer"
-                >
-                  <Checkbox
-                    checked={checked}
-                    onCheckedChange={toggle}
-                    size="md"
-                  />
-                  <span className="font-medium">{opt.label}</span>
-                </label>
-              );
-            })}
-          </div>
-        )}
-      </div>
-    </>
+      {step.type === "multiple" && step.options && (
+        <div className="flex flex-col gap-2.5">
+          {step.options.map((opt, i) => {
+            const arr = (value as string[] | undefined) ?? [];
+            const checked = arr.includes(opt.value);
+            const toggle = () => {
+              if (opt.value === "None") {
+                handleMultipleChange(["None"]);
+                return;
+              }
+              const next = checked
+                ? arr.filter((x) => x !== opt.value)
+                : [...arr.filter((x) => x !== "None"), opt.value];
+              handleMultipleChange(next.length ? next : []);
+            };
+            return (
+              <label
+                key={opt.value}
+                className={cn(optionCardClass(checked), arrive)}
+                style={arriveDelay(i + 2)}
+              >
+                <span className="flex-1 font-medium text-accent-foreground">
+                  {opt.label}
+                </span>
+                <Checkbox
+                  checked={checked}
+                  onCheckedChange={toggle}
+                  size="md"
+                />
+              </label>
+            );
+          })}
+        </div>
+      )}
+    </div>
   );
 }
 
 function ConfirmationStep() {
   const features = [
-    { icon: Wallet, label: "Wallet", desc: "Manage all policies in one place" },
-    {
-      icon: Shield,
-      label: "Premium",
-      desc: "Manage all policies in one place",
-    },
+    { icon: Wallet, label: "Wallet", desc: "All your policies in one place" },
+    { icon: Shield, label: "Premium", desc: "Track what you pay and when" },
     {
       icon: Activity,
       label: "Risk Profile",
-      desc: "Manage all policies in one place",
+      desc: "A plan shaped around you",
     },
-    { icon: Heart, label: "Claims", desc: "Manage all policies in one place" },
+    { icon: Heart, label: "Claims", desc: "Help when you need it" },
     {
       icon: Check,
       label: "Quick Actions",
-      desc: "Manage all policies in one place",
+      desc: "Buy, renew, or update in a tap",
     },
   ];
 
   return (
-    <div className="flex-1 flex flex-col justify-center text-center">
-      <div className="flex justify-center mb-6">
-        <div className="size-16 rounded-full bg-green-500/20 flex items-center justify-center">
+    <div className="flex flex-col text-center">
+      <div className="mb-6 flex justify-center">
+        <div className="flex size-16 items-center justify-center rounded-full bg-green-500/15 motion-safe:animate-in motion-safe:zoom-in-75 motion-safe:fade-in motion-safe:duration-500 motion-reduce:animate-none">
           <Check className="size-8 text-green-600 dark:text-green-400" />
         </div>
       </div>
-      <h1 className="text-2xl font-semibold text-accent-foreground mb-2">
+      <h1 className="mb-2 text-balance text-2xl font-semibold tracking-tight text-accent-foreground">
         Your Personalized Risk Profile is Ready!
       </h1>
-      <ul className="text-left space-y-3 mt-8">
-        {features.map(({ icon: Icon, label, desc }) => (
-          <li key={label} className="flex items-center gap-3">
-            <Icon className="size-5 text-primary shrink-0" />
-            <div>
-              <span className="font-medium text-accent-foreground">
-                {label}
-              </span>
-              <span className="text-muted-foreground text-sm ml-2">{desc}</span>
+      <ul className="mt-8 space-y-2.5 text-left">
+        {features.map(({ icon: Icon, label, desc }, i) => (
+          <li
+            key={label}
+            className="flex items-center gap-3 rounded-2xl border border-border bg-card px-4 py-3 shadow-xs motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-3 motion-safe:duration-500 motion-safe:fill-mode-both motion-reduce:animate-none"
+            style={{ animationDelay: `${100 + i * 70}ms` }}
+          >
+            <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/10">
+              <Icon className="size-5 text-primary" />
+            </span>
+            <div className="min-w-0">
+              <p className="font-medium text-accent-foreground">{label}</p>
+              <p className="text-sm text-muted-foreground">{desc}</p>
             </div>
           </li>
         ))}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import HeaderLayout from "@/components/BaseComponents/common/header";
 import { RouteLoading } from "@/components/ui/route-loading";
@@ -14,29 +14,25 @@ export default function PrivateLayout({
   const router = useRouter();
   const pathname = usePathname();
   const { user, loading: authLoading } = useAuth();
-  const [authorized, setAuthorized] = useState(false);
   const isOnboarding = pathname?.startsWith("/onboarding");
   const isBuyInsurance = pathname?.startsWith("/buy-insurance");
 
+  // Derive the auth gate during render (no setState-in-effect); the effect only
+  // performs the redirect side effect.
+  const complete = user?.user_metadata?.onboarding_complete === true;
+  const isDashboard = pathname?.startsWith("/dashboard");
+  const redirectTo = authLoading
+    ? null
+    : !user
+      ? "/"
+      : isDashboard && !complete
+        ? "/onboarding"
+        : null;
+  const authorized = !authLoading && redirectTo === null;
+
   useEffect(() => {
-    if (authLoading) return;
-
-    if (!user) {
-      setAuthorized(false);
-      router.replace("/");
-      return;
-    }
-
-    const complete = user.user_metadata?.onboarding_complete === true;
-    const isDashboard = pathname?.startsWith("/dashboard");
-    if (isDashboard && !complete) {
-      setAuthorized(false);
-      router.replace("/onboarding");
-      return;
-    }
-
-    setAuthorized(true);
-  }, [authLoading, user, pathname, router]);
+    if (redirectTo) router.replace(redirectTo);
+  }, [redirectTo, router]);
 
   if (authLoading || !authorized) {
     return <RouteLoading preset="session" />;

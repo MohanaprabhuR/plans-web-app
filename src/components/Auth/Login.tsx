@@ -8,7 +8,10 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Field, FieldGroup, FieldLabel } from "../ui/field";
 import { supabase } from "@/lib/supabase/client";
-import { isEmailNotConfirmedError } from "@/lib/auth-errors";
+import {
+  getAuthErrorMessage,
+  isEmailNotConfirmedError,
+} from "@/lib/auth-errors";
 import { isValidEmail } from "@/lib/utils";
 import { toast } from "sonner";
 import { Alert, AlertTitle } from "../ui/alert";
@@ -63,7 +66,7 @@ export default function LoginScreen({ onSwitchToSignup }: LoginScreenProps) {
       toast.custom(() => (
         <Alert variant="error">
           <CircleAlert className="size-4" />
-          <AlertTitle>{error.message}</AlertTitle>
+          <AlertTitle>{getAuthErrorMessage(error.message)}</AlertTitle>
         </Alert>
       ));
       return;
@@ -106,7 +109,7 @@ export default function LoginScreen({ onSwitchToSignup }: LoginScreenProps) {
           <AlertTitle>
             {isEmailNotConfirmedError(error.message)
               ? "Please confirm your email before logging in."
-              : error.message}
+              : getAuthErrorMessage(error.message)}
           </AlertTitle>
         </Alert>
       ));

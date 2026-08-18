@@ -423,3 +423,65 @@ export function buildOnboardingPayload(
     submitted_at: new Date().toISOString(),
   };
 }
+
+/**
+ * Inverse of buildOnboardingPayload: maps a stored onboarding_responses row
+ * back into the form's shape, so a completed user can re-open and edit their
+ * answers. Unknown/missing columns become undefined.
+ */
+export function mapRowToFormData(
+  row: Record<string, unknown> | null | undefined,
+): OnboardingFormData {
+  if (!row) return {};
+  const str = (v: unknown): string | undefined =>
+    typeof v === "string" && v.trim() !== "" ? v : undefined;
+  const arr = (v: unknown): string[] | undefined =>
+    Array.isArray(v) && v.length ? (v.filter((x) => typeof x === "string") as string[]) : undefined;
+
+  // Literal string-union fields are narrowed at runtime by the form's options,
+  // so a cast through the row's free-form text is safe here.
+  return {
+    gender: str(row.gender) as OnboardingFormData["gender"],
+    ageGroup: str(row.age_group) as OnboardingFormData["ageGroup"],
+    employmentType: str(row.employment_type) as OnboardingFormData["employmentType"],
+    dependents: str(row.dependents) as OnboardingFormData["dependents"],
+    smoking: str(row.smoking) as OnboardingFormData["smoking"],
+    alcohol: str(row.alcohol) as OnboardingFormData["alcohol"],
+    exerciseFrequency: str(row.exercise_frequency) as OnboardingFormData["exerciseFrequency"],
+    fitnessLevel: str(row.fitness_level) as OnboardingFormData["fitnessLevel"],
+    preExistingConditions: str(row.pre_existing_conditions) as OnboardingFormData["preExistingConditions"],
+    knownConditions: str(row.known_conditions) as unknown as OnboardingFormData["knownConditions"],
+    hospitalizedPast5Years: str(row.hospitalized_past_5_years) as OnboardingFormData["hospitalizedPast5Years"],
+    regularMedications: str(row.regular_medications) as OnboardingFormData["regularMedications"],
+    monthlyIncome: str(row.monthly_income) as OnboardingFormData["monthlyIncome"],
+    existingInsurancePolicies: str(row.existing_insurance_policies) as OnboardingFormData["existingInsurancePolicies"],
+    insuranceBeneficiary: str(row.insurance_beneficiary) as OnboardingFormData["insuranceBeneficiary"],
+    insuranceTypesOwned: arr(row.insurance_types_owned),
+  };
+}
+
+/** Question steps grouped by category, for a review/edit summary screen. */
+export function getEditableStepsByCategory(): {
+  category: StepCategory;
+  label: string;
+  steps: StepConfig[];
+}[] {
+  const groups: {
+    category: StepCategory;
+    label: string;
+    steps: StepConfig[];
+  }[] = [];
+  for (const step of ONBOARDING_STEPS) {
+    if (step.category === "welcome" || step.category === "confirmation") continue;
+    if (!step.options) continue;
+    const existing = groups.find((g) => g.category === step.category);
+    if (existing) existing.steps.push(step);
+    else
+      groups.push({
+        category: step.category,
+        label: step.categoryLabel,
+        steps: [step],
+      });
+  }
+  return groups;
+}
