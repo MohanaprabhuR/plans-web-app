@@ -3,6 +3,7 @@
 import React, { useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { PageLoadState } from "@/components/ui/page-load-state";
+import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { useUserFetch } from "@/hooks/useUserFetch";
 import {
   BriefcaseMedical,
@@ -135,8 +136,9 @@ const MyClaimsPage = () => {
       {/* Claims list */}
       {claims.length > 0 && (
         <div className="flex flex-col gap-4">
-          {claims.map((claim) => (
-            <Card key={claim.claimId} className="overflow-hidden">
+          {claims.map((claim, i) => (
+            <ScrollReveal key={claim.claimId} delay={Math.min(i, 5) * 60}>
+            <Card className="overflow-hidden">
               <CardContent className="p-0">
                 <div className="flex items-stretch">
                   <div className="flex flex-1 items-center gap-5 ">
@@ -201,6 +203,7 @@ const MyClaimsPage = () => {
                 </div>
               </CardContent>
             </Card>
+            </ScrollReveal>
           ))}
         </div>
       )}

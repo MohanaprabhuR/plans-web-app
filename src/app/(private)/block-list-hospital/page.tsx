@@ -16,6 +16,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
+import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import {
   ChevronDown,
   ChevronLeft,
@@ -407,8 +408,13 @@ const NetworkHospitalPage = () => {
           </div>
         </div>
         <div className="flex flex-wrap gap-6">
-          {filteredHospitals.map((hospital) => (
-            <Card key={hospital.id} className="w-full max-w-[354px]">
+          {filteredHospitals.map((hospital, i) => (
+            <ScrollReveal
+              key={hospital.id}
+              className="w-full max-w-88.5"
+              delay={Math.min(i, 5) * 60}
+            >
+            <Card className="w-full">
               <CardHeader className="flex flex-row items-start justify-between gap-3 ">
                 <div className="flex flex-col gap-0.5">
                   <CardTitle className="font-semibold">
@@ -438,6 +444,7 @@ const NetworkHospitalPage = () => {
                 </div>
               </CardFooter>
             </Card>
+            </ScrollReveal>
           ))}
         </div>
       </div>

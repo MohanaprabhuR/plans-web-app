@@ -8,6 +8,7 @@ import useAuth from "@/hooks/useAuth";
 import { toast } from "sonner";
 import { Alert, AlertTitle } from "@/components/ui/alert";
 import { PageLoadState } from "@/components/ui/page-load-state";
+import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { useAsyncData } from "@/hooks/useAsyncData";
 import { fetchJsonWithUser, fetchWithUser } from "@/lib/fetch-with-user";
 import { cn } from "@/lib/utils";
@@ -362,14 +363,15 @@ export default function BuyInsurancePlansPage() {
       >
       {plans.length > 0 && (
         <div className="flex flex-col gap-4">
-          {plans.map((plan) => (
-            <PlanOptionCard
-              key={plan.planId}
-              plan={plan}
-              category={type}
-              selected={selectedPlanId === plan.planId}
-              onSelect={() => setSelectedPlanId(plan.planId)}
-            />
+          {plans.map((plan, i) => (
+            <ScrollReveal key={plan.planId} delay={Math.min(i, 5) * 60}>
+              <PlanOptionCard
+                plan={plan}
+                category={type}
+                selected={selectedPlanId === plan.planId}
+                onSelect={() => setSelectedPlanId(plan.planId)}
+              />
+            </ScrollReveal>
           ))}
 
           <Button

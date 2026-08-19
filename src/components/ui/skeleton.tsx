@@ -12,7 +12,9 @@ function Skeleton({ className, delay, style, ...props }: SkeletonProps) {
       aria-hidden="true"
       className={cn(
         "relative overflow-hidden rounded-md bg-muted/70",
-        "after:absolute after:inset-0 after:animate-[skeleton-shimmer_1.4s_ease-in-out_infinite]",
+        "after:absolute after:inset-0 after:animate-skeleton-shimmer",
+        // Motion-sensitive users get a static placeholder, not an endless shimmer.
+        "motion-reduce:after:animate-none",
         "after:bg-linear-to-r after:from-transparent after:via-white/40 after:to-transparent",
         "dark:after:via-white/10",
         className,

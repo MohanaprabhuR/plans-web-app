@@ -234,7 +234,7 @@ export default function SearchPage() {
             <Badge
               variant="outline"
               size="md"
-              className="text-[#FF5E00] outline-[#FF5E00]/35"
+              className="text-brand outline-brand/35"
             >
               Required
             </Badge>
@@ -260,7 +260,7 @@ export default function SearchPage() {
           <div
             className={`relative overflow-hidden rounded-xl border text-center transition-colors ${
               isDragging
-                ? "border-[#FF5E00]"
+                ? "border-brand"
                 : uploadState === "failed"
                   ? "border-destructive/40 bg-destructive/5"
                   : uploadState === "uploading"
@@ -284,7 +284,7 @@ export default function SearchPage() {
               <div
                 aria-hidden
                 className={`absolute inset-y-0 left-0 transition-[width] duration-300 ease-out ${
-                  isDragging ? "bg-[#FF5E00]/5" : "bg-orange-100"
+                  isDragging ? "bg-brand/5" : "bg-orange-100"
                 }`}
                 style={{ width: isDragging ? "100%" : `${uploadProgress}%` }}
               />
@@ -296,7 +296,7 @@ export default function SearchPage() {
                 strokeWidth={1.5}
                 className={`mx-auto mb-4 size-11 ${
                   isDragging
-                    ? "fill-[#FF5E00]/20 text-[#FF5E00]"
+                    ? "fill-brand/20 text-brand"
                     : "fill-amber-200 text-amber-400"
                 }`}
               />
@@ -323,7 +323,7 @@ export default function SearchPage() {
                     File size exceeded, max size is 25 MB.{" "}
                     <button
                       type="button"
-                      className="text-[#FF5E00] underline"
+                      className="text-brand underline"
                       onClick={(e) => {
                         e.stopPropagation();
                         resetUpload();
@@ -340,7 +340,7 @@ export default function SearchPage() {
                     Drag &amp; Drop or{" "}
                     <button
                       type="button"
-                      className="text-[#FF5E00] underline"
+                      className="text-brand underline"
                       onClick={(e) => {
                         e.stopPropagation();
                         openFilePicker();
@@ -387,7 +387,7 @@ export default function SearchPage() {
               )}
 
               {/* Chat messages */}
-              <div className="min-h-[260px] space-y-5">
+              <div className="min-h-65 space-y-5">
                 {messages.map((m, idx) => (
                   <div
                     key={idx}
@@ -407,7 +407,7 @@ export default function SearchPage() {
                     {/* Bubble */}
                     <div
                       className={
-                        m.role === "user" ? "max-w-[360px]" : "max-w-[560px]"
+                        m.role === "user" ? "max-w-90" : "max-w-140"
                       }
                     >
                       <div
@@ -457,7 +457,7 @@ export default function SearchPage() {
                     }}
                   />
                   <Button
-                    className="size-11 shrink-0 rounded-full p-0 bg-[#FF5E00] hover:bg-[#ff4a00]"
+                    className="size-11 shrink-0 rounded-full p-0 bg-brand hover:bg-brand-hover"
                     onClick={() => send()}
                     disabled={!input.trim() || sending}
                     aria-label="Send"

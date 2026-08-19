@@ -184,6 +184,9 @@
   --border: var(--color-gray-600);
   --background: var(--color-black);
   --foreground: var(--color-gray-50);
+  /* Brand accent (used for CTAs, progress, active states) */
+  --brand: #ff5e00;
+  --brand-hover: #ff7524;
   --primary: var(--color-gray-50);
   --primary-foreground: var(--color-gray-950);
   --secondary: var(--color-gray-700);
