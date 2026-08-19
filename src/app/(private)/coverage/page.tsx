@@ -313,7 +313,7 @@ export default function CoveragePage() {
               <p className="text-2xl font-semibold text-accent-foreground leading-8 tracking-4">
                 Coverage Breakdown
               </p>
-              <div className="flex gap-x-6 ">
+              <div className="flex flex-col gap-6 lg:flex-row lg:gap-x-6">
                 <Card>
                   <ul>
                     {data.coverageBreakdown.map((coverage, index) => (
@@ -415,7 +415,7 @@ export default function CoveragePage() {
                     ))}
                   </ul>
                 </Card>
-                <div className="w-full max-w-88.5 flex flex-col gap-y-6">
+                <div className="w-full flex flex-col gap-y-6 lg:max-w-88.5">
                   <Card className="h-fit ">
                     <CardHeader className="gap-0">
                       <CardTitle className="flex items-center gap-x-2 font-semibold">
