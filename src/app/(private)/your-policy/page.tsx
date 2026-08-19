@@ -196,7 +196,7 @@ const YourPolicyPage = () => {
         preset="your-policy"
       >
       {!loading && !error && (
-        <div className="w-full flex gap-x-6 pt-8">
+        <div className="w-full flex flex-col gap-6 pt-8 lg:flex-row lg:gap-x-6">
           <div className="w-full flex flex-col gap-y-6 max-w-[730px] ">
             <div className="embla overflow-hidden">
               <div className="embla__viewport overflow-hidden" ref={emblaRef}>
@@ -314,7 +314,7 @@ const YourPolicyPage = () => {
               </>
             )}
           </div>
-          <div className="w-full max-w-88.5 min-w-88.5 flex flex-col gap-y-6">
+          <div className="w-full flex flex-col gap-y-6 lg:max-w-88.5 lg:min-w-88.5">
             <Card className="gap-4">
               <CardHeader>
                 <CardTitle className="flex items-center gap-x-2 font-semibold">

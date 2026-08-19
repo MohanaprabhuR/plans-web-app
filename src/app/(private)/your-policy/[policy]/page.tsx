@@ -557,7 +557,7 @@ const PolicyDetailPage = () => {
             </TabsContent>
           </Tabs>
         </div>
-        <div className="w-full max-w-88.5 min-w-88.5 flex flex-col gap-y-6">
+        <div className="w-full flex flex-col gap-y-6 lg:max-w-88.5 lg:min-w-88.5">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-x-2 font-semibold">
