@@ -780,6 +780,7 @@ const DashboardPage = () => {
 
 
               <RiskScoreGauge
+                className="my-10"
                 value={
                   coverageScore ??
                   apiData?.endpoints?.riskAssessment?.getRiskScore?.response

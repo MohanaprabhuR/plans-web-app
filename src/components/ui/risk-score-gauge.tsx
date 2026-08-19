@@ -7,6 +7,7 @@ const EMPTY = "#E2E2E2";
 const TICKS = 68;
 const R_OUTER = 100;
 const R_INNER = 82;
+const R_ARC = 72; // thin guide arc inside the ticks; the marker rides on it
 const CX = 110;
 const CY = 110;
 
@@ -75,10 +76,13 @@ export function RiskScoreGauge({
 
   // Marker sits just inside the arc at the current value.
   const markerAngle = Math.PI * (1 - score / 100);
-  const markerR = R_INNER - 7;
+  const markerR = R_ARC;
   const mx = CX + markerR * Math.cos(markerAngle);
   const my = CY - markerR * Math.sin(markerAngle);
-  const markerRotation = 90 - (score / 100) * 180;
+  // Point the marker inward, back along the radius toward the centre.
+  // rotate(R) maps (1,0) -> (cos R, sin R); the inward unit vector is
+  // (-cos t, sin t) in SVG coords, so R = 180 - t, i.e. 1.8 * score.
+  const markerRotation = (score / 100) * 180;
 
   return (
     <div className={cn("mx-auto w-full max-w-95", className)}>
@@ -88,6 +92,15 @@ export function RiskScoreGauge({
         role="img"
         aria-label={`Risk score ${score} out of 100, ${label} risk`}
       >
+        {/* Guide arc the marker travels along */}
+        <path
+          d={`M ${CX - R_ARC} ${CY} A ${R_ARC} ${R_ARC} 0 0 1 ${CX + R_ARC} ${CY}`}
+          fill="none"
+          stroke="#E2E2E2"
+          strokeWidth={1.5}
+          strokeLinecap="round"
+        />
+
         {ticks.map((t) => (
           <line
             key={t.key}
