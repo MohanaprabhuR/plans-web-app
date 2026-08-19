@@ -234,7 +234,7 @@ export default function CoveragePage() {
                             {coverage?.provider && coverage?.coverage ? (
                               <p className="text-muted-foreground text-base leading-6 tracking-4 font-normal flex items-center gap-2 pb-2">
                                 {coverage?.provider}{" "}
-                                <div className="w-1 h-1 bg-muted-foreground rounded-full"></div>
+                                <span className="inline-block w-1 h-1 shrink-0 bg-muted-foreground rounded-full" />
                                 {coverage.coverage}
                               </p>
                             ) : null}
