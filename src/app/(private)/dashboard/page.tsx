@@ -213,27 +213,27 @@ const quickActions = [
   {
     id: 1,
     name: "Download Policy",
-    icon: <ArrowDownToLine className="size-6 text-[#FF5E00]" />,
+    icon: <ArrowDownToLine className="size-6 text-brand" />,
     type: "drawer",
   },
   {
     id: 2,
     name: "Network Hospitals",
-    icon: <Plus className="size-6 text-[#FF5E00]" />,
+    icon: <Plus className="size-6 text-brand" />,
     type: "link",
     href: "/network-hospital",
   },
   {
     id: 3,
     name: "Blacklisted Hospitals",
-    icon: <Ban className="size-6 text-[#FF5E00]" />,
+    icon: <Ban className="size-6 text-brand" />,
     type: "link",
     href: "/block-list-hospital",
   },
   {
     id: 4,
     name: "Policy AI Chat",
-    icon: <MessageSquareText className="size-6 text-[#FF5E00]" />,
+    icon: <MessageSquareText className="size-6 text-brand" />,
     type: "link",
     href: "/search",
   },
@@ -716,7 +716,7 @@ const DashboardPage = () => {
             <div className="scrollbar-hide flex gap-6 overflow-x-auto">
                 {policies.length === 0 ? (
                   <Card
-                    className="min-w-[354px] border  bg-muted/30 flex flex-col items-center justify-center py-16 px-6 cursor-pointer hover:bg-muted/50 transition-colors"
+                    className="min-w-88.5 border  bg-muted/30 flex flex-col items-center justify-center py-16 px-6 cursor-pointer hover:bg-muted/50 transition-colors"
                     onClick={openAddModal}
                     role="button"
                     tabIndex={0}
@@ -1092,7 +1092,7 @@ const DashboardPage = () => {
                 </div>
               </div>
             </div>
-            <div className="w-full max-w-[354px] flex flex-col gap-y-6">
+            <div className="w-full max-w-88.5 flex flex-col gap-y-6">
               <Card className="gap-4">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-x-2 font-semibold">

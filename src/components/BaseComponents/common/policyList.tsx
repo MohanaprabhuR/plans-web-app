@@ -39,15 +39,15 @@ const PolicyListCard: React.FC<PolicyCardProps> = ({ policy }) => {
   const getIcon = () => {
     switch (policy.type) {
       case "Health":
-        return <Hospital className="size-5 min-w-5 text-[#8E51FF]" />;
+        return <Hospital className="size-5 min-w-5 text-icon-violet" />;
       case "Auto":
-        return <CarFront className="size-5 min-w-5 text-[#E12AFB]" />;
+        return <CarFront className="size-5 min-w-5 text-icon-fuchsia" />;
       case "Life":
-        return <LifeBuoy className="size-5 min-w-5 text-[#FE9A00]" />;
+        return <LifeBuoy className="size-5 min-w-5 text-icon-amber" />;
       case "Travel":
-        return <PlaneTakeoff className="size-5 min-w-5 text-[#FE9A00]" />;
+        return <PlaneTakeoff className="size-5 min-w-5 text-icon-amber" />;
       case "Home":
-        return <House className="size-5 min-w-5 text-[#FE9A00]" />;
+        return <House className="size-5 min-w-5 text-icon-amber" />;
       default:
         return null;
     }
@@ -55,7 +55,7 @@ const PolicyListCard: React.FC<PolicyCardProps> = ({ policy }) => {
 
   const router = useRouter();
   return (
-    <Card className={`bg-white min-w-[354px] `}>
+    <Card className={`bg-white min-w-88.5 `}>
       <CardContent>
         <div className="flex items-center justify-between pb-4 border-b border-dashed">
           <div className="flex items-center gap-x-4">
@@ -82,7 +82,7 @@ const PolicyListCard: React.FC<PolicyCardProps> = ({ policy }) => {
                     {policy.type}
                   </span>
                 </div>
-                <div className="size-1 rounded-full bg-[#757575]"></div>
+                <div className="size-1 rounded-full bg-icon-muted"></div>
                 <span className="text-base font-medium leading-5 tracking-4 text-accent-foreground">
                   {policy.status}
                 </span>

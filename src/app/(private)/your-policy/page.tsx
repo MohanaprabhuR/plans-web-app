@@ -211,15 +211,15 @@ const YourPolicyPage = () => {
                           <div className="flex items-center gap-x-4">
                             <div className="size-12 rounded-full bg-accent flex items-center justify-center">
                               {expiry.type === "Health" ? (
-                                <BriefcaseMedical className="size-5.5 stroke-[#8E51FF]" />
+                                <BriefcaseMedical className="size-5.5 stroke-icon-violet" />
                               ) : expiry.type === "Home" ? (
-                                <House className="size-5.5 stroke-[#FE9A00]" />
+                                <House className="size-5.5 stroke-icon-amber" />
                               ) : expiry.type === "Life" ? (
-                                <Heart className="size-5.5 stroke-[#FF5255]" />
+                                <Heart className="size-5.5 stroke-icon-rose" />
                               ) : expiry.type === "Travel" ? (
-                                <PlaneTakeoff className="size-5.5 stroke-[#00D3F2]" />
+                                <PlaneTakeoff className="size-5.5 stroke-icon-cyan" />
                               ) : expiry.type === "Auto" ? (
-                                <CarFront className="size-5.5 stroke-[#E12AFB]" />
+                                <CarFront className="size-5.5 stroke-icon-fuchsia" />
                               ) : null}
                             </div>
                             <div className="flex flex-col">
@@ -314,7 +314,7 @@ const YourPolicyPage = () => {
               </>
             )}
           </div>
-          <div className="w-full max-w-[354px] min-w-[354px] flex flex-col gap-y-6">
+          <div className="w-full max-w-88.5 min-w-88.5 flex flex-col gap-y-6">
             <Card className="gap-4">
               <CardHeader>
                 <CardTitle className="flex items-center gap-x-2 font-semibold">
@@ -329,7 +329,7 @@ const YourPolicyPage = () => {
                       `/buy-insurance?type=${encodeURIComponent("Health")}`,
                     );
                   }}
-                  className="w-full max-w-[150px] justify-start"
+                  className="w-full max-w-37.5 justify-start"
                   variant="shadow"
                   size="lg"
                 >
@@ -343,7 +343,7 @@ const YourPolicyPage = () => {
                       `/buy-insurance?type=${encodeURIComponent("Home")}`,
                     );
                   }}
-                  className="w-full max-w-[150px] justify-start"
+                  className="w-full max-w-37.5 justify-start"
                   variant="shadow"
                   size="lg"
                 >
@@ -357,7 +357,7 @@ const YourPolicyPage = () => {
                       `/buy-insurance?type=${encodeURIComponent("Life")}`,
                     );
                   }}
-                  className="w-full max-w-[150px] justify-start"
+                  className="w-full max-w-37.5 justify-start"
                   variant="shadow"
                   size="lg"
                 >
@@ -371,7 +371,7 @@ const YourPolicyPage = () => {
                       `/buy-insurance?type=${encodeURIComponent("Travel")}`,
                     );
                   }}
-                  className="w-full max-w-[150px] justify-start"
+                  className="w-full max-w-37.5 justify-start"
                   variant="shadow"
                   size="lg"
                 >
@@ -385,7 +385,7 @@ const YourPolicyPage = () => {
                       `/buy-insurance?type=${encodeURIComponent("Auto")}`,
                     );
                   }}
-                  className="w-full max-w-[150px] justify-start"
+                  className="w-full max-w-37.5 justify-start"
                   variant="shadow"
                   size="lg"
                 >

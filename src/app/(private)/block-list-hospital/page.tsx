@@ -367,41 +367,41 @@ const NetworkHospitalPage = () => {
                   checked={ratings1}
                   onCheckedChange={setRatings1}
                 >
-                  <Star className="size-4 fill-[#FF5E00] text-[#FF5E00]" />
+                  <Star className="size-4 fill-brand text-brand" />
                 </DropdownMenuCheckboxItem>
                 <DropdownMenuCheckboxItem
                   checked={ratings2}
                   onCheckedChange={setRatings2}
                 >
-                  <Star className="size-4 fill-[#FF5E00] text-[#FF5E00]" />
-                  <Star className="size-4 fill-[#FF5E00] text-[#FF5E00]" />
+                  <Star className="size-4 fill-brand text-brand" />
+                  <Star className="size-4 fill-brand text-brand" />
                 </DropdownMenuCheckboxItem>
                 <DropdownMenuCheckboxItem
                   checked={ratings3}
                   onCheckedChange={setRatings3}
                 >
-                  <Star className="size-4 fill-[#FF5E00] text-[#FF5E00]" />
-                  <Star className="size-4 fill-[#FF5E00] text-[#FF5E00]" />
-                  <Star className="size-4 fill-[#FF5E00] text-[#FF5E00]" />
+                  <Star className="size-4 fill-brand text-brand" />
+                  <Star className="size-4 fill-brand text-brand" />
+                  <Star className="size-4 fill-brand text-brand" />
                 </DropdownMenuCheckboxItem>
                 <DropdownMenuCheckboxItem
                   checked={ratings4}
                   onCheckedChange={setRatings4}
                 >
-                  <Star className="size-4 fill-[#FF5E00] text-[#FF5E00]" />
-                  <Star className="size-4 fill-[#FF5E00] text-[#FF5E00]" />
-                  <Star className="size-4 fill-[#FF5E00] text-[#FF5E00]" />
-                  <Star className="size-4 fill-[#FF5E00] text-[#FF5E00]" />
+                  <Star className="size-4 fill-brand text-brand" />
+                  <Star className="size-4 fill-brand text-brand" />
+                  <Star className="size-4 fill-brand text-brand" />
+                  <Star className="size-4 fill-brand text-brand" />
                 </DropdownMenuCheckboxItem>
                 <DropdownMenuCheckboxItem
                   checked={ratings5}
                   onCheckedChange={setRatings5}
                 >
-                  <Star className="size-4 fill-[#FF5E00] text-[#FF5E00]" />
-                  <Star className="size-4 fill-[#FF5E00] text-[#FF5E00]" />
-                  <Star className="size-4 fill-[#FF5E00] text-[#FF5E00]" />
-                  <Star className="size-4 fill-[#FF5E00] text-[#FF5E00]" />
-                  <Star className="size-4 fill-[#FF5E00] text-[#FF5E00]" />
+                  <Star className="size-4 fill-brand text-brand" />
+                  <Star className="size-4 fill-brand text-brand" />
+                  <Star className="size-4 fill-brand text-brand" />
+                  <Star className="size-4 fill-brand text-brand" />
+                  <Star className="size-4 fill-brand text-brand" />
                 </DropdownMenuCheckboxItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -425,7 +425,7 @@ const NetworkHospitalPage = () => {
                   </CardDescription>
                 </div>
                 <div className="bg-accent flex rounded-full px-2 py-1 items-center gap-1 text-base font-medium tracking-4 leading-6 text-accent-foreground">
-                  <Star className="size-4 fill-[#ff5e00]  text-[#FF5E00]" />
+                  <Star className="size-4 fill-brand  text-brand" />
                   {hospital.rating}
                 </div>
               </CardHeader>
@@ -437,7 +437,7 @@ const NetworkHospitalPage = () => {
                   </p>
                 </div>
                 <div className="flex gap-x-1 items-center">
-                  <Navigation className="size-4 text-[#FF5E00]" />
+                  <Navigation className="size-4 text-brand" />
                   <p className="text-base font-medium tracking-4 leading-6 text-accent-foreground">
                     Get Directions
                   </p>

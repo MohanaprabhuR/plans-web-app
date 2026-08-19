@@ -281,7 +281,7 @@ export default function BuyInsurancePage() {
 
   return (
     <div className="flex">
-      <div className="w-1/3 bg-[#FFF7ED] py-4 px-8 h-screen">
+      <div className="w-1/3 bg-orange-50 py-4 px-8 h-screen">
         <Link href="/">
           <Image src={Logo} alt="Logo" width={78} height={32} />
         </Link>
@@ -308,15 +308,15 @@ export default function BuyInsurancePage() {
                 <div
                   key={s.id}
                   className={`flex items-center gap-4 relative before:content-[] before:w-0.5 before:h-8.5 before:absolute before:top-[23px] last:before:hidden before:left-[11px] ${
-                    done ? "before:bg-[#FF5E00]" : "before:bg-primary/30"
+                    done ? "before:bg-brand" : "before:bg-primary/30"
                   }`}
                 >
                   <div
                     className={`size-6 z-1 relative rounded-full border flex items-center justify-center ${
                       done
-                        ? "bg-[#FF5E00] border-[#FF5E00]"
+                        ? "bg-brand border-brand"
                         : active
-                          ? "border-[#FF5E00] "
+                          ? "border-brand "
                           : "border-primary/30 bg-transparent"
                     }`}
                   >

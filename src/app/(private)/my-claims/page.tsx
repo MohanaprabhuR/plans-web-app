@@ -40,12 +40,12 @@ interface ApiResponse {
 
 function getTypeIcon(type: string) {
   if (type === "Health")
-    return <BriefcaseMedical className="size-5 stroke-[#8E51FF]" />;
-  if (type === "Auto") return <CarFront className="size-5 stroke-[#E12AFB]" />;
-  if (type === "Life") return <Heart className="size-5 stroke-[#FF5255]" />;
-  if (type === "Home") return <House className="size-5 stroke-[#FE9A00]" />;
+    return <BriefcaseMedical className="size-5 stroke-icon-violet" />;
+  if (type === "Auto") return <CarFront className="size-5 stroke-icon-fuchsia" />;
+  if (type === "Life") return <Heart className="size-5 stroke-icon-rose" />;
+  if (type === "Home") return <House className="size-5 stroke-icon-amber" />;
   if (type === "Travel")
-    return <PlaneTakeoff className="size-5 stroke-[#00D3F2]" />;
+    return <PlaneTakeoff className="size-5 stroke-icon-cyan" />;
   return <ClipboardList className="size-5 stroke-muted-foreground" />;
 }
 

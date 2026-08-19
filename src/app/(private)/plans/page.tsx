@@ -53,15 +53,15 @@ function formatInr(amount: number) {
 function getCategoryIcon(category: string) {
   switch (category) {
     case "Health":
-      return <Hospital className="size-5 min-w-5 text-[#8E51FF]" />;
+      return <Hospital className="size-5 min-w-5 text-icon-violet" />;
     case "Auto":
-      return <CarFront className="size-5 min-w-5 text-[#E12AFB]" />;
+      return <CarFront className="size-5 min-w-5 text-icon-fuchsia" />;
     case "Life":
-      return <LifeBuoy className="size-5 min-w-5 text-[#FE9A00]" />;
+      return <LifeBuoy className="size-5 min-w-5 text-icon-amber" />;
     case "Travel":
-      return <PlaneTakeoff className="size-5 min-w-5 text-[#FE9A00]" />;
+      return <PlaneTakeoff className="size-5 min-w-5 text-icon-amber" />;
     case "Home":
-      return <House className="size-5 min-w-5 text-[#FE9A00]" />;
+      return <House className="size-5 min-w-5 text-icon-amber" />;
     default:
       return <ShieldCheck className="size-5 min-w-5 text-muted-foreground" />;
   }
@@ -119,7 +119,7 @@ function PlanOptionCard({
                     {plan.provider}
                   </span>
                 </div>
-                <div className="size-1 rounded-full bg-[#757575]" />
+                <div className="size-1 rounded-full bg-icon-muted" />
                 <span className="text-base font-medium leading-5 tracking-4 text-accent-foreground">
                   {category}
                 </span>
@@ -144,7 +144,7 @@ function PlanOptionCard({
         </div>
 
         <div className="flex items-start justify-between gap-4 pt-4 flex-wrap">
-          <div className="flex text-sm flex-col min-w-[100px]">
+          <div className="flex text-sm flex-col min-w-25">
             <span className="text-muted-foreground text-base font-medium leading-5 tracking-4">
               Premium
             </span>
@@ -152,7 +152,7 @@ function PlanOptionCard({
               ₹{formatInr(plan.monthlyPrice)}/mo
             </span>
           </div>
-          <div className="flex text-sm flex-col min-w-[100px]">
+          <div className="flex text-sm flex-col min-w-25">
             <span className="text-muted-foreground text-base font-medium leading-5 tracking-4">
               Yearly
             </span>
