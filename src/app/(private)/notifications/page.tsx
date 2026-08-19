@@ -69,15 +69,15 @@ function formatTypeLabel(type: string) {
 function getCategoryIcon(category: string) {
   switch (category) {
     case "Health":
-      return <Hospital className="size-5 min-w-5 text-[#8E51FF]" />;
+      return <Hospital className="size-5 min-w-5 text-icon-violet" />;
     case "Auto":
-      return <CarFront className="size-5 min-w-5 text-[#E12AFB]" />;
+      return <CarFront className="size-5 min-w-5 text-icon-fuchsia" />;
     case "Life":
-      return <LifeBuoy className="size-5 min-w-5 text-[#FE9A00]" />;
+      return <LifeBuoy className="size-5 min-w-5 text-icon-amber" />;
     case "Travel":
-      return <PlaneTakeoff className="size-5 min-w-5 text-[#FE9A00]" />;
+      return <PlaneTakeoff className="size-5 min-w-5 text-icon-amber" />;
     case "Home":
-      return <House className="size-5 min-w-5 text-[#FE9A00]" />;
+      return <House className="size-5 min-w-5 text-icon-amber" />;
     default:
       return null;
   }
@@ -86,9 +86,9 @@ function getCategoryIcon(category: string) {
 /** Notification event icon (renewal, claim, payment) */
 function getTypeIcon(type: string) {
   if (type === "policy_renewal")
-    return <House className="size-5 min-w-5 text-[#FE9A00]" />;
+    return <House className="size-5 min-w-5 text-icon-amber" />;
   if (type === "claim_update")
-    return <ClipboardList className="size-5 min-w-5 text-[#8E51FF]" />;
+    return <ClipboardList className="size-5 min-w-5 text-icon-violet" />;
   if (type === "payment")
     return <CreditCard className="size-5 min-w-5 text-green-600" />;
   return <ShieldCheck className="size-5 min-w-5 text-muted-foreground" />;
@@ -286,7 +286,7 @@ export default function NotificationsPage() {
                   </div>
 
                   <div className="flex items-start justify-between gap-4 pt-4 flex-wrap">
-                    <div className="flex text-sm flex-col min-w-[100px]">
+                    <div className="flex text-sm flex-col min-w-25">
                       <span className="text-muted-foreground text-base font-medium leading-5 tracking-4">
                         Category
                       </span>
@@ -294,7 +294,7 @@ export default function NotificationsPage() {
                         {formatTypeLabel(item.type)}
                       </span>
                     </div>
-                    <div className="flex text-sm flex-col min-w-[100px]">
+                    <div className="flex text-sm flex-col min-w-25">
                       <span className="text-muted-foreground text-base font-medium leading-5 tracking-4 pb-1">
                         Priority
                       </span>
@@ -306,7 +306,7 @@ export default function NotificationsPage() {
                         {item.priority}
                       </Badge>
                     </div>
-                    <div className="flex text-sm flex-col min-w-[100px]">
+                    <div className="flex text-sm flex-col min-w-25">
                       <span className="text-muted-foreground text-base font-medium leading-5 tracking-4">
                         Received
                       </span>

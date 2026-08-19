@@ -221,7 +221,7 @@ export default function PolicyAI() {
                   </div>
                   <div className="mx-auto h-2 w-64 rounded-full bg-muted overflow-hidden">
                     <div
-                      className="h-full bg-[#FF5E00] transition-all duration-300"
+                      className="h-full bg-brand transition-all duration-300"
                       style={{ width: `${uploadProgress}%` }}
                     />
                   </div>
@@ -241,7 +241,7 @@ export default function PolicyAI() {
                     File size exceeded, max size is 25 MB.{" "}
                     <button
                       type="button"
-                      className="text-[#FF5E00] underline"
+                      className="text-brand underline"
                       onClick={(e) => {
                         e.stopPropagation();
                         resetUpload();
@@ -261,7 +261,7 @@ export default function PolicyAI() {
                     Drag &amp; Drop or{" "}
                     <button
                       type="button"
-                      className="text-[#FF5E00] underline"
+                      className="text-brand underline"
                       onClick={(e) => {
                         e.stopPropagation();
                         openFilePicker();
@@ -371,7 +371,7 @@ export default function PolicyAI() {
                     }}
                   />
                   <Button
-                    className="size-11 shrink-0 rounded-full p-0 bg-[#FF5E00] hover:bg-[#ff4a00]"
+                    className="size-11 shrink-0 rounded-full p-0 bg-brand hover:bg-brand-hover"
                     onClick={() => send()}
                     disabled={!input.trim() || sending}
                     aria-label="Send"

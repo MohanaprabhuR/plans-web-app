@@ -13,7 +13,7 @@ const QuickActionCard = React.forwardRef<HTMLDivElement, QuickActionCardProps>(
         className={`flex flex-col items-center justify-center gap-y-2 w-full max-w-[68px] cursor-pointer ${className}`}
         {...props}
       >
-        <div className="flex items-center justify-center size-12 rounded-full bg-[#FFF7ED]">
+        <div className="flex items-center justify-center size-12 rounded-full bg-orange-50">
           {icon}
         </div>
 

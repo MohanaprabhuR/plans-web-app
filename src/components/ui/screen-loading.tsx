@@ -121,7 +121,7 @@ function CardsRowSkeleton({ count = 3 }: { count?: number }) {
       {Array.from({ length: count }).map((_, i) => (
         <Skeleton
           key={`card-${i}`}
-          className="h-[280px] min-w-[300px] shrink-0 rounded-xl sm:min-w-[354px]"
+          className="h-[280px] min-w-[300px] shrink-0 rounded-xl sm:min-w-88.5"
           delay={100 + i * 80}
         />
       ))}

@@ -405,25 +405,25 @@ const PolicyDetailPage = () => {
                         <div className="flex items-center gap-x-1.5 pt-1.5">
                           <div className="flex gap-x-1 items-center">
                             {policy.type === "Health" && (
-                              <Hospital className="size-5 min-w-5 text-[#8E51FF]" />
+                              <Hospital className="size-5 min-w-5 text-icon-violet" />
                             )}
                             {policy.type === "Auto" && (
-                              <CarFront className="size-5 min-w-5 text-[#E12AFB]" />
+                              <CarFront className="size-5 min-w-5 text-icon-fuchsia" />
                             )}
                             {policy.type === "Life" && (
-                              <LifeBuoy className="size-5 min-w-5 text-[#FE9A00]" />
+                              <LifeBuoy className="size-5 min-w-5 text-icon-amber" />
                             )}
                             {policy.type === "Travel" && (
-                              <PlaneTakeoff className="size-5 min-w-5 text-[#FE9A00]" />
+                              <PlaneTakeoff className="size-5 min-w-5 text-icon-amber" />
                             )}
                             {policy.type === "Home" && (
-                              <House className="size-5 min-w-5 text-[#FE9A00]" />
+                              <House className="size-5 min-w-5 text-icon-amber" />
                             )}
                             <span className="text-base font-medium leading-5 tracking-4 text-accent-foreground">
                               {policy.type}
                             </span>
                           </div>
-                          <div className="size-1 rounded-full bg-[#757575]"></div>
+                          <div className="size-1 rounded-full bg-icon-muted"></div>
                           <span className="text-base font-medium leading-5 tracking-4 text-accent-foreground">
                             {policy.policyId}
                           </span>
@@ -557,7 +557,7 @@ const PolicyDetailPage = () => {
             </TabsContent>
           </Tabs>
         </div>
-        <div className="w-full max-w-[354px] min-w-[354px] flex flex-col gap-y-6">
+        <div className="w-full max-w-88.5 min-w-88.5 flex flex-col gap-y-6">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-x-2 font-semibold">

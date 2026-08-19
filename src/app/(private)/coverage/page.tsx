@@ -326,19 +326,19 @@ export default function CoveragePage() {
                             className={`w-12 h-13 min-w-12 min-h-13  rounded-2xl flex items-center justify-center ${coverage?.category === "Health Insurance" ? "bg-[#F8F5FF]" : coverage?.category === "Auto Insurance" ? "bg-[#FDF0FF]" : coverage?.category === "Life Insurance" ? "bg-[#FFF5F5]" : coverage?.category === "Home Insurance" ? "bg-[#FEF6EA]" : coverage?.category === "Travel Insurance" ? "bg-[#FFF4E5]" : coverage?.category === "Pet Insurance" ? "bg-[#ECFEFF]" : coverage?.category === "Renters Insurance" ? "bg-[#F0FDFA]" : ""}`}
                           >
                             {coverage?.category === "Health Insurance" ? (
-                              <BriefcaseMedical className="stroke-[#8E51FF]" />
+                              <BriefcaseMedical className="stroke-icon-violet" />
                             ) : coverage?.category === "Auto Insurance" ? (
-                              <CarFront className="stroke-[#E12AFB]" />
+                              <CarFront className="stroke-icon-fuchsia" />
                             ) : coverage?.category === "Life Insurance" ? (
-                              <Heart className="stroke-[#FF5255]" />
+                              <Heart className="stroke-icon-rose" />
                             ) : coverage?.category === "Home Insurance" ? (
-                              <House className="stroke-[#FE9A00]" />
+                              <House className="stroke-icon-amber" />
                             ) : coverage?.category === "Travel Insurance" ? (
-                              <PlaneTakeoff className="stroke-[#00D3F2]" />
+                              <PlaneTakeoff className="stroke-icon-cyan" />
                             ) : coverage?.category === "Pet Insurance" ? (
-                              <Dog className="stroke-[#00D3F2]" />
+                              <Dog className="stroke-icon-cyan" />
                             ) : coverage?.category === "Renters Insurance" ? (
-                              <KeyRound className="stroke-[#00BBA7]" />
+                              <KeyRound className="stroke-icon-teal" />
                             ) : (
                               ""
                             )}
@@ -415,7 +415,7 @@ export default function CoveragePage() {
                     ))}
                   </ul>
                 </Card>
-                <div className="w-full max-w-[354px] flex flex-col gap-y-6">
+                <div className="w-full max-w-88.5 flex flex-col gap-y-6">
                   <Card className="h-fit ">
                     <CardHeader className="gap-0">
                       <CardTitle className="flex items-center gap-x-2 font-semibold">
