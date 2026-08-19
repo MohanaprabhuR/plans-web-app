@@ -79,10 +79,10 @@ export function RiskScoreGauge({
   const markerR = R_ARC;
   const mx = CX + markerR * Math.cos(markerAngle);
   const my = CY - markerR * Math.sin(markerAngle);
-  // Point the marker inward, back along the radius toward the centre.
-  // rotate(R) maps (1,0) -> (cos R, sin R); the inward unit vector is
-  // (-cos t, sin t) in SVG coords, so R = 180 - t, i.e. 1.8 * score.
-  const markerRotation = (score / 100) * 180;
+  // Point the marker outward along the radius, at the ticks. rotate(R) maps
+  // (1,0) -> (cos R, sin R); the outward unit vector is (cos t, -sin t) in
+  // SVG coords, so R = -t, i.e. 1.8 * score - 180.
+  const markerRotation = (score / 100) * 180 - 180;
 
   return (
     <div className={cn("mx-auto w-full max-w-95", className)}>
