@@ -184,15 +184,6 @@
   --border: var(--color-gray-600);
   --background: var(--color-black);
   --foreground: var(--color-gray-50);
-  /* Category icon palette (decorative; same in both themes) */
-  --icon-rose: #ff5255;
-  --icon-amber: #fe9a00;
-  --icon-cyan: #00d3f2;
-  --icon-violet: #8e51ff;
-  --icon-fuchsia: #e12afb;
-  --icon-teal: #00bba7;
-  --icon-muted: #757575;
-
   /* Brand accent (used for CTAs, progress, active states) */
   --brand: #ff5e00;
   --brand-hover: #ff7524;

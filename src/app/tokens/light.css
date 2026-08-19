@@ -152,18 +152,9 @@
   --border: var(--color-gray-200);
   --background: var(--color-white);
   --foreground: var(--color-gray-900);
-  /* Category icon palette (decorative; same in both themes) */
-  --icon-rose: #ff5255;
-  --icon-amber: #fe9a00;
-  --icon-cyan: #00d3f2;
-  --icon-violet: #8e51ff;
-  --icon-fuchsia: #e12afb;
-  --icon-teal: #00bba7;
-  --icon-muted: #757575;
-
   /* Brand accent (used for CTAs, progress, active states) */
   --brand: #ff5e00;
-  --brand-hover: #ff4a00;
+  --brand-hover: #e55400;
   --primary: var(--color-gray-900);
   --primary-foreground: var(--color-white);
   --secondary: var(--color-gray-100);

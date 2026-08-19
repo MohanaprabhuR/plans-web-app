@@ -27,14 +27,6 @@
   /* Skeleton shimmer (keyframes in globals.css) */
   --animate-skeleton-shimmer: skeleton-shimmer 1.4s ease-in-out infinite;
 
-  --color-icon-rose: var(--icon-rose);
-  --color-icon-amber: var(--icon-amber);
-  --color-icon-cyan: var(--icon-cyan);
-  --color-icon-violet: var(--icon-violet);
-  --color-icon-fuchsia: var(--icon-fuchsia);
-  --color-icon-teal: var(--icon-teal);
-  --color-icon-muted: var(--icon-muted);
-
   --color-brand: var(--brand);
   --color-brand-hover: var(--brand-hover);
   --color-primary: var(--primary);
