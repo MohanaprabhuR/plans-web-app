@@ -35,7 +35,7 @@ function Inline({ text }: InlineProps) {
       nodes.push(
         <code
           key={key++}
-          className="rounded bg-muted px-1 py-0.5 font-mono text-[0.85em]"
+          className="rounded bg-muted px-1 py-0.5 font-mono text-sm"
         >
           {token.slice(1, -1)}
         </code>,
@@ -128,7 +128,7 @@ export function Markdown({
               key={i}
               className={cn(
                 "font-semibold text-foreground",
-                block.level <= 2 ? "text-[0.95rem]" : "text-sm",
+                block.level <= 2 ? "text-base" : "text-sm",
                 i > 0 && "pt-1",
               )}
             >

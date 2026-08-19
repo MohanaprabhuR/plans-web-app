@@ -571,7 +571,7 @@ const PolicyDetailPage = () => {
                   key={`${member.name}-${idx}`}
                   className="flex gap-x-3 border-b py-4 first:border-t-0 last:border-b-0 first:pt-0 last:pb-0"
                 >
-                  <Avatar size="2xl" className="size-[42px] min-w-[42px]">
+                  <Avatar size="2xl" className="size-10 min-w-10">
                     <AvatarImage
                       src={member.avatar}
                       alt={member.name || "avatar"}

@@ -11,6 +11,10 @@ export type PageLoadingPreset =
   | "your-policy"
   | "policy-detail"
   | "my-profile"
+  | "hospitals"
+  | "buy-insurance"
+  | "assistant"
+  | "onboarding"
   | "session";
 
 type PageLoadingPresetConfig = Pick<
@@ -84,6 +88,30 @@ export const PAGE_LOADING_PRESETS: Record<
     showHeader: false,
     label: "Loading profile",
     className: "py-4",
+  },
+  hospitals: {
+    variant: "list",
+    showHeader: true,
+    rows: 6,
+    label: "Loading hospitals",
+    className: "py-2",
+  },
+  "buy-insurance": {
+    variant: "cards-row",
+    showHeader: true,
+    rows: 3,
+    label: "Loading insurance plans",
+    className: "py-2",
+  },
+  assistant: {
+    variant: "detail",
+    showHeader: false,
+    label: "Loading assistant",
+    className: "py-4",
+  },
+  onboarding: {
+    variant: "full",
+    label: "Loading onboarding",
   },
   session: {
     variant: "full",

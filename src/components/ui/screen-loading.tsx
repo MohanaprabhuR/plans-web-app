@@ -213,7 +213,7 @@ function ScreenLoading({
         aria-busy="true"
         aria-label={label}
         className={cn(
-          "flex min-h-screen flex-col items-center justify-center gap-6 bg-[#FFF7ED] px-4 animate-in fade-in duration-300",
+          "flex min-h-screen flex-col items-center justify-center gap-6 bg-orange-50 px-4 motion-safe:animate-in motion-safe:fade-in motion-safe:duration-300",
           className,
         )}
         {...props}
@@ -234,7 +234,7 @@ function ScreenLoading({
       aria-busy="true"
       aria-label={label}
       className={cn(
-        "flex w-full flex-col gap-8 animate-in fade-in duration-300",
+        "flex w-full flex-col gap-8 motion-safe:animate-in motion-safe:fade-in motion-safe:duration-300",
         className,
       )}
       {...props}
