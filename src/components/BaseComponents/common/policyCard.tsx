@@ -68,15 +68,15 @@ const PolicyCard: React.FC<PolicyCardProps> = ({ policy, onClick }) => {
   const getIcon = () => {
     switch (policy.type) {
       case "Health":
-        return <Hospital className="size-5 min-w-5 text-[#8E51FF]" />;
+        return <Hospital className="size-5 min-w-5 text-icon-violet" />;
       case "Auto":
-        return <CarFront className="size-5 min-w-5 text-[#E12AFB]" />;
+        return <CarFront className="size-5 min-w-5 text-icon-fuchsia" />;
       case "Life":
-        return <LifeBuoy className="size-5 min-w-5 text-[#FE9A00]" />;
+        return <LifeBuoy className="size-5 min-w-5 text-icon-amber" />;
       case "Travel":
-        return <PlaneTakeoff className="size-5 min-w-5 text-[#FE9A00]" />;
+        return <PlaneTakeoff className="size-5 min-w-5 text-icon-amber" />;
       case "Home":
-        return <House className="size-5 min-w-5 text-[#FE9A00]" />;
+        return <House className="size-5 min-w-5 text-icon-amber" />;
       default:
         return null;
     }
@@ -85,15 +85,15 @@ const PolicyCard: React.FC<PolicyCardProps> = ({ policy, onClick }) => {
   const getProgressColor = () => {
     switch (policy.type) {
       case "Health":
-        return "**:data-[slot=progress-indicator]:bg-[#8E51FF]";
+        return "**:data-[slot=progress-indicator]:bg-icon-violet";
       case "Auto":
-        return "**:data-[slot=progress-indicator]:bg-[#E12AFB]";
+        return "**:data-[slot=progress-indicator]:bg-icon-fuchsia";
       case "Life":
-        return "**:data-[slot=progress-indicator]:bg-[#FE9A00]";
+        return "**:data-[slot=progress-indicator]:bg-icon-amber";
       case "Travel":
-        return "**:data-[slot=progress-indicator]:bg-[#FE9A00]";
+        return "**:data-[slot=progress-indicator]:bg-icon-amber";
       case "Home":
-        return "**:data-[slot=progress-indicator]:bg-[#FE9A00]";
+        return "**:data-[slot=progress-indicator]:bg-icon-amber";
       default:
         return "**:data-[slot=progress-indicator]:bg-gray-500";
     }
@@ -101,7 +101,7 @@ const PolicyCard: React.FC<PolicyCardProps> = ({ policy, onClick }) => {
 
   return (
     <Card
-      className={`bg-white min-w-[354px] ${getBackgroundClass()} ${onClick ? "cursor-pointer" : ""}`}
+      className={`bg-white min-w-88.5 ${getBackgroundClass()} ${onClick ? "cursor-pointer" : ""}`}
       onClick={onClick}
     >
       <CardHeader>
@@ -113,7 +113,7 @@ const PolicyCard: React.FC<PolicyCardProps> = ({ policy, onClick }) => {
                 {policy.type}
               </span>
             </div>
-            <div className="size-1 rounded-full bg-[#757575]"></div>
+            <div className="size-1 rounded-full bg-icon-muted"></div>
             <span className="text-base font-medium leading-5 tracking-4 text-accent-foreground">
               {policy.status}
             </span>

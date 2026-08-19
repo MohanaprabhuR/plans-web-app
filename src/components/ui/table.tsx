@@ -104,7 +104,7 @@ function TableCell({ className, ...props }: React.ComponentProps<"td">) {
 
         "last:after:content-[''] last:after:absolute last:after:w-3 last:after:h-full last:after:bg-card last:after:opacity-0 last:after:top-0 last:after:-right-3 last:after:rounded-r-lg group-hover:last:after:opacity-100",
         "group-data-[state=selected]:last:after:bg-secondary group-data-[state=selected]:last:after:opacity-100 group-data-[state=selected]:last:after:rounded-none group-data-[state=selected]:last:after:border-b group-data-[state=selected]:last:after:border-border group-data-[state=selected]:last:after:h-11.25 group-data-[state=selected]:last:after:border-t-transparent ",
-        "relative  text-secondary-foreground text-base  px-2 py-3 tracking-4 leading-tight font-normal  align-middle whitespace-nowrap [&:has([role=checkbox])]:px-1.5  [&:has([role=checkbox])]:w-[28px] [&:has([role=checkbox])]:py-3  [&>[role=checkbox]]:translate-y-[2px] [&:has([data-slot=avatar])]:py-3 [&:has(button)]:py-0 [&_strong]:text-accent-foreground [&_strong]:font-medium",
+        "relative  text-secondary-foreground text-base  px-2 py-3 tracking-4 leading-tight font-normal  align-middle whitespace-nowrap [&:has([role=checkbox])]:px-1.5  [&:has([role=checkbox])]:w-7 [&:has([role=checkbox])]:py-3  [&>[role=checkbox]]:translate-y-[2px] [&:has([data-slot=avatar])]:py-3 [&:has(button)]:py-0 [&_strong]:text-accent-foreground [&_strong]:font-medium",
         className
       )}
       {...props}

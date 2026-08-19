@@ -506,7 +506,7 @@ const MyProfilePage = () => {
             </Link>
           </Button>
         </div>
-        <div className="min-w-0 w-full max-w-[800px]">
+        <div className="min-w-0 w-full max-w-200">
           <Tabs
             defaultValue="personal-information"
             variant="underline"

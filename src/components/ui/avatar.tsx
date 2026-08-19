@@ -233,7 +233,7 @@ function Avatar({
 
                 "size-[4px]": size === "xs",
                 "size-[5px]": size === "sm",
-                "size-[7px]": size === "md",
+                "size-1.75": size === "md",
                 "size-[8px]": size === "lg" || size === "xl",
                 "size-[10px]": size === "2xl",
                 "size-[12px]": size === "3xl",

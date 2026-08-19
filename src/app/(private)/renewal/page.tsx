@@ -42,15 +42,15 @@ type Renewal = {
 function getTypeIcon(type: string) {
   switch (type) {
     case "Health":
-      return <BriefcaseMedical className="size-5 stroke-[#8E51FF]" />;
+      return <BriefcaseMedical className="size-5 stroke-icon-violet" />;
     case "Auto":
-      return <CarFront className="size-5 stroke-[#E12AFB]" />;
+      return <CarFront className="size-5 stroke-icon-fuchsia" />;
     case "Life":
-      return <Heart className="size-5 stroke-[#FF5255]" />;
+      return <Heart className="size-5 stroke-icon-rose" />;
     case "Travel":
-      return <PlaneTakeoff className="size-5 stroke-[#00D3F2]" />;
+      return <PlaneTakeoff className="size-5 stroke-icon-cyan" />;
     case "Home":
-      return <House className="size-5 stroke-[#FE9A00]" />;
+      return <House className="size-5 stroke-icon-amber" />;
     default:
       return <ShieldCheck className="size-5 text-muted-foreground" />;
   }

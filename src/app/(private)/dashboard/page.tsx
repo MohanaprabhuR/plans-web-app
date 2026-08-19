@@ -1,5 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
+import { RiskScoreGauge } from "@/components/ui/risk-score-gauge";
 import {
   ArrowDownToLine,
   BadgePercent,
@@ -64,14 +65,10 @@ import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import Image from "next/image";
 import { StaticImport } from "next/dist/shared/lib/get-img-props";
-import dynamic from "next/dynamic";
 import { PageLoadState } from "@/components/ui/page-load-state";
 import { useUserFetch } from "@/hooks/useUserFetch";
 import { useRouter } from "next/navigation";
 
-const GaugeComponent = dynamic(() => import("react-gauge-component"), {
-  ssr: false,
-});
 
 const DASHBOARD_POLICIES_LIMIT = 3;
 
@@ -213,27 +210,27 @@ const quickActions = [
   {
     id: 1,
     name: "Download Policy",
-    icon: <ArrowDownToLine className="size-6 text-[#FF5E00]" />,
+    icon: <ArrowDownToLine className="size-6 text-brand" />,
     type: "drawer",
   },
   {
     id: 2,
     name: "Network Hospitals",
-    icon: <Plus className="size-6 text-[#FF5E00]" />,
+    icon: <Plus className="size-6 text-brand" />,
     type: "link",
     href: "/network-hospital",
   },
   {
     id: 3,
     name: "Blacklisted Hospitals",
-    icon: <Ban className="size-6 text-[#FF5E00]" />,
+    icon: <Ban className="size-6 text-brand" />,
     type: "link",
     href: "/block-list-hospital",
   },
   {
     id: 4,
     name: "Policy AI Chat",
-    icon: <MessageSquareText className="size-6 text-[#FF5E00]" />,
+    icon: <MessageSquareText className="size-6 text-brand" />,
     type: "link",
     href: "/search",
   },
@@ -716,7 +713,7 @@ const DashboardPage = () => {
             <div className="scrollbar-hide flex gap-6 overflow-x-auto">
                 {policies.length === 0 ? (
                   <Card
-                    className="min-w-[354px] border  bg-muted/30 flex flex-col items-center justify-center py-16 px-6 cursor-pointer hover:bg-muted/50 transition-colors"
+                    className="min-w-88.5 border  bg-muted/30 flex flex-col items-center justify-center py-16 px-6 cursor-pointer hover:bg-muted/50 transition-colors"
                     onClick={openAddModal}
                     role="button"
                     tabIndex={0}
@@ -781,141 +778,19 @@ const DashboardPage = () => {
                 </Button>
               </div>
 
-              {/* <GaugeComponent
-            className="max-w-[380px]! w-full! mx-auto h-[380px]! max-h-[380px] min-h-[380px]"
-            value={
-              coverageScore ??
-              apiData?.endpoints?.riskAssessment?.getRiskScore?.response
-                ?.overallScore ??
-              0
-            }
-            type="semicircle"
-            minValue={10}
-            maxValue={100}
-            arc={{
-              width: 0.2,
-              padding: 0.03,
-              cornerRadius: 0,
-              subArcs: [],
-              colorArray: [
-                "#eb4f46",
-                "#e9833d",
-                "#edd748",
-                "#67f06d",
-                "#0ee087",
-              ],
-              nbSubArcs: 5,
-              subArcsStrokeWidth: 0,
-            }}
-            pointer={{
-              type: "arrow",
-              color: "#383838",
-              length: 0.7,
-              width: 22,
-              maxFps: 30,
-              baseColor: "#ffffff",
-              strokeWidth: 2,
-              arrowOffset: 0.9,
-            }}
-            labels={{
-              valueLabel: {
-                formatTextValue: (e) => "".concat(e, ""),
-                style: {
-                  fontSize: "20px",
-                  fill: "#383838",
-                  fontWeight: "bold",
-                  textShadow: "none",
-                },
-              },
-              tickLabels: {
-                type: "outer",
-                defaultTickValueConfig: {
-                  formatTextValue: (e) => "".concat(e, "\xb0"),
-                  style: { fontSize: "9px", fill: "#aaa" },
-                  hide: true,
-                },
-                defaultTickLineConfig: {
-                  color: "#666",
-                  length: 4,
-                  width: 1,
-                  hide: true,
-                },
-                ticks: [],
-                hideMinMax: true,
-                autoSpaceTickLabels: false,
-              },
-            }}
-            startAngle={-135}
-            endAngle={135}
-          /> */}
 
-              <GaugeComponent
+              <RiskScoreGauge
+                className="my-10"
                 value={
                   coverageScore ??
                   apiData?.endpoints?.riskAssessment?.getRiskScore?.response
                     ?.overallScore ??
                   0
                 }
-                className="max-w-[380px]! w-full! mx-auto h-[380px]! max-h-[380px] min-h-[380px]"
-                type="grafana"
-                minValue={0}
-                maxValue={100}
-                arc={{
-                  width: 0.02,
-                  padding: 0.03,
-                  cornerRadius: 0,
-                  subArcs: [],
-                  colorArray: [
-                    "#eb4f46",
-                    "#e9833d",
-                    "#edd748",
-                    "#67f06d",
-                    "#0ee087",
-                  ],
-                  nbSubArcs: 5,
-                  subArcsStrokeWidth: 0,
-                  outerArc: { width: 28, padding: 0.04 },
-                }}
-                pointer={{
-                  type: "arrow",
-                  color: "#383838",
-                  length: 0.7,
-                  width: 22,
-                  maxFps: 30,
-                  baseColor: "#ffffff",
-                  strokeWidth: 2,
-                  arrowOffset: 0.9,
-                }}
-                labels={{
-                  valueLabel: {
-                    formatTextValue: (e) => "".concat(e, ""),
-                    style: {
-                      fontSize: "20px",
-                      fill: "#383838",
-                      fontWeight: "bold",
-                      textShadow: "none",
-                    },
-                  },
-                  tickLabels: {
-                    type: "outer",
-                    defaultTickValueConfig: {
-                      formatTextValue: (e) => "".concat(e, "\xb0"),
-                      style: { fontSize: "9px", fill: "#aaa" },
-                      hide: true,
-                    },
-                    defaultTickLineConfig: {
-                      color: "#ededed",
-                      length: 4,
-                      width: 1,
-                      hide: true,
-                    },
-                    ticks: [],
-                    hideMinMax: true,
-                    autoSpaceTickLabels: false,
-                  },
-                }}
-                startAngle={-135}
-                endAngle={135}
+                riskLevel={
+                  apiData?.endpoints?.riskAssessment?.getRiskScore?.response
+                    ?.riskLevel
+                }
               />
 
               <div className="flex gap-6 justify-between">
@@ -1092,7 +967,7 @@ const DashboardPage = () => {
                 </div>
               </div>
             </div>
-            <div className="w-full max-w-[354px] flex flex-col gap-y-6">
+            <div className="w-full max-w-88.5 flex flex-col gap-y-6">
               <Card className="gap-4">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-x-2 font-semibold">
