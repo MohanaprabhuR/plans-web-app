@@ -90,6 +90,7 @@ export default function CoveragePage() {
               <div className="w-1/2 flex items-center justify-center h-full">
                 <div className="w-full max-w-[380px] max-h-[380px] min-h-[380px] min-w-[380px] flex items-center justify-center">
                                     <RiskScoreGauge
+                    className="my-6"
                     value={data?.overallScore ?? 0}
                   />
                 </div>
