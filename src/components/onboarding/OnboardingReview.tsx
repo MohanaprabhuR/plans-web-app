@@ -117,7 +117,7 @@ export function OnboardingReview() {
   }, [formData, router]);
 
   return (
-    <div className="mx-auto flex h-dvh w-full max-w-lg flex-col bg-background">
+    <div className="mx-auto flex h-[calc(100dvh-62px)] w-full max-w-lg flex-col bg-background">
       <header className="shrink-0 border-b border-border px-5 pt-[max(1.25rem,env(safe-area-inset-top))] pb-4">
         <div className="flex items-center gap-3">
           <Button

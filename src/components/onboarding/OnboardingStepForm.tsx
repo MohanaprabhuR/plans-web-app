@@ -188,7 +188,7 @@ export function OnboardingStepForm() {
   );
 
   return (
-    <div className="relative mx-auto flex h-dvh w-full max-w-lg flex-col overflow-hidden bg-background">
+    <div className="relative mx-auto flex h-[calc(100dvh-62px)] w-full max-w-lg flex-col overflow-hidden bg-background">
       <div
         aria-hidden
         className="pointer-events-none absolute inset-x-0 top-0 h-56 bg-linear-to-b from-orange-50 to-transparent dark:from-orange-950/25"

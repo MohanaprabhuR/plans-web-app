@@ -281,7 +281,7 @@ export default function BuyInsurancePage() {
 
   return (
     <div className="flex">
-      <div className="w-1/3 bg-orange-50 py-4 px-8 h-screen">
+      <div className="w-1/3 bg-orange-50 py-4 px-8 h-[calc(100vh-62px)]">
         <Link href="/">
           <Image src={Logo} alt="Logo" width={78} height={32} />
         </Link>
@@ -333,7 +333,7 @@ export default function BuyInsurancePage() {
           </div>
         </div>
       </div>
-      <div className="flex flex-col gap-4 w-3/4 h-screen py-25 px-32">
+      <div className="flex flex-col gap-4 w-3/4 h-[calc(100vh-62px)] py-25 px-32">
         <div className="flex items-center gap-4">
           {stepIndex > 0 && (
             <Button variant="ghost" iconOnly onClick={back}>

@@ -40,10 +40,12 @@ export default function PrivateLayout({
 
   return (
     <>
+      <HeaderLayout />
+      {/* Onboarding and buy-insurance own their full-height layouts, so they
+          get the header but not the standard page container. */}
       {(isOnboarding || isBuyInsurance) && <div>{children}</div>}
       {!isOnboarding && !isBuyInsurance && (
         <>
-          <HeaderLayout />
           <div className="relative flex min-h-[calc(100vh-62px)] w-full flex-col items-center pb-12">
             <div className="pointer-events-none absolute left-0 top-15 mt-0 h-77 w-full bg-linear-to-b from-orange-50 to-transparent dark:from-card" />
             <div className="relative z-10 mx-auto w-full max-w-285.5 px-4 pt-25">
