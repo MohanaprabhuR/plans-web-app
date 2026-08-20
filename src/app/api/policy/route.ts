@@ -44,19 +44,38 @@ function rowToPolicy(row: Record<string, unknown>): Policy {
   };
 }
 
+/**
+ * Read a user's policies.
+ *
+ * Distinguishes three outcomes, because collapsing them is how a failed read
+ * ends up looking like an empty account:
+ *   { kind: "ok" }            - query succeeded (possibly zero rows)
+ *   { kind: "unconfigured" }  - no Supabase, caller may use the memory store
+ *   { kind: "error" }         - query failed; the caller must surface it
+ */
+type PolicyReadResult =
+  | { kind: "ok"; policies: Policy[] }
+  | { kind: "unconfigured" }
+  | { kind: "error"; error: string };
+
 async function getPoliciesFromSupabase(
   userId: string,
   accessToken?: string,
-): Promise<Policy[] | null> {
+): Promise<PolicyReadResult> {
   const supabase = getSupabase(accessToken);
-  if (!supabase) return null;
+  if (!supabase) return { kind: "unconfigured" };
   const { data, error } = await supabase
     .from(POLICIES_TABLE)
     .select("*")
     .eq("user_id", userId)
     .order("created_at", { ascending: false });
-  if (error) return null;
-  return (data ?? []).map((row) => rowToPolicy(row as Record<string, unknown>));
+  if (error) return { kind: "error", error: error.message };
+  return {
+    kind: "ok",
+    policies: (data ?? []).map((row) =>
+      rowToPolicy(row as Record<string, unknown>),
+    ),
+  };
 }
 
 async function addPolicyToSupabase(
@@ -117,13 +136,19 @@ async function updatePolicyInSupabase(
 // In-memory fallback when Supabase is not configured (e.g. local dev without env)
 const policiesStore: Record<string, Policy[]> = {};
 
+/**
+ * Throws when the database read fails, so a transient failure (an expired
+ * token being the common one) cannot be mistaken for "this user has no
+ * policies" and silently render an empty list.
+ */
 async function getPoliciesForUser(
   userId: string,
   accessToken?: string,
 ): Promise<Policy[]> {
   if (!userId) return [];
-  const fromDb = await getPoliciesFromSupabase(userId, accessToken);
-  if (fromDb !== null) return fromDb;
+  const result = await getPoliciesFromSupabase(userId, accessToken);
+  if (result.kind === "ok") return result.policies;
+  if (result.kind === "error") throw new Error(result.error);
   if (!policiesStore[userId]) policiesStore[userId] = [];
   return policiesStore[userId];
 }
@@ -133,7 +158,23 @@ export async function GET(req: Request) {
   const userId =
     headersList.get("X-User-Id") ?? req.headers.get("X-User-Id") ?? "";
   const accessToken = getAccessTokenFromRequest(req);
-  const userPolicies = await getPoliciesForUser(userId, accessToken);
+
+  // Surface a read failure instead of returning an empty list, which the UI
+  // would render as "you have no policies".
+  let userPolicies: Policy[];
+  try {
+    userPolicies = await getPoliciesForUser(userId, accessToken);
+  } catch (e) {
+    return NextResponse.json(
+      {
+        error: `Failed to load policies: ${
+          e instanceof Error ? e.message : "unknown error"
+        }`,
+      },
+      { status: 502 },
+    );
+  }
+
   const apiDocumentation = {
     apiVersion: "1.0.0",
     baseUrl: "https://api.plans.com/v1",

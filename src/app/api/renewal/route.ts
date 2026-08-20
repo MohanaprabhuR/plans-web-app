@@ -44,18 +44,29 @@ function rowToRenewal(row: Record<string, unknown>): Renewal {
   };
 }
 
+/** Separates a failed query from a genuinely empty one. */
+type RenewalReadResult =
+  | { kind: "ok"; renewals: Renewal[] }
+  | { kind: "unconfigured" }
+  | { kind: "error"; error: string };
+
 async function getRenewalsFromSupabase(
   userId: string,
-): Promise<Renewal[] | null> {
+): Promise<RenewalReadResult> {
   const supabase = getSupabase();
-  if (!supabase) return null;
+  if (!supabase) return { kind: "unconfigured" };
   const { data, error } = await supabase
     .from("renewals")
     .select("*")
     .eq("user_id", userId)
     .order("due_date", { ascending: true });
-  if (error) return null;
-  return (data ?? []).map((row) => rowToRenewal(row as Record<string, unknown>));
+  if (error) return { kind: "error", error: error.message };
+  return {
+    kind: "ok",
+    renewals: (data ?? []).map((row) =>
+      rowToRenewal(row as Record<string, unknown>),
+    ),
+  };
 }
 
 async function upsertRenewalInSupabase(
@@ -98,8 +109,11 @@ function saveRenewalInMemory(userId: string, renewal: Renewal) {
 
 async function getRenewalsForUser(userId: string): Promise<Renewal[]> {
   if (!userId) return [];
-  const fromDb = await getRenewalsFromSupabase(userId);
-  if (fromDb !== null) return fromDb;
+  const result = await getRenewalsFromSupabase(userId);
+  if (result.kind === "ok") return result.renewals;
+  // Never fall through to the seeded sample data on a read failure — that
+  // would show fabricated renewals as if they were the user's own.
+  if (result.kind === "error") throw new Error(result.error);
   if (!renewalsStore[userId]) {
     // Seed with a couple of example renewals for local dev
     renewalsStore[userId] = [
@@ -137,7 +151,19 @@ export async function GET(req: Request) {
   const userId =
     headersList.get("X-User-Id") ?? req.headers.get("X-User-Id") ?? "";
 
-  const renewals = await getRenewalsForUser(userId);
+  let renewals: Renewal[];
+  try {
+    renewals = await getRenewalsForUser(userId);
+  } catch (e) {
+    return NextResponse.json(
+      {
+        error: `Failed to load renewals: ${
+          e instanceof Error ? e.message : "unknown error"
+        }`,
+      },
+      { status: 502 },
+    );
+  }
   return NextResponse.json({ renewals });
 }
 
