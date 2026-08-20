@@ -152,7 +152,7 @@ export function OnboardingReview() {
                 className="rounded-2xl border border-border bg-card/40 p-5 sm:p-6"
               >
                 <div className="mb-5 flex items-baseline justify-between gap-3 border-b border-border pb-3">
-                  <h2 className="text-sm font-semibold text-accent-foreground">
+                  <h2 className="text-2xl font-semibold tracking-tight text-accent-foreground">
                     {group.label}
                   </h2>
                   <span className="text-xs text-muted-foreground tabular-nums">
