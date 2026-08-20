@@ -71,7 +71,7 @@ const HeaderLayout = () => {
               className={`font-medium text-base leading-6 tracking-none hover:text-orange-500 transition-all duration-300 delay-100 ${
                 isActive("/dashboard")
                   ? "text-orange-500"
-                  : "text-light-gray-800"
+                  : "text-accent-foreground"
               }`}
             >
               Dashboard
@@ -81,7 +81,7 @@ const HeaderLayout = () => {
               className={`font-medium text-base leading-6 tracking-none hover:text-orange-500 transition-all duration-300 delay-100 ${
                 isActive("/your-policy")
                   ? "text-orange-500"
-                  : "text-light-gray-800"
+                  : "text-accent-foreground"
               }`}
             >
               Your Policies
@@ -91,7 +91,7 @@ const HeaderLayout = () => {
               className={`font-medium text-base leading-6 tracking-none hover:text-orange-500 transition-all duration-300 delay-100 ${
                 isActive("/coverage")
                   ? "text-orange-500"
-                  : "text-light-gray-800"
+                  : "text-accent-foreground"
               }`}
             >
               Coverage
@@ -99,7 +99,7 @@ const HeaderLayout = () => {
             <Link
               href="/search"
               className={`font-medium text-base leading-6 tracking-none hover:text-orange-500 transition-all duration-300 delay-100 ${
-                isActive("/search") ? "text-orange-500" : "text-light-gray-800"
+                isActive("/search") ? "text-orange-500" : "text-accent-foreground"
               }`}
             >
               Search
@@ -130,7 +130,7 @@ const HeaderLayout = () => {
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex items-center gap-x-1">
-                  <p className="font-medium text-base leading-6 tracking-none text-light-gray-800">
+                  <p className="font-medium text-base leading-6 tracking-none text-accent-foreground">
                     {user?.user_metadata?.full_name}
                   </p>
                   <ChevronDown className="w-4 h-4" />
