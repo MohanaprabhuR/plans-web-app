@@ -92,14 +92,14 @@ function PlanOptionCard({
         }
       }}
       className={cn(
-        "bg-white w-full cursor-pointer transition-shadow hover:shadow-md",
+        "bg-background dark:bg-card w-full cursor-pointer transition-shadow hover:shadow-md",
         selected && "ring-1 ring-primary/30",
       )}
     >
       <CardContent>
         <div className="flex items-center justify-between pb-4 border-b border-dashed">
           <div className="flex items-center gap-x-4 min-w-0">
-            <div className="p-0.5 bg-white rounded-lg shrink-0">
+            <div className="p-0.5 bg-background dark:bg-card rounded-lg shrink-0">
               <Image
                 src={DEFAULT_LOGO}
                 alt={plan.provider}

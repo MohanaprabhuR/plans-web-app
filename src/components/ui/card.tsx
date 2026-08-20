@@ -27,7 +27,7 @@ function Card({
   return (
     <div
       data-slot="card"
-      className={cn(cardVariants({ size }), "bg-white", className)}
+      className={cn(cardVariants({ size }), "bg-background dark:bg-card", className)}
       {...props}
     />
   );

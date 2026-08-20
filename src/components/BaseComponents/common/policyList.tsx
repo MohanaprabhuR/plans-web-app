@@ -55,11 +55,11 @@ const PolicyListCard: React.FC<PolicyCardProps> = ({ policy }) => {
 
   const router = useRouter();
   return (
-    <Card className={`bg-white min-w-88.5 `}>
+    <Card className={`bg-background dark:bg-card min-w-88.5 `}>
       <CardContent>
         <div className="flex items-center justify-between pb-4 border-b border-dashed">
           <div className="flex items-center gap-x-4">
-            <div className="p-0.5 bg-white rounded-lg">
+            <div className="p-0.5 bg-background dark:bg-card rounded-lg">
               <Image
                 src={
                   policy.providerLogo ||

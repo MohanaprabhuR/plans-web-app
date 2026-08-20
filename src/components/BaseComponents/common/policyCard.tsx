@@ -101,7 +101,7 @@ const PolicyCard: React.FC<PolicyCardProps> = ({ policy, onClick }) => {
 
   return (
     <Card
-      className={`bg-white min-w-88.5 ${getBackgroundClass()} ${onClick ? "cursor-pointer" : ""}`}
+      className={`bg-background dark:bg-card min-w-88.5 ${getBackgroundClass()} ${onClick ? "cursor-pointer" : ""}`}
       onClick={onClick}
     >
       <CardHeader>
@@ -140,7 +140,7 @@ const PolicyCard: React.FC<PolicyCardProps> = ({ policy, onClick }) => {
                 Coverage:&nbsp;{policy.coverage}
               </span>
             </div>
-            <div className="p-0.5 bg-white rounded-lg">
+            <div className="p-0.5 bg-background dark:bg-card rounded-lg">
               <Image
                 src={
                   policy.providerLogo ||

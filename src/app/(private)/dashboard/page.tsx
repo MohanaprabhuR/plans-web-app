@@ -864,7 +864,7 @@ const DashboardPage = () => {
                                 {list.coveredBy}
                               </span>
                             </p>
-                            <div className="bg-white size-12 p-0.5 rounded-lg">
+                            <div className="bg-background dark:bg-card size-12 p-0.5 rounded-lg">
                               <Image
                                 src={list.providerLogo}
                                 alt="Care Health Supreme"
@@ -950,7 +950,7 @@ const DashboardPage = () => {
                                 {list.coveredBy}
                               </span>
                             </p>
-                            <div className="bg-white size-12 p-0.5 rounded-lg">
+                            <div className="bg-background dark:bg-card size-12 p-0.5 rounded-lg">
                               <Image
                                 src={list.providerLogo}
                                 alt="Care Health Supreme"

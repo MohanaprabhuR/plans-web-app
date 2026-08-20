@@ -16,6 +16,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import {
   User,
   LogOut,
@@ -58,7 +59,7 @@ const HeaderLayout = () => {
     <>
       <Header
         className={`shadow-[0_1px_0_0_rgba(255,94,0,0.1)] border-0 px-0 py-3.5 fixed top-0 left-0 w-full z-50 transition-colors duration-200 ${
-          isScrolled ? "bg-white" : "bg-orange-50"
+          isScrolled ? "bg-background dark:bg-card" : "bg-orange-50"
         }`}
       >
         <div className="w-full mx-auto max-w-[1142px] px-4 flex items-center justify-between">
@@ -107,6 +108,7 @@ const HeaderLayout = () => {
           </div>
 
           <div className="flex items-center gap-2">
+            <ThemeToggle />
             <Link
               href="/notifications"
               className="relative rounded-lg p-1 transition-colors hover:opacity-80"
@@ -116,7 +118,7 @@ const HeaderLayout = () => {
                 className={`size-6 transition-colors duration-300 ${
                   isActive("/notifications")
                     ? "text-orange-500"
-                    : "text-[#555555]"
+                    : "text-muted-foreground"
                 }`}
                 strokeWidth={2}
               />

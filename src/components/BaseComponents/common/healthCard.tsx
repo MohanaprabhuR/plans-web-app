@@ -47,7 +47,7 @@ const HealthCard = ({ card }: { card: HealthCardMember }) => {
   return (
     <Card className="relative">
       <CardContent>
-        <span className="text-base font-medium leading-5 tracking-4 text-accent-foreground absolute -top-3 bg-white px-1.5 left-4">
+        <span className="text-base font-medium leading-5 tracking-4 text-accent-foreground absolute -top-3 bg-background dark:bg-card px-1.5 left-4">
           #{card.policy_number}
         </span>
         <div className="flex items-center justify-between">

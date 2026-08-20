@@ -22,7 +22,7 @@ function Notification({
       data-slot="notification"
       role="alert"
       className={cn(
-        "relative shadow-2xl bg-white rounded-xl dark:bg-[var(--color-dark-gray-100)]  flex w-full  flex-1 has-[>svg]:grid-cols-[calc(var(--spacing)*4)_1fr] grid-cols-[0_1fr] has-[>svg]:gap-x-2.5 gap-x-2.5 gap-y-0.5 [&>svg]:w-4 [&>svg]:h-4 [&>svg]:shrink-0 [&>svg]:text-current",
+        "relative shadow-2xl bg-background dark:bg-card rounded-xl dark:bg-[var(--color-dark-gray-100)]  flex w-full  flex-1 has-[>svg]:grid-cols-[calc(var(--spacing)*4)_1fr] grid-cols-[0_1fr] has-[>svg]:gap-x-2.5 gap-x-2.5 gap-y-0.5 [&>svg]:w-4 [&>svg]:h-4 [&>svg]:shrink-0 [&>svg]:text-current",
         action && "pl-3 pr-1 py-1.5 items-center rounded-xl",
         longText &&
           "py-3 px-3.5  items-start [&>svg]:mt-0.75 [&>svg]:mb-0.75 [&>img]:mt-0.75 [&>img]:mb-0.75 rounded-2xl",
