@@ -117,8 +117,8 @@ export function OnboardingReview() {
   }, [formData, router]);
 
   return (
-    <div className="mx-auto flex h-[calc(100dvh-62px)] w-full max-w-lg flex-col bg-background">
-      <header className="shrink-0 border-b border-border px-5 pt-[max(1.25rem,env(safe-area-inset-top))] pb-4">
+    <div className="mx-auto flex h-[calc(100dvh-62px)] w-full max-w-4xl flex-col bg-background">
+      <header className="shrink-0 border-b border-border px-5 pt-[max(1.25rem,env(safe-area-inset-top))] pb-4 sm:px-6">
         <div className="flex items-center gap-3">
           <Button
             variant="ghost"
@@ -131,27 +131,36 @@ export function OnboardingReview() {
             <ChevronLeft />
           </Button>
           <div>
-            <h1 className="text-lg font-semibold tracking-tight text-accent-foreground">
+            <h1 className="text-2xl font-semibold leading-8 tracking-tight text-accent-foreground sm:text-3xl">
               Edit risk profile
             </h1>
-            <p className="text-sm text-muted-foreground">
+            <p className="pt-1 text-sm text-muted-foreground sm:text-base">
               Update any answer, then save your changes.
             </p>
           </div>
         </div>
       </header>
 
-      <main className="min-h-0 flex-1 overflow-y-auto px-5 py-6">
+      <main className="min-h-0 flex-1 overflow-y-auto px-5 py-6 sm:px-6">
         {formData === null ? (
           <ReviewSkeleton />
         ) : (
-          <div className="flex flex-col gap-8">
+          <div className="flex flex-col gap-6">
             {GROUPS.map((group) => (
-              <section key={group.category}>
-                <h2 className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                  {group.label}
-                </h2>
-                <div className="flex flex-col gap-5">
+              <section
+                key={group.category}
+                className="rounded-2xl border border-border bg-card/40 p-5 sm:p-6"
+              >
+                <div className="mb-5 flex items-baseline justify-between gap-3 border-b border-border pb-3">
+                  <h2 className="text-sm font-semibold text-accent-foreground">
+                    {group.label}
+                  </h2>
+                  <span className="text-xs text-muted-foreground tabular-nums">
+                    {group.steps.length} question
+                    {group.steps.length === 1 ? "" : "s"}
+                  </span>
+                </div>
+                <div className="grid gap-x-8 gap-y-6 sm:grid-cols-2">
                   {group.steps.map((step) => (
                     <QuestionRow
                       key={step.id}
@@ -167,12 +176,14 @@ export function OnboardingReview() {
         )}
       </main>
 
-      <footer className="shrink-0 border-t border-border px-5 pt-3 pb-[max(1.25rem,env(safe-area-inset-bottom))]">
-        <div className="flex gap-3">
+      <footer className="shrink-0 border-t border-border px-5 pt-3 pb-[max(1.25rem,env(safe-area-inset-bottom))] sm:px-6">
+        {/* Full-width and thumb-reachable on phones; natural width and
+            right-aligned once there is room for it. */}
+        <div className="flex gap-3 sm:justify-end">
           <Button
             variant="outline"
             size="lg"
-            className="flex-1 rounded-xl"
+            className="flex-1 rounded-xl sm:flex-none sm:px-6"
             onClick={() => router.push(RETURN_TO)}
             disabled={saving}
           >
@@ -180,7 +191,7 @@ export function OnboardingReview() {
           </Button>
           <Button
             size="lg"
-            className="flex-1 rounded-xl"
+            className="flex-1 rounded-xl sm:flex-none sm:px-6"
             onClick={save}
             disabled={saving || formData === null}
           >
