@@ -13,11 +13,9 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
-import { ThemeMenuItems } from "@/components/ui/theme-toggle";
 import {
   User,
   LogOut,
@@ -146,9 +144,6 @@ const HeaderLayout = () => {
                   <SquareChartGantt className="w-6 h-6" />
                   My Claims
                 </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <ThemeMenuItems />
-                <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleSignOut}>
                   <LogOut className="w-6 h-6" /> Log out
                 </DropdownMenuItem>

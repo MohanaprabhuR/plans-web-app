@@ -43,7 +43,11 @@ export default function PrivateLayout({
       <HeaderLayout />
       {/* Onboarding and buy-insurance own their full-height layouts, so they
           get the header but not the standard page container. */}
-      {(isOnboarding || isBuyInsurance) && <div>{children}</div>}
+      {/* The header is fixed, so these self-laid-out pages need to start
+          below it; 15.5 on the spacing scale is the header's 62px. */}
+      {(isOnboarding || isBuyInsurance) && (
+        <div className="pt-15.5">{children}</div>
+      )}
       {!isOnboarding && !isBuyInsurance && (
         <>
           <div className="relative flex min-h-[calc(100vh-62px)] w-full flex-col items-center pb-12">
