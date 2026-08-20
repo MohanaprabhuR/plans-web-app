@@ -48,20 +48,24 @@ function getMinimalPolicyLabel(policyId: string) {
 
 const PolicyCard: React.FC<PolicyCardProps> = ({ policy, onClick }) => {
   const minimalPolicyLabel = getMinimalPolicyLabel(policy.policyId);
+  // Tint the card with its category's icon colour. Using the palette tokens
+  // (rather than baked-in hex) means the wash works on the light surface and
+  // the dark one, and stays in step if a category colour changes.
   const getBackgroundClass = () => {
+    const wash = "bg-linear-to-b to-transparent";
     switch (policy.type) {
       case "Health":
-        return "bg-[linear-gradient(180deg,#F5F0FF_0%,#FFFFFF_60%)]";
+        return `${wash} from-icon-violet/12 dark:from-icon-violet/20`;
       case "Auto":
-        return "bg-[linear-gradient(180deg,#FCEFFF_0%,#FFFFFF_100%)]";
+        return `${wash} from-icon-fuchsia/12 dark:from-icon-fuchsia/20`;
       case "Life":
-        return "bg-[linear-gradient(180deg,#F5F0FF_0%,#FFFFFF_100%)]";
+        return `${wash} from-icon-rose/12 dark:from-icon-rose/20`;
       case "Travel":
-        return "bg-[linear-gradient(180deg,#FFF4E5_0%,#FFFFFF_100%)]";
+        return `${wash} from-icon-cyan/12 dark:from-icon-cyan/20`;
       case "Home":
-        return "bg-[linear-gradient(180deg,#FFF4E5_0%,#FFFFFF_100%)]";
+        return `${wash} from-icon-amber/12 dark:from-icon-amber/20`;
       default:
-        return "bg-gray-500";
+        return `${wash} from-muted`;
     }
   };
 
@@ -140,7 +144,7 @@ const PolicyCard: React.FC<PolicyCardProps> = ({ policy, onClick }) => {
                 Coverage:&nbsp;{policy.coverage}
               </span>
             </div>
-            <div className="p-0.5 bg-white rounded-lg">
+            <div className="p-0.5 bg-background dark:bg-card rounded-lg">
               <Image
                 src={
                   policy.providerLogo ||

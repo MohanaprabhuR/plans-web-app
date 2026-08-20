@@ -510,7 +510,7 @@ const MyProfilePage = () => {
           <Tabs
             defaultValue="personal-information"
             variant="underline"
-            className="w-full bg-white rounded-2xl p-8 border"
+            className="w-full bg-background dark:bg-card rounded-2xl p-8 border"
           >
             <TabsList>
               <TabsTrigger value="personal-information">

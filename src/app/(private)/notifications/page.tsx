@@ -232,12 +232,12 @@ export default function NotificationsPage() {
             return (
               <Card
                 key={item.notificationId}
-                className={`bg-white w-full ${!read ? "ring-1 ring-primary/10" : ""}`}
+                className={`bg-background dark:bg-card w-full ${!read ? "ring-1 ring-primary/10" : ""}`}
               >
                 <CardContent>
                   <div className="flex items-center justify-between pb-4 border-b border-dashed">
                     <div className="flex items-center gap-x-4 min-w-0">
-                      <div className="p-0.5 bg-white rounded-lg shrink-0">
+                      <div className="p-0.5 bg-background dark:bg-card rounded-lg shrink-0">
                         <Image
                           src={item.providerLogo ?? DEFAULT_LOGO}
                           alt={displayTitle}

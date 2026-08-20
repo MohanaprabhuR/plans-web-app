@@ -251,7 +251,7 @@
   --error: var(--color-red-100);
   --error-border: var(--color-red-400);
   --error-foreground: var(--color-red-700);
-  --autofill: var(--color-orange-100);
+  --autofill: var(--color-orange-50);
   --autofill-border: var(--color-orange-400);
 
   /* Spinner Border Color */

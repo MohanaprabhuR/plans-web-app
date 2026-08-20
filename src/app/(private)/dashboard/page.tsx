@@ -864,7 +864,7 @@ const DashboardPage = () => {
                                 {list.coveredBy}
                               </span>
                             </p>
-                            <div className="bg-white size-12 p-0.5 rounded-lg">
+                            <div className="bg-background dark:bg-card size-12 p-0.5 rounded-lg">
                               <Image
                                 src={list.providerLogo}
                                 alt="Care Health Supreme"
@@ -950,7 +950,7 @@ const DashboardPage = () => {
                                 {list.coveredBy}
                               </span>
                             </p>
-                            <div className="bg-white size-12 p-0.5 rounded-lg">
+                            <div className="bg-background dark:bg-card size-12 p-0.5 rounded-lg">
                               <Image
                                 src={list.providerLogo}
                                 alt="Care Health Supreme"
@@ -1155,8 +1155,8 @@ const DashboardPage = () => {
               </Card>
             </div>
           </div>
-          <div className="w-full p-6 border rounded-2xl flex items-center justify-between bg-[linear-gradient(60deg,#FFF3EB_0%,rgba(255,243,235,0)_50%)]">
-            <div className="flex flex-col gap-y-2 max-w-[265px]">
+          <div className="w-full p-6 border rounded-2xl flex items-center justify-between bg-linear-60 from-brand/10 from-0% to-transparent to-50% dark:from-brand/20">
+            <div className="flex flex-col gap-y-2 max-w-66.25">
               <Badge variant="secondary" size="md" theme="blue">
                 <BadgePercent className="size-4" />
                 Exclusive Offers
@@ -1170,7 +1170,7 @@ const DashboardPage = () => {
                 ?.length ? (
                 apiData.endpoints.offers.getExclusiveOffers.response.map(
                   (offer, index) => (
-                    <Card key={index} className="w-[344px] min-w-[344px]">
+                    <Card key={index} className="w-86 min-w-86">
                       <CardContent>
                         <Badge theme="amber">
                           Save {offer.discount} Yearly
@@ -1195,7 +1195,7 @@ const DashboardPage = () => {
                             </div>
                           </div>
 
-                          <p className="text-accent-foreground text-3xl leading-4 font-semibold -tracking-4 max-w-[70px] text-right">
+                          <p className="text-accent-foreground text-3xl leading-4 font-semibold -tracking-4 max-w-17.5 text-right">
                             ${offer.price}
                             <br />
                             <span className="text-muted-foreground text-[10px] uppercase font-medium">

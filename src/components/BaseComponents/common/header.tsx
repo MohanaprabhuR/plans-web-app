@@ -13,9 +13,11 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
+import { ThemeMenuItems } from "@/components/ui/theme-toggle";
 import {
   User,
   LogOut,
@@ -116,7 +118,7 @@ const HeaderLayout = () => {
                 className={`size-6 transition-colors duration-300 ${
                   isActive("/notifications")
                     ? "text-orange-500"
-                    : "text-[#555555]"
+                    : "text-muted-foreground"
                 }`}
                 strokeWidth={2}
               />
@@ -144,6 +146,9 @@ const HeaderLayout = () => {
                   <SquareChartGantt className="w-6 h-6" />
                   My Claims
                 </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <ThemeMenuItems />
+                <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleSignOut}>
                   <LogOut className="w-6 h-6" /> Log out
                 </DropdownMenuItem>
