@@ -1170,7 +1170,7 @@ const DashboardPage = () => {
                 ?.length ? (
                 apiData.endpoints.offers.getExclusiveOffers.response.map(
                   (offer, index) => (
-                    <Card key={index} className="w-86 min-w-86">
+                    <Card key={index} className="w-full sm:w-86 sm:min-w-86">
                       <CardContent>
                         <Badge theme="amber">
                           Save {offer.discount} Yearly

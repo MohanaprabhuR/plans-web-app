@@ -86,16 +86,16 @@ export default function CoveragePage() {
         >
         {data ? (
           <>
-            <Card className="flex items-center flex-row justify-between">
-              <div className="w-1/2 flex items-center justify-center h-full">
-                <div className="w-full max-w-[380px] max-h-[380px] min-h-[380px] min-w-[380px] flex items-center justify-center">
+            <Card className="flex flex-col items-center gap-6 lg:flex-row lg:justify-between lg:gap-0">
+              <div className="w-full lg:w-1/2 flex items-center justify-center h-full">
+                <div className="w-full max-w-95 flex items-center justify-center">
                                     <RiskScoreGauge
                     className="my-6"
                     value={data?.overallScore ?? 0}
                   />
                 </div>
               </div>
-              <div className="w-1/2 flex flex-col">
+              <div className="w-full lg:w-1/2 flex flex-col">
                 <div className="flex items-center justify-between">
                   <div className="flex flex-col">
                     <p className="text-3xl font-bold text-accent-foreground leading-8 tracking-4">
