@@ -51,17 +51,17 @@ const PolicyCard: React.FC<PolicyCardProps> = ({ policy, onClick }) => {
   const getBackgroundClass = () => {
     switch (policy.type) {
       case "Health":
-        return "bg-[linear-gradient(180deg,#F5F0FF_0%,#FFFFFF_60%)]";
+        return "bg-[linear-gradient(180deg,#F5F0FF_0%,#FFFFFF_60%)] dark:bg-none dark:bg-card";
       case "Auto":
-        return "bg-[linear-gradient(180deg,#FCEFFF_0%,#FFFFFF_100%)]";
+        return "bg-[linear-gradient(180deg,#FCEFFF_0%,#FFFFFF_100%)] dark:bg-none dark:bg-card";
       case "Life":
-        return "bg-[linear-gradient(180deg,#F5F0FF_0%,#FFFFFF_100%)]";
+        return "bg-[linear-gradient(180deg,#F5F0FF_0%,#FFFFFF_100%)] dark:bg-none dark:bg-card";
       case "Travel":
-        return "bg-[linear-gradient(180deg,#FFF4E5_0%,#FFFFFF_100%)]";
+        return "bg-[linear-gradient(180deg,#FFF4E5_0%,#FFFFFF_100%)] dark:bg-none dark:bg-card";
       case "Home":
-        return "bg-[linear-gradient(180deg,#FFF4E5_0%,#FFFFFF_100%)]";
+        return "bg-[linear-gradient(180deg,#FFF4E5_0%,#FFFFFF_100%)] dark:bg-none dark:bg-card";
       default:
-        return "bg-gray-500";
+        return "bg-muted";
     }
   };
 

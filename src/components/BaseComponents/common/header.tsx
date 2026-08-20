@@ -13,10 +13,11 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { ThemeMenuItems } from "@/components/ui/theme-toggle";
 import {
   User,
   LogOut,
@@ -72,7 +73,7 @@ const HeaderLayout = () => {
               className={`font-medium text-base leading-6 tracking-none hover:text-orange-500 transition-all duration-300 delay-100 ${
                 isActive("/dashboard")
                   ? "text-orange-500"
-                  : "text-light-gray-800"
+                  : "text-accent-foreground"
               }`}
             >
               Dashboard
@@ -82,7 +83,7 @@ const HeaderLayout = () => {
               className={`font-medium text-base leading-6 tracking-none hover:text-orange-500 transition-all duration-300 delay-100 ${
                 isActive("/your-policy")
                   ? "text-orange-500"
-                  : "text-light-gray-800"
+                  : "text-accent-foreground"
               }`}
             >
               Your Policies
@@ -92,7 +93,7 @@ const HeaderLayout = () => {
               className={`font-medium text-base leading-6 tracking-none hover:text-orange-500 transition-all duration-300 delay-100 ${
                 isActive("/coverage")
                   ? "text-orange-500"
-                  : "text-light-gray-800"
+                  : "text-accent-foreground"
               }`}
             >
               Coverage
@@ -100,7 +101,7 @@ const HeaderLayout = () => {
             <Link
               href="/search"
               className={`font-medium text-base leading-6 tracking-none hover:text-orange-500 transition-all duration-300 delay-100 ${
-                isActive("/search") ? "text-orange-500" : "text-light-gray-800"
+                isActive("/search") ? "text-orange-500" : "text-accent-foreground"
               }`}
             >
               Search
@@ -108,7 +109,6 @@ const HeaderLayout = () => {
           </div>
 
           <div className="flex items-center gap-2">
-            <ThemeToggle />
             <Link
               href="/notifications"
               className="relative rounded-lg p-1 transition-colors hover:opacity-80"
@@ -132,7 +132,7 @@ const HeaderLayout = () => {
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex items-center gap-x-1">
-                  <p className="font-medium text-base leading-6 tracking-none text-light-gray-800">
+                  <p className="font-medium text-base leading-6 tracking-none text-accent-foreground">
                     {user?.user_metadata?.full_name}
                   </p>
                   <ChevronDown className="w-4 h-4" />
@@ -146,6 +146,9 @@ const HeaderLayout = () => {
                   <SquareChartGantt className="w-6 h-6" />
                   My Claims
                 </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <ThemeMenuItems />
+                <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleSignOut}>
                   <LogOut className="w-6 h-6" /> Log out
                 </DropdownMenuItem>

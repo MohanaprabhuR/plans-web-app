@@ -2,14 +2,11 @@
 
 import * as React from "react";
 import { useTheme } from "next-themes";
-import { Monitor, Moon, Sun } from "lucide-react";
+import { Check, Monitor, Moon, Sun } from "lucide-react";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuTrigger,
+  DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
-import { cn } from "@/lib/utils";
 
 const OPTIONS = [
   { value: "light", label: "Light", Icon: Sun },
@@ -18,53 +15,41 @@ const OPTIONS = [
 ] as const;
 
 /**
- * Light / dark / system switcher.
+ * Light / dark / system options, for use inside an existing dropdown menu.
  *
- * `theme` is the user's choice ("system" included) and drives the tick;
- * `resolvedTheme` is what system actually resolved to and drives the icon.
- * Both are undefined until next-themes reads localStorage on the client, so
- * the trigger renders a stable placeholder icon until mounted — rendering the
- * real one during SSR would mismatch on hydration.
+ * `theme` is the user's raw choice ("system" included) so the tick stays on
+ * System rather than jumping to whichever theme it resolved to. next-themes
+ * only knows the choice after reading localStorage on the client, so the tick
+ * is withheld until mounted — rendering it during SSR would mismatch on
+ * hydration.
  */
-export function ThemeToggle({ className }: { className?: string }) {
-  const { theme, resolvedTheme, setTheme } = useTheme();
+export function ThemeMenuItems() {
+  const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = React.useState(false);
 
   React.useEffect(() => setMounted(true), []);
 
-  const TriggerIcon = !mounted ? Sun : resolvedTheme === "dark" ? Moon : Sun;
-
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger
-        aria-label="Change theme"
-        className={cn(
-          "flex size-9 items-center justify-center rounded-full text-accent-foreground",
-          "transition-colors hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
-          className,
-        )}
-      >
-        <TriggerIcon className="size-5" />
-      </DropdownMenuTrigger>
-
-      <DropdownMenuContent align="end" className="min-w-36">
-        {OPTIONS.map(({ value, label, Icon }) => (
-          <DropdownMenuItem
-            key={value}
-            onClick={() => setTheme(value)}
-            className="gap-2"
-          >
-            <Icon className="size-4" />
-            <span className="flex-1">{label}</span>
-            {mounted && theme === value && (
-              <span
-                aria-hidden
-                className="size-1.5 rounded-full bg-brand"
-              />
-            )}
-          </DropdownMenuItem>
-        ))}
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <>
+      <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
+        Appearance
+      </DropdownMenuLabel>
+      {OPTIONS.map(({ value, label, Icon }) => (
+        <DropdownMenuItem
+          key={value}
+          onSelect={(e) => {
+            // Keep the menu open so the change is visible before it closes.
+            e.preventDefault();
+            setTheme(value);
+          }}
+        >
+          <Icon className="size-4" />
+          <span className="flex-1">{label}</span>
+          {mounted && theme === value && (
+            <Check className="size-4 text-brand" />
+          )}
+        </DropdownMenuItem>
+      ))}
+    </>
   );
 }
