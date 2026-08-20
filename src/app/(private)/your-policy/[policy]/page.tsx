@@ -382,7 +382,7 @@ const PolicyDetailPage = () => {
                 </AlertTitle>
               </Alert>
             ) : (
-              <Card className="bg-[linear-gradient(180deg,#F5F0FF_0%,rgba(245,240,255,0)_80%)]">
+              <Card className="bg-linear-to-b from-icon-violet/12 from-0% to-transparent to-80% dark:from-icon-violet/20">
                 <CardContent>
                   <div className="flex items-center justify-between pb-4 border-b border-dashed">
                     <div className="flex items-center gap-x-4">
