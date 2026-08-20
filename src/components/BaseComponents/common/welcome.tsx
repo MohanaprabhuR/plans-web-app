@@ -9,7 +9,7 @@ import Coverage from "../../../../public/images/svg/cover-wallet.svg";
 
 const WelcomeScreen = () => {
   return (
-    <div className="bg-[url('/images/svg/bg-vector.svg')] bg-contain bg-no-repeat bg-bottom bg-orange-50 dark:bg-card h-screen ">
+    <div className="bg-[url('/images/svg/bg-vector.svg')] bg-contain bg-no-repeat bg-bottom  bg-orange-50 h-screen ">
       <div className="w-full max-w-110 mx-auto flex flex-col items-center pt-30.5 h-screen">
         <Image src={PlansLogo} alt="Plans Logo" width={118} height={48} />
         <p className="text-accent-foreground text-5xl leading-9 tracking-4 text-center pt-4 pb-8 font-medium">

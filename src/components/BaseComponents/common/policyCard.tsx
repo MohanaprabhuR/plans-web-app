@@ -105,7 +105,7 @@ const PolicyCard: React.FC<PolicyCardProps> = ({ policy, onClick }) => {
 
   return (
     <Card
-      className={`bg-background dark:bg-card min-w-88.5 ${getBackgroundClass()} ${onClick ? "cursor-pointer" : ""}`}
+      className={`bg-white min-w-88.5 ${getBackgroundClass()} ${onClick ? "cursor-pointer" : ""}`}
       onClick={onClick}
     >
       <CardHeader>
