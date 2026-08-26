@@ -105,8 +105,12 @@ export function RiskScoreGauge({
   // base exactly on the guide ring with the apex reaching into the band.
   const [mx, my] = polar(R_GUIDE + 6, markerDeg);
 
-  const [gx1, gy1] = polar(R_GUIDE, START_DEG);
-  const [gx2, gy2] = polar(R_GUIDE, START_DEG + SWEEP_DEG);
+  // The ring sits at a smaller radius, so at the band's end angle its tips
+  // stop noticeably higher. Sweeping it a little further each side brings them
+  // down level with the band, as in the design.
+  const GUIDE_EXTRA_DEG = 26;
+  const [gx1, gy1] = polar(R_GUIDE, START_DEG - GUIDE_EXTRA_DEG);
+  const [gx2, gy2] = polar(R_GUIDE, START_DEG + SWEEP_DEG + GUIDE_EXTRA_DEG);
 
   return (
     <div className={cn("mx-auto w-full max-w-95", className)}>
