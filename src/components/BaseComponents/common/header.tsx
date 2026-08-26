@@ -13,9 +13,11 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
+import { ThemeMenuItems } from "@/components/ui/theme-toggle";
 import {
   User,
   LogOut,
@@ -57,8 +59,8 @@ const HeaderLayout = () => {
   return (
     <>
       <Header
-        className={`shadow-[0_1px_0_0_rgba(255,94,0,0.1)] border-0 px-0 py-3.5 fixed top-0 left-0 w-full z-50 transition-colors duration-200 ${
-          isScrolled ? "bg-white" : "bg-orange-50"
+        className={`shadow-[0_1px_0_0_rgba(255,94,0,0.1)] dark:shadow-none dark:border-b dark:border-border border-0 px-0 py-3.5 fixed top-0 left-0 w-full z-50 transition-colors duration-200 ${
+          isScrolled ? "bg-background" : "bg-orange-50 dark:bg-card"
         }`}
       >
         <div className="w-full mx-auto max-w-[1142px] px-4 flex items-center justify-between">
@@ -144,6 +146,9 @@ const HeaderLayout = () => {
                   <SquareChartGantt className="w-6 h-6" />
                   My Claims
                 </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <ThemeMenuItems />
+                <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleSignOut}>
                   <LogOut className="w-6 h-6" /> Log out
                 </DropdownMenuItem>
