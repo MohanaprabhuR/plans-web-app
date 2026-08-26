@@ -14,8 +14,8 @@ const GAP_SLICES = 2; // blanked slices at each segment boundary
 const CX = 110;
 const CY = 110;
 const R_OUTER = 96;
-const R_INNER = 80;
-const R_GUIDE = 68;
+const R_INNER = 79;
+const R_GUIDE = 67;
 
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 const hexToRgb = (h: string) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
@@ -127,7 +127,7 @@ export function RiskScoreGauge({
           d={`M ${gx1} ${gy1} A ${R_GUIDE} ${R_GUIDE} 0 1 1 ${gx2} ${gy2}`}
           fill="none"
           stroke="#E4E4E4"
-          strokeWidth={1.5}
+          strokeWidth={1}
           strokeLinecap="round"
         />
 
