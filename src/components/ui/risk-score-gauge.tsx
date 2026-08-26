@@ -1,38 +1,59 @@
 import { cn } from "@/lib/utils";
 
-/** Gradient stops across the arc, low score (left) to high (right). */
-const STOPS = ["#eb4f46", "#f0813c", "#f5c53f", "#c3dd4a", "#7ed957"] as const;
-const EMPTY = "#E2E2E2";
+/** Gradient stops sampled along the arc, low score to high. */
+const STOPS = ["#e8564e", "#e8933d", "#e8d24a", "#8fd95f", "#4fd996", "#3fd18a"];
 
-const TICKS = 68;
-const R_OUTER = 100;
-const R_INNER = 82;
-const R_ARC = 72; // thin guide arc inside the ticks; the marker rides on it
+/** −135° to +135°: a 270° sweep with the opening at the bottom. */
+const START_DEG = -135;
+const SWEEP_DEG = 270;
+
+const SEGMENTS = 5;
+const SLICES = 120; // per-slice fill approximates a continuous gradient
+const GAP_SLICES = 3; // blanked slices at each segment boundary
+
 const CX = 110;
 const CY = 110;
+const R_OUTER = 96;
+const R_INNER = 80;
+const R_GUIDE = 72;
 
-function lerp(a: number, b: number, t: number) {
-  return a + (b - a) * t;
-}
+const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+const hexToRgb = (h: string) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
 
-function hexToRgb(hex: string) {
-  return [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
-}
-
-/** Sample the gradient at 0..1. */
+/** Sample the palette at 0..1. */
 function colorAt(t: number): string {
   const span = 1 / (STOPS.length - 1);
   const i = Math.min(STOPS.length - 2, Math.floor(t / span));
   const local = (t - i * span) / span;
   const [r1, g1, b1] = hexToRgb(STOPS[i]);
   const [r2, g2, b2] = hexToRgb(STOPS[i + 1]);
-  const c = [lerp(r1, r2, local), lerp(g1, g2, local), lerp(b1, b2, local)];
-  return `rgb(${c.map((n) => Math.round(n)).join(", ")})`;
+  return `rgb(${[lerp(r1, r2, local), lerp(g1, g2, local), lerp(b1, b2, local)]
+    .map(Math.round)
+    .join(", ")})`;
 }
 
+const polar = (r: number, deg: number) => {
+  const rad = ((deg - 90) * Math.PI) / 180;
+  return [CX + r * Math.cos(rad), CY + r * Math.sin(rad)] as const;
+};
+
+/** Filled ring slice between two angles. */
+function slicePath(from: number, to: number): string {
+  const [ox1, oy1] = polar(R_OUTER, from);
+  const [ox2, oy2] = polar(R_OUTER, to);
+  const [ix2, iy2] = polar(R_INNER, to);
+  const [ix1, iy1] = polar(R_INNER, from);
+  return `M ${ox1} ${oy1} A ${R_OUTER} ${R_OUTER} 0 0 1 ${ox2} ${oy2} L ${ix2} ${iy2} A ${R_INNER} ${R_INNER} 0 0 0 ${ix1} ${iy1} Z`;
+}
+
+/**
+ * Fallback label when the API does not supply one. Bands chosen so 72 reads as
+ * "Medium", matching the design; the dashboard passes the API's riskLevel and
+ * overrides this.
+ */
 function riskLabelFor(score: number): string {
-  if (score < 34) return "High";
-  if (score < 67) return "Medium";
+  if (score < 40) return "High";
+  if (score < 80) return "Medium";
   return "Low";
 }
 
@@ -45,133 +66,126 @@ type RiskScoreGaugeProps = {
 };
 
 /**
- * Semicircular risk-score gauge drawn as inline SVG: ticks sweep red → green
- * left to right, filled up to the score and greyed beyond it, with a marker at
- * the current value. The readout sits in the middle as real DOM text so it
- * uses the app's type styles.
+ * Radial risk-score gauge.
+ *
+ * Drawn as inline SVG: the arc is built from many thin slices so the colour
+ * runs as a continuous gradient rather than flat bands, with a few slices
+ * blanked at each of the five segment boundaries to leave the dividing gaps.
+ * The readout sits inside the SVG so it scales with the dial.
  */
 export function RiskScoreGauge({
   value,
   riskLevel,
   className,
 }: RiskScoreGaugeProps) {
-  const score = Math.max(0, Math.min(100, Math.round(value)));
+  // Math.min/max propagate NaN, so screen it out before clamping.
+  const safe = Number.isFinite(value) ? value : 0;
+  const score = Math.max(0, Math.min(100, Math.round(safe)));
   const label = riskLevel?.trim() || riskLabelFor(score);
-  const filledThrough = (score / 100) * (TICKS - 1);
 
-  const ticks = Array.from({ length: TICKS }, (_, i) => {
-    const t = i / (TICKS - 1);
-    const angle = Math.PI * (1 - t); // π (left) → 0 (right)
-    const cos = Math.cos(angle);
-    const sin = Math.sin(angle);
+  const per = SLICES / SEGMENTS;
+  const slices = Array.from({ length: SLICES }, (_, i) => {
+    const posInSegment = i % per;
+    // Leave a gap at the start of every segment except the first.
+    if (i >= per && posInSegment < GAP_SLICES) return null;
+    const t = i / (SLICES - 1);
     return {
       key: i,
-      x1: CX + R_INNER * cos,
-      y1: CY - R_INNER * sin,
-      x2: CX + R_OUTER * cos,
-      y2: CY - R_OUTER * sin,
-      color: i <= filledThrough ? colorAt(t) : EMPTY,
+      d: slicePath(
+        START_DEG + (i / SLICES) * SWEEP_DEG,
+        START_DEG + ((i + 1.02) / SLICES) * SWEEP_DEG,
+      ),
+      fill: colorAt(t),
     };
-  });
+  }).filter(Boolean) as { key: number; d: string; fill: string }[];
 
-  // Marker sits just inside the arc at the current value.
-  const markerAngle = Math.PI * (1 - score / 100);
-  const markerR = R_ARC;
-  const mx = CX + markerR * Math.cos(markerAngle);
-  const my = CY - markerR * Math.sin(markerAngle);
-  // Point the marker outward along the radius, at the ticks. rotate(R) maps
-  // (1,0) -> (cos R, sin R); the outward unit vector is (cos t, -sin t) in
-  // SVG coords, so R = -t, i.e. 1.8 * score - 180.
-  const markerRotation = (score / 100) * 180 - 180;
+  // Marker rides just inside the band at the current value.
+  const markerDeg = START_DEG + (score / 100) * SWEEP_DEG;
+  const [mx, my] = polar(R_INNER + 4, markerDeg);
+
+  const [gx1, gy1] = polar(R_GUIDE, START_DEG);
+  const [gx2, gy2] = polar(R_GUIDE, START_DEG + SWEEP_DEG);
 
   return (
     <div className={cn("mx-auto w-full max-w-95", className)}>
       <svg
-        viewBox="0 0 220 132"
+        viewBox="0 0 220 224"
         className="w-full"
         role="img"
         aria-label={`Risk score ${score} out of 100, ${label} risk`}
       >
-        {/* Guide arc the marker travels along */}
+        {slices.map((s) => (
+          <path key={s.key} d={s.d} fill={s.fill} />
+        ))}
+
+        {/* Thin guide ring inside the band */}
         <path
-          d={`M ${CX - R_ARC} ${CY} A ${R_ARC} ${R_ARC} 0 0 1 ${CX + R_ARC} ${CY}`}
+          d={`M ${gx1} ${gy1} A ${R_GUIDE} ${R_GUIDE} 0 1 1 ${gx2} ${gy2}`}
           fill="none"
-          stroke="#E2E2E2"
+          stroke="#E4E4E4"
           strokeWidth={1.5}
           strokeLinecap="round"
         />
 
-        {ticks.map((t) => (
-          <line
-            key={t.key}
-            x1={t.x1}
-            y1={t.y1}
-            x2={t.x2}
-            y2={t.y2}
-            stroke={t.color}
-            strokeWidth={2}
-            strokeLinecap="round"
-          />
-        ))}
+        {/* Value marker, rotated to sit flat against the arc */}
         <polygon
-          points="0,-5 8,0 0,5"
-          fill={colorAt(score / 100)}
-          transform={`translate(${mx} ${my}) rotate(${markerRotation})`}
+          points="-7,-5 7,-5 0,6"
+          className="fill-foreground"
+          transform={`translate(${mx} ${my}) rotate(${markerDeg})`}
         />
 
-        {/* Readout lives in the SVG so it scales with the arc */}
         <text
           x={CX}
-          y={82}
+          y={126}
           textAnchor="middle"
           className="fill-accent-foreground"
-          style={{ fontSize: 30, fontWeight: 600, letterSpacing: "-0.02em" }}
+          style={{ fontSize: 46, fontWeight: 600, letterSpacing: "-0.02em" }}
         >
           {score}
         </text>
         <text
           x={CX}
-          y={95}
+          y={150}
           textAnchor="middle"
           className="fill-muted-foreground"
-          style={{ fontSize: 7.5, fontWeight: 500, letterSpacing: "0.14em" }}
+          style={{ fontSize: 11, fontWeight: 500, letterSpacing: "0.08em" }}
         >
           YOUR RISK SCORE
         </text>
         <rect
-          x={CX - 25}
-          y={102}
-          width={50}
-          height={16}
-          rx={8}
+          x={CX - 34}
+          y={164}
+          width={68}
+          height={24}
+          rx={12}
           className="fill-primary"
         />
         <text
           x={CX}
-          y={113}
+          y={180}
           textAnchor="middle"
           className="fill-primary-foreground"
-          style={{ fontSize: 7.5, fontWeight: 500 }}
+          style={{ fontSize: 11, fontWeight: 500 }}
         >
           {label}
         </text>
 
-        {/* Scale bounds, aligned under the arc ends */}
+        {/* Scale bounds under the arc ends */}
         <text
-          x={CX - R_OUTER}
-          y={129}
+          x={polar(R_OUTER, START_DEG)[0]}
+          y={216}
           textAnchor="middle"
           className="fill-muted-foreground"
-          style={{ fontSize: 8 }}
+          style={{ fontSize: 11 }}
         >
           0
         </text>
         <text
-          x={CX + R_OUTER}
-          y={129}
+          x={polar(R_OUTER, START_DEG + SWEEP_DEG)[0]}
+          y={216}
           textAnchor="middle"
           className="fill-muted-foreground"
-          style={{ fontSize: 8 }}
+          style={{ fontSize: 11 }}
         >
           100
         </text>
