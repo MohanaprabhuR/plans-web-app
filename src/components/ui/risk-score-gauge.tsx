@@ -101,7 +101,9 @@ export function RiskScoreGauge({
 
   // Marker rides just inside the band at the current value.
   const markerDeg = START_DEG + (score / 100) * SWEEP_DEG;
-  const [mx, my] = polar(R_INNER + 4, markerDeg);
+  // Half-height is 6, so placing the centre at R_GUIDE + 6 puts the marker's
+  // base exactly on the guide ring with the apex reaching into the band.
+  const [mx, my] = polar(R_GUIDE + 6, markerDeg);
 
   const [gx1, gy1] = polar(R_GUIDE, START_DEG);
   const [gx2, gy2] = polar(R_GUIDE, START_DEG + SWEEP_DEG);
@@ -154,7 +156,7 @@ export function RiskScoreGauge({
           y={150}
           textAnchor="middle"
           className="fill-muted-foreground"
-          style={{ fontSize: 11, fontWeight: 500, letterSpacing: "0.08em" }}
+          style={{ fontSize: 9, fontWeight: 500, letterSpacing: "0.08em" }}
         >
           YOUR RISK SCORE
         </text>
