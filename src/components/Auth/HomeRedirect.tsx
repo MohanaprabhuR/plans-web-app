@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import AuthScreen from "./Auth";
 import useAuth from "@/hooks/useAuth";
+import { RouteLoading } from "@/components/ui/route-loading";
 
 export default function HomeRedirect() {
   const router = useRouter();
@@ -20,11 +21,7 @@ export default function HomeRedirect() {
   }, [authLoading, user, router]);
 
   if (!showAuth) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <div className="size-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-      </div>
-    );
+    return <RouteLoading preset="session" />;
   }
 
   return <AuthScreen />;

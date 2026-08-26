@@ -22,7 +22,7 @@ export const Icon: React.FC<IconProps> = ({
       aria-hidden={isLabeled ? undefined : true}
       focusable={isLabeled ? undefined : false}
       className={twMerge(
-        "inline-block h-[1rem] w-[1rem] shrink-0 align-middle leading-[1em]",
+        "inline-block size-4 shrink-0 align-middle leading-[1em]",
         className
       )}
       {...props}

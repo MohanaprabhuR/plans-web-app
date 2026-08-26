@@ -197,14 +197,14 @@ const YourPolicyPage = () => {
       >
       {!loading && !error && (
         <div className="w-full flex flex-col gap-6 pt-8 lg:flex-row lg:gap-x-6">
-          <div className="w-full flex flex-col gap-y-6 max-w-[730px] ">
+          <div className="w-full flex flex-col gap-y-6 max-w-182.5 ">
             <div className="embla overflow-hidden">
               <div className="embla__viewport overflow-hidden" ref={emblaRef}>
                 <div className="embla__container flex gap-4">
                   {apiData?.endpoints?.expiry?.getExpiry?.response?.map(
                     (expiry, expiryIndex) => (
                       <Card
-                        className="gap-4 embla__slide flex-[0_0_100%] "
+                        className="gap-4 embla__slide w-full shrink-0 grow-0 basis-full "
                         key={`${expiry.policyId}-${expiry.type}-${expiryIndex}`}
                       >
                         <CardContent className="flex items-center justify-between">

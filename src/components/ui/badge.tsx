@@ -19,8 +19,8 @@ const badgeVariants = cva(
       },
       size: {
         sm: "px-1.5 py-px text-xs font-normal [&>svg]:size-2.5 tracking-4 leading-tight",
-        md: "px-1.5 py-[3px] text-xs font-normal [&>svg]:size-3 tracking-4 leading-tight",
-        lg: "px-2 py-[4.5px] text-sm font-normal [&>svg]:size-3 tracking-4 leading-tight",
+        md: "px-1.5 py-0.75 text-xs font-normal [&>svg]:size-3 tracking-4 leading-tight",
+        lg: "px-2 py-1.125 text-sm font-normal [&>svg]:size-3 tracking-4 leading-tight",
       },
     },
     defaultVariants: {

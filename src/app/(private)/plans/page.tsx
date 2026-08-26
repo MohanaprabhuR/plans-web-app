@@ -160,7 +160,7 @@ function PlanOptionCard({
               ₹{formatInr(plan.yearlyPrice)}/yr
             </span>
           </div>
-          <div className="flex text-sm flex-col flex-1 min-w-[140px]">
+          <div className="flex text-sm flex-col flex-1 min-w-35">
             <span className="text-muted-foreground text-base font-medium leading-5 tracking-4">
               Coverage
             </span>

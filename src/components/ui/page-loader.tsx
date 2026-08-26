@@ -41,7 +41,20 @@ export function getPresetForPath(pathname: string | null): PageLoadingPreset {
  */
 export function PageLoader({ preset }: { preset?: PageLoadingPreset }) {
   const pathname = usePathname();
-  return <RouteLoading preset={preset ?? getPresetForPath(pathname)} />;
+  const resolved = preset ?? getPresetForPath(pathname);
+  const isFullBleed = resolved === "session" || resolved === "onboarding";
+
+  return (
+    <div
+      className={
+        isFullBleed
+          ? "w-full"
+          : "mx-auto w-full max-w-285.5 px-4 py-4 sm:px-6"
+      }
+    >
+      <RouteLoading preset={resolved} />
+    </div>
+  );
 }
 
 export default PageLoader;

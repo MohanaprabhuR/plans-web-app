@@ -3,12 +3,31 @@
 @import "tw-animate-css";
 @import "./tokens/base-colors.css";
 
-@custom-variant dark (&:is(.dark *));
+@custom-variant dark (&:where(.dark, .dark *));
 
 @layer base {
   * {
     border-color: var(--border);
     outline-color: var(--ring);
+  }
+
+  :root {
+    color-scheme: light;
+  }
+
+  .dark {
+    color-scheme: dark;
+  }
+
+  /* Smooth in-page scrolling; disabled when the user prefers reduced motion. */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
   }
 }
 
@@ -23,4 +42,59 @@
 
 [data-slot="skeleton"]::after {
   animation-delay: var(--skeleton-delay, 0s);
+}
+
+/* Onboarding: panel slides horizontally; children cascade in vertically. */
+@keyframes onboarding-panel-in {
+  from {
+    opacity: 0;
+    transform: translate3d(var(--onboarding-from-x, 1.5rem), 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes onboarding-arrive-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 0.5rem, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes onboarding-option-pop {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.02);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  [data-onboarding-step] {
+    animation: onboarding-panel-in 380ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  [data-onboarding-step][data-direction="back"] {
+    --onboarding-from-x: -1.5rem;
+  }
+
+  [data-onboarding-arrive] {
+    opacity: 0;
+    animation: onboarding-arrive-in 360ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: var(--onboarding-delay, 0ms);
+  }
+
+  [data-onboarding-selected="true"] {
+    animation: onboarding-option-pop 280ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
 }

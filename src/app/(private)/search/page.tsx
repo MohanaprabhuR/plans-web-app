@@ -283,7 +283,7 @@ export default function SearchPage() {
             {(uploadState === "uploading" || isDragging) && (
               <div
                 aria-hidden
-                className={`absolute inset-y-0 left-0 transition-[width] duration-300 ease-out ${
+                className={`absolute inset-y-0 left-0 transition-all duration-300 ease-out ${
                   isDragging ? "bg-brand/5" : "bg-orange-100"
                 }`}
                 style={{ width: isDragging ? "100%" : `${uploadProgress}%` }}

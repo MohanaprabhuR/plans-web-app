@@ -50,11 +50,11 @@ function getTypeIcon(type: string) {
 }
 
 function getTypeBg(type: string) {
-  if (type === "Health") return "bg-[#F8F5FF]";
-  if (type === "Auto") return "bg-[#FDF0FF]";
-  if (type === "Life") return "bg-[#FFF5F5]";
-  if (type === "Home") return "bg-[#FEF6EA]";
-  if (type === "Travel") return "bg-[#E0FAFF]";
+  if (type === "Health") return "bg-icon-violet/12";
+  if (type === "Auto") return "bg-icon-fuchsia/12";
+  if (type === "Life") return "bg-icon-rose/12";
+  if (type === "Home") return "bg-icon-amber/12";
+  if (type === "Travel") return "bg-icon-cyan/15";
   return "bg-accent";
 }
 

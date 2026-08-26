@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import Logo from "../../../../public/images/svg/plans-logo.svg";
-import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import { PlansLogo } from "@/components/BaseComponents/common/plans-logo";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { Input } from "@/components/ui/input";
 import { Alert, AlertTitle } from "@/components/ui/alert";
 import { Check, CheckCircle, CircleAlert, MoveLeft } from "lucide-react";
@@ -20,6 +20,7 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import useAuth from "@/hooks/useAuth";
 import Link from "next/link";
+import { RouteLoading } from "@/components/ui/route-loading";
 const ALLOWED_TYPES = ["Health", "Home", "Life", "Travel", "Auto"] as const;
 type InsuranceType = (typeof ALLOWED_TYPES)[number];
 
@@ -126,7 +127,7 @@ function validate(step: StepId, a: Answers): string | null {
 }
 
 export default function BuyInsurancePage() {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
   const type = useMemo(
@@ -156,7 +157,7 @@ export default function BuyInsurancePage() {
     hasExistingInsurance: "",
   });
   const [, setError] = useState<string | null>(null);
-  const [loading] = useState(false);
+  const [hydrating, setHydrating] = useState(true);
   const [mode, setMode] = useState<"questions" | "plans" | "success">(
     "questions",
   );
@@ -164,7 +165,14 @@ export default function BuyInsurancePage() {
   const hydratedRef = useRef(false);
 
   useEffect(() => {
-    if (!user?.id || hydratedRef.current) return;
+    if (!user?.id) {
+      if (!authLoading) setHydrating(false);
+      return;
+    }
+    if (hydratedRef.current) {
+      setHydrating(false);
+      return;
+    }
     hydratedRef.current = true;
 
     (async () => {
@@ -203,9 +211,11 @@ export default function BuyInsurancePage() {
         }
       } catch {
         // Offline / stale HMR — keep the default form state.
+      } finally {
+        setHydrating(false);
       }
     })();
-  }, [user?.id]);
+  }, [user?.id, authLoading]);
 
   useEffect(() => {
     if (!user?.id) return;
@@ -279,12 +289,19 @@ export default function BuyInsurancePage() {
     "Mother",
   ];
 
+  if (hydrating || authLoading) {
+    return <RouteLoading preset="buy-insurance" />;
+  }
+
   return (
     <div className="flex flex-col lg:flex-row">
-      <div className="w-full lg:w-1/3 bg-orange-50 py-4 px-8 lg:h-[calc(100vh-62px)]">
-        <Link href="/">
-          <Image src={Logo} alt="Logo" width={78} height={32} />
-        </Link>
+      <div className="w-full bg-orange-50 px-8 py-4 dark:bg-card lg:h-app-screen lg:w-1/3">
+        <div className="flex items-center justify-between gap-3">
+          <Link href="/">
+            <PlansLogo width={78} height={32} />
+          </Link>
+          <ThemeToggle />
+        </div>
         <div className="pt-13">
           <div className="flex flex-col  gap-x-2">
             <p className="text-base tracking-4 leading-6  font-medium text-accent-foreground">
@@ -307,7 +324,7 @@ export default function BuyInsurancePage() {
               return (
                 <div
                   key={s.id}
-                  className={`flex items-center gap-4 relative before:content-[] before:w-0.5 before:h-8.5 before:absolute before:top-[23px] last:before:hidden before:left-[11px] ${
+                  className={`flex items-center gap-4 relative before:content-[] before:w-0.5 before:h-8.5 before:absolute before:top-5.75 last:before:hidden before:left-2.75 ${
                     done ? "before:bg-brand" : "before:bg-primary/30"
                   }`}
                 >
@@ -333,7 +350,7 @@ export default function BuyInsurancePage() {
           </div>
         </div>
       </div>
-      <div className="flex flex-col gap-4 w-full lg:w-3/4 lg:h-[calc(100vh-62px)] py-8 px-5 sm:px-10 lg:py-25 lg:px-32">
+      <div className="flex flex-col gap-4 w-full lg:w-3/4 lg:h-app-screen py-8 px-5 sm:px-10 lg:py-25 lg:px-32">
         <div className="flex items-center gap-4">
           {stepIndex > 0 && (
             <Button variant="ghost" iconOnly onClick={back}>
@@ -625,13 +642,8 @@ export default function BuyInsurancePage() {
               className="w-full"
               size="lg"
               onClick={next}
-              disabled={loading}
             >
-              {loading
-                ? "Loading…"
-                : stepIndex === STEPS.length - 1
-                  ? "View plans"
-                  : "Continue"}
+              {stepIndex === STEPS.length - 1 ? "View plans" : "Continue"}
             </Button>
           </>
         )}

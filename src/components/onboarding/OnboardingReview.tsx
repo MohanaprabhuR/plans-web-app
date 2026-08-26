@@ -4,6 +4,8 @@ import React, { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronLeft, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import {
   type OnboardingFormData,
@@ -117,8 +119,8 @@ export function OnboardingReview() {
   }, [formData, router]);
 
   return (
-    <div className="mx-auto flex h-[calc(100dvh-62px)] w-full max-w-4xl flex-col bg-background">
-      <header className="shrink-0 border-b border-border px-5 pt-[max(1.25rem,env(safe-area-inset-top))] pb-4 sm:px-6">
+    <div className="mx-auto flex h-app-screen w-full max-w-4xl flex-col bg-background">
+      <header className="shrink-0 border-b border-border px-5 pt-safe-top pb-4 sm:px-6">
         <div className="flex items-center gap-3">
           <Button
             variant="ghost"
@@ -130,7 +132,7 @@ export function OnboardingReview() {
           >
             <ChevronLeft />
           </Button>
-          <div>
+          <div className="min-w-0 flex-1">
             <h1 className="text-2xl font-semibold leading-8 tracking-tight text-accent-foreground sm:text-3xl">
               Edit risk profile
             </h1>
@@ -138,6 +140,7 @@ export function OnboardingReview() {
               Update any answer, then save your changes.
             </p>
           </div>
+          <ThemeToggle />
         </div>
       </header>
 
@@ -176,7 +179,7 @@ export function OnboardingReview() {
         )}
       </main>
 
-      <footer className="shrink-0 border-t border-border px-5 pt-3 pb-[max(1.25rem,env(safe-area-inset-bottom))] sm:px-6">
+      <footer className="shrink-0 border-t border-border px-5 pt-3 pb-safe-bottom sm:px-6">
         {/* Full-width and thumb-reachable on phones; natural width and
             right-aligned once there is room for it. */}
         <div className="flex gap-3 sm:justify-end">
@@ -270,17 +273,39 @@ function QuestionRow({
 
 function ReviewSkeleton() {
   return (
-    <div className="flex flex-col gap-8">
+    <div
+      role="status"
+      aria-busy="true"
+      aria-label="Loading risk profile"
+      className="flex flex-col gap-8 motion-safe:animate-in motion-safe:fade-in motion-safe:duration-300"
+    >
+      <span className="sr-only">Loading risk profile</span>
       {[0, 1, 2].map((s) => (
-        <div key={s}>
-          <div className="mb-3 h-3 w-32 rounded bg-secondary" />
+        <div
+          key={s}
+          className="rounded-2xl border border-border bg-card/40 p-5 sm:p-6"
+        >
+          <Skeleton className="mb-5 h-7 w-40" delay={s * 80} />
           <div className="flex flex-col gap-5">
             {[0, 1].map((r) => (
               <div key={r}>
-                <div className="mb-2 h-4 w-56 max-w-full rounded bg-secondary" />
-                <div className="flex gap-2">
-                  <div className="h-9 w-20 rounded-full bg-secondary" />
-                  <div className="h-9 w-20 rounded-full bg-secondary" />
+                <Skeleton
+                  className="mb-2 h-4 w-56 max-w-full"
+                  delay={s * 80 + r * 40 + 20}
+                />
+                <div className="flex flex-wrap gap-2">
+                  <Skeleton
+                    className="h-9 w-20 rounded-full"
+                    delay={s * 80 + r * 40 + 40}
+                  />
+                  <Skeleton
+                    className="h-9 w-24 rounded-full"
+                    delay={s * 80 + r * 40 + 55}
+                  />
+                  <Skeleton
+                    className="h-9 w-16 rounded-full"
+                    delay={s * 80 + r * 40 + 70}
+                  />
                 </div>
               </div>
             ))}

@@ -222,8 +222,8 @@ function Avatar({
             className={cn(
               "absolute bottom-0 right-0 flex items-center justify-center rounded-full bg-background ring-2 ring-background",
               {
-                "bg-green-600  p-[2px]": status === "checked",
-                "bg-red-500 p-[2px]": status === "close",
+                "bg-green-600  p-0.5": status === "checked",
+                "bg-red-500 p-0.5": status === "close",
                 "bg-cyan-500 p-px ": status === "pin",
                 "text-green-700 ": status === "active",
                 "text-gray-600 dark:text-gray-300":
@@ -231,12 +231,12 @@ function Avatar({
                   status === "sleep" ||
                   status === "pinned",
 
-                "size-[4px]": size === "xs",
-                "size-[5px]": size === "sm",
+                "size-1": size === "xs",
+                "size-1.25": size === "sm",
                 "size-1.75": size === "md",
-                "size-[8px]": size === "lg" || size === "xl",
-                "size-[10px]": size === "2xl",
-                "size-[12px]": size === "3xl",
+                "size-2": size === "lg" || size === "xl",
+                "size-2.5": size === "2xl",
+                "size-3": size === "3xl",
               },
             )}
           >

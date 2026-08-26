@@ -205,7 +205,7 @@ export default function CoveragePage() {
                       >
                         <div className="flex items-start gap-4">
                           <div
-                            className={`w-12 h-13 min-w-12 min-h-13  rounded-2xl flex items-center justify-center ${coverage?.category === "Health Insurance" ? "bg-[#F8F5FF]" : coverage?.category === "Auto Insurance" ? "bg-[#FDF0FF]" : coverage?.category === "Life Insurance" ? "bg-[#FFF5F5]" : coverage?.category === "Home Insurance" ? "bg-[#FEF6EA]" : coverage?.category === "Travel Insurance" ? "bg-[#FFF4E5]" : coverage?.category === "Pet Insurance" ? "bg-[#ECFEFF]" : coverage?.category === "Renters Insurance" ? "bg-[#F0FDFA]" : ""}`}
+                            className={`w-12 h-13 min-w-12 min-h-13  rounded-2xl flex items-center justify-center ${coverage?.category === "Health Insurance" ? "bg-icon-violet/12" : coverage?.category === "Auto Insurance" ? "bg-icon-fuchsia/12" : coverage?.category === "Life Insurance" ? "bg-icon-rose/12" : coverage?.category === "Home Insurance" ? "bg-icon-amber/12" : coverage?.category === "Travel Insurance" ? "bg-icon-cyan/12" : coverage?.category === "Pet Insurance" ? "bg-icon-cyan/12" : coverage?.category === "Renters Insurance" ? "bg-icon-teal/12" : ""}`}
                           >
                             {coverage?.category === "Health Insurance" ? (
                               <BriefcaseMedical className="stroke-icon-violet" />

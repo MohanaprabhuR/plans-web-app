@@ -58,11 +58,11 @@ const HeaderLayout = () => {
   return (
     <>
       <Header
-        className={`shadow-[0_1px_0_0_rgba(255,94,0,0.1)] dark:shadow-none dark:border-b dark:border-border border-0 px-0 py-3.5 fixed top-0 left-0 w-full z-50 transition-colors duration-200 ${
+        className={`shadow-header-accent dark:shadow-none dark:border-b dark:border-border border-0 px-0 py-3.5 fixed top-0 left-0 w-full z-50 transition-colors duration-200 ${
           isScrolled ? "bg-background" : "bg-orange-50 dark:bg-card"
         }`}
       >
-        <div className="w-full mx-auto max-w-[1142px] px-4 flex items-center justify-between">
+        <div className="w-full mx-auto max-w-285.5 px-4 flex items-center justify-between">
           <Link href="/dashboard">
             <PlansLogo width={78} height={32} />
           </Link>

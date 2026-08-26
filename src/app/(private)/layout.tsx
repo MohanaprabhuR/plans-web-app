@@ -50,7 +50,7 @@ export default function PrivateLayout({
       )}
       {!isOnboarding && !isBuyInsurance && (
         <>
-          <div className="relative flex min-h-[calc(100vh-62px)] w-full flex-col items-center pb-12">
+          <div className="relative flex min-h-app-screen w-full flex-col items-center pb-12">
             <div className="pointer-events-none absolute left-0 top-15 mt-0 h-77 w-full bg-linear-to-b from-orange-50 to-transparent dark:from-card" />
             <div className="relative z-10 mx-auto w-full max-w-285.5 px-4 pt-25">
               {children}

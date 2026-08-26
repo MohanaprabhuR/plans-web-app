@@ -123,7 +123,7 @@ const PolicyCard: React.FC<PolicyCardProps> = ({ policy, onClick }) => {
             </span>
           </div>
           <span
-            className="text-sm font-medium leading-5 tracking-4 text-muted-foreground truncate max-w-[88px]"
+            className="text-sm font-medium leading-5 tracking-4 text-muted-foreground truncate max-w-22"
             title={policy.policyId}
           >
             {minimalPolicyLabel}
@@ -135,7 +135,7 @@ const PolicyCard: React.FC<PolicyCardProps> = ({ policy, onClick }) => {
           <div className="flex justify-between items-center w-full">
             <div className="flex flex-col">
               <span
-                className="font-medium text-xl leading-6 tracking-4 text-accent-foreground truncate max-w-[200px]"
+                className="font-medium text-xl leading-6 tracking-4 text-accent-foreground truncate max-w-50"
                 title={policy.provider}
               >
                 {policy.provider}

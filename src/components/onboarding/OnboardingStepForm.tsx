@@ -11,6 +11,7 @@ import {
   Check,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
@@ -46,9 +47,19 @@ const PROGRESS_CATEGORIES: StepCategory[] = [
   "financial",
 ];
 
-const STEP_EASE = "ease-[cubic-bezier(0.22,1,0.36,1)]";
-const STEP_MOTION =
-  "motion-safe:animate-in motion-safe:fade-in motion-safe:duration-400 motion-reduce:animate-none";
+const ARRIVE_STEP_MS = 55;
+const AUTO_NEXT_DELAY_SINGLE = 380;
+const AUTO_NEXT_DELAY_MULTIPLE = 750;
+
+function arriveProps(index: number, direction: "next" | "back") {
+  return {
+    "data-onboarding-arrive": true,
+    "data-direction": direction,
+    style: {
+      ["--onboarding-delay" as string]: `${index * ARRIVE_STEP_MS}ms`,
+    } as React.CSSProperties,
+  };
+}
 
 export function OnboardingStepForm() {
   const router = useRouter();
@@ -58,6 +69,7 @@ export function OnboardingStepForm() {
   );
   const [direction, setDirection] = useState<"next" | "back">("next");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [navLocked, setNavLocked] = useState(false);
 
   const step = ONBOARDING_STEPS[stepIndex];
   const categoryProgress = step ? getCategoryProgress(step.id) : null;
@@ -67,6 +79,13 @@ export function OnboardingStepForm() {
       setStoredOnboardingData(formData);
     }
   }, [formData]);
+
+  // Unlock after the enter animation so rapid taps can't skip steps.
+  useEffect(() => {
+    setNavLocked(true);
+    const id = window.setTimeout(() => setNavLocked(false), 320);
+    return () => window.clearTimeout(id);
+  }, [stepIndex]);
 
   const updateField = useCallback(
     (field: keyof OnboardingFormData, value: string | string[]) => {
@@ -85,11 +104,8 @@ export function OnboardingStepForm() {
       const userId = session?.user?.id ?? null;
 
       // The RLS policy on onboarding_responses only allows a write when
-      // user_id === auth.uid(), so without a session the insert is rejected
-      // ("new row violates row-level security policy"). This happens on the
-      // dev-only /onboarding-preview route, which has no auth. Skip the write
-      // in dev so the flow can still be previewed end-to-end; in production
-      // (where the auth guard guarantees a session) surface a clear message.
+      // user_id === auth.uid(), so without a session the insert is rejected.
+      // Skip the write on the dev-only /onboarding-preview route.
       if (!userId) {
         if (process.env.NODE_ENV !== "production") {
           clearStoredOnboardingData();
@@ -134,7 +150,7 @@ export function OnboardingStepForm() {
   const goNext = useCallback(() => {
     void (async () => {
       const currentStep = step;
-      if (!currentStep) return;
+      if (!currentStep || navLocked || isSubmitting) return;
 
       if (currentStep.id === "insuranceTypesOwned") {
         try {
@@ -152,12 +168,13 @@ export function OnboardingStepForm() {
       setDirection("next");
       setStepIndex((i) => Math.min(i + 1, ONBOARDING_STEPS.length - 1));
     })();
-  }, [step, saveOnboarding, router]);
+  }, [step, saveOnboarding, router, navLocked, isSubmitting]);
 
   const goBack = useCallback(() => {
+    if (navLocked) return;
     setDirection("back");
     setStepIndex((i) => Math.max(i - 1, 0));
-  }, []);
+  }, [navLocked]);
 
   const isCategoryEndWithAnswer = (
     s: typeof step,
@@ -179,22 +196,14 @@ export function OnboardingStepForm() {
     step.id === "confirmation" ||
     isCategoryEndWithAnswer(step, formData);
 
-  const enterClass = cn(
-    STEP_MOTION,
-    STEP_EASE,
-    direction === "next"
-      ? "motion-safe:slide-in-from-right-4"
-      : "motion-safe:slide-in-from-left-4",
-  );
-
   return (
-    <div className="relative mx-auto flex h-[calc(100dvh-62px)] w-full max-w-lg flex-col overflow-hidden bg-background">
+    <div className="relative mx-auto flex h-app-screen w-full max-w-lg flex-col overflow-hidden bg-background">
       <div
         aria-hidden
         className="pointer-events-none absolute inset-x-0 top-0 h-56 bg-linear-to-b from-orange-50 to-transparent dark:from-orange-950/25"
       />
 
-      <header className="relative z-10 shrink-0 px-5 pt-[max(1.25rem,env(safe-area-inset-top))]">
+      <header className="relative z-10 shrink-0 px-5 pt-safe-top">
         <div className="flex min-h-14 items-center gap-3">
           {!isIntroStep ? (
             <>
@@ -204,6 +213,7 @@ export function OnboardingStepForm() {
                 iconOnly
                 className="-ml-1.5 rounded-full"
                 onClick={goBack}
+                disabled={navLocked}
                 aria-label="Go back"
               >
                 <ChevronLeft />
@@ -212,14 +222,18 @@ export function OnboardingStepForm() {
                 activeCategory={step.category}
                 progress={categoryProgress}
               />
+              <ThemeToggle />
             </>
           ) : (
-            <div className="h-8 w-full" />
+            <>
+              <div className="h-8 w-full" />
+              <ThemeToggle />
+            </>
           )}
         </div>
         <div
           className={cn(
-            "grid transition-[grid-template-rows,opacity,margin] duration-300 ease-out",
+            "grid transition-all duration-300 ease-out",
             isIntroStep
               ? "mb-0 grid-rows-[0fr] opacity-0"
               : "mb-1 grid-rows-[1fr] opacity-100",
@@ -229,20 +243,16 @@ export function OnboardingStepForm() {
             <div className="flex items-baseline justify-between pb-1">
               <span
                 key={step.categoryLabel}
-                className={cn(
-                  "text-sm font-medium text-muted-foreground",
-                  STEP_MOTION,
-                )}
+                className="text-sm font-medium text-muted-foreground"
+                {...arriveProps(0, direction)}
               >
                 {step.categoryLabel}
               </span>
               {categoryProgress && (
                 <span
                   key={`${step.category}-${categoryProgress.current}`}
-                  className={cn(
-                    "text-xs tabular-nums text-muted-foreground",
-                    STEP_MOTION,
-                  )}
+                  className="text-xs tabular-nums text-muted-foreground"
+                  {...arriveProps(1, direction)}
                 >
                   {categoryProgress.current} of {categoryProgress.total}
                 </span>
@@ -259,9 +269,11 @@ export function OnboardingStepForm() {
         )}
       >
         <div className="overflow-x-hidden">
-          {/* Intro steps animate as a block; question steps cascade their
-              own children in, so the container stays still for them. */}
-          <div key={step.id} className={isIntroStep ? enterClass : undefined}>
+          <div
+            key={step.id}
+            data-onboarding-step
+            data-direction={direction}
+          >
             {step.id === "welcome" && <WelcomeStep />}
 
             {step.id === "confirmation" && <ConfirmationStep />}
@@ -275,24 +287,29 @@ export function OnboardingStepForm() {
                 onAutoNext={goNext}
                 categoryIcon={CATEGORY_ICONS[step.category]}
                 isCategoryEnd={Boolean(step.nextButtonLabel)}
+                disabled={navLocked || isSubmitting}
               />
             )}
           </div>
         </div>
       </main>
 
-      <footer className="relative z-10 shrink-0 px-5 pt-2 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
+      <footer className="relative z-10 shrink-0 px-5 pt-2 pb-safe-bottom-lg">
         <div className="flex min-h-14 items-stretch">
           {showBottomCta && (
             <Button
+              key={`cta-${step.id}`}
               size="lg"
-              className={cn(
-                "h-12 w-full rounded-xl",
-                STEP_MOTION,
-                "motion-safe:slide-in-from-bottom-2",
-              )}
+              className="h-12 w-full rounded-xl"
+              data-onboarding-arrive
+              data-direction={direction}
+              style={
+                {
+                  ["--onboarding-delay" as string]: "120ms",
+                } as React.CSSProperties
+              }
               onClick={goNext}
-              disabled={isSubmitting}
+              disabled={isSubmitting || navLocked}
             >
               {isSubmitting
                 ? "Saving…"
@@ -328,7 +345,7 @@ function ProgressBar({
             className="h-1.5 flex-1 overflow-hidden rounded-full bg-secondary"
           >
             <div
-              className="h-full origin-left rounded-full bg-primary transition-[width] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+              className="h-full origin-left rounded-full bg-primary transition-all duration-500 ease-onboarding"
               style={{ width: `${fill}%` }}
             />
           </div>
@@ -356,8 +373,8 @@ function WelcomeStep() {
         {features.map(({ label, icon: Icon }, i) => (
           <div
             key={label}
-            className="flex min-h-20 items-center gap-3 rounded-2xl border border-border bg-card p-4 shadow-xs motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-3 motion-safe:duration-500 motion-safe:fill-mode-both motion-reduce:animate-none"
-            style={{ animationDelay: `${80 + i * 80}ms` }}
+            className="flex min-h-20 items-center gap-3 rounded-2xl border border-border bg-card p-4 shadow-xs"
+            {...arriveProps(i + 1, "next")}
           >
             <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10">
               <Icon className="size-5 text-primary" />
@@ -372,23 +389,17 @@ function WelcomeStep() {
   );
 }
 
-const AUTO_NEXT_DELAY_SINGLE = 420;
-const AUTO_NEXT_DELAY_MULTIPLE = 800;
-
 function optionCardClass(selected: boolean) {
   return cn(
     "flex min-h-14 w-full items-center gap-3 rounded-2xl border px-4 py-3.5 text-left",
-    "transition-[border-color,background-color,box-shadow,transform] duration-200",
-    "cursor-pointer select-none active:scale-[0.985]",
+    "transition-colors duration-200",
+    "cursor-pointer select-none active:scale-98",
     "motion-reduce:transition-none motion-reduce:active:scale-100",
     selected
       ? "border-primary bg-primary/5 shadow-xs"
       : "border-border bg-card hover:border-primary/40 hover:bg-accent/40",
   );
 }
-
-/** Per-item entrance for a freshly-arrived question. */
-const ARRIVE_STEP_MS = 70;
 
 function QuestionStep({
   step,
@@ -398,6 +409,7 @@ function QuestionStep({
   onAutoNext,
   categoryIcon,
   isCategoryEnd,
+  disabled,
 }: {
   step: StepConfig;
   direction: "next" | "back";
@@ -409,10 +421,12 @@ function QuestionStep({
   onAutoNext: () => void;
   categoryIcon: React.ReactNode;
   isCategoryEnd: boolean;
+  disabled: boolean;
 }) {
   const key = step.id as keyof OnboardingFormData;
   const value = formData[key];
   const timeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [justSelected, setJustSelected] = useState<string | null>(null);
 
   const scheduleAutoNext = useCallback(
     (delay: number) => {
@@ -434,55 +448,42 @@ function QuestionStep({
 
   const handleSingleChange = useCallback(
     (v: string) => {
+      if (disabled) return;
       updateField(key, v);
+      setJustSelected(v);
       if (!isCategoryEnd) scheduleAutoNext(AUTO_NEXT_DELAY_SINGLE);
     },
-    [key, updateField, scheduleAutoNext, isCategoryEnd],
+    [key, updateField, scheduleAutoNext, isCategoryEnd, disabled],
   );
 
   const handleMultipleChange = useCallback(
     (next: string[]) => {
+      if (disabled) return;
       updateField(key, next);
+      if (next.length > 0) {
+        setJustSelected(next[next.length - 1] ?? null);
+      }
       if (next.length > 0 && !isCategoryEnd)
         scheduleAutoNext(AUTO_NEXT_DELAY_MULTIPLE);
     },
-    [key, updateField, scheduleAutoNext, isCategoryEnd],
+    [key, updateField, scheduleAutoNext, isCategoryEnd, disabled],
   );
 
   const currentSingle = (value as string | undefined) ?? "";
-
-  // Each part of the question "arrives" in sequence: icon, heading, then the
-  // options cascade in. Direction-aware, and disabled under reduced motion.
-  const arrive = cn(
-    "motion-safe:animate-in motion-safe:fade-in motion-safe:fill-mode-both motion-safe:duration-400 motion-reduce:animate-none",
-    STEP_EASE,
-    direction === "next"
-      ? "motion-safe:slide-in-from-right-4"
-      : "motion-safe:slide-in-from-left-4",
-  );
-  const arriveDelay = (i: number): React.CSSProperties => ({
-    animationDelay: `${i * ARRIVE_STEP_MS}ms`,
-  });
 
   return (
     <div className="flex flex-col">
       {categoryIcon && (
         <div
-          className={cn(
-            "mb-4 flex size-12 items-center justify-center rounded-full bg-primary/10",
-            arrive,
-          )}
-          style={arriveDelay(0)}
+          className="mb-4 flex size-12 items-center justify-center rounded-full bg-primary/10"
+          {...arriveProps(0, direction)}
         >
           {categoryIcon}
         </div>
       )}
       <h2
-        className={cn(
-          "mb-6 text-balance text-xl font-semibold tracking-tight text-accent-foreground",
-          arrive,
-        )}
-        style={arriveDelay(1)}
+        className="mb-6 text-balance text-xl font-semibold tracking-tight text-accent-foreground"
+        {...arriveProps(1, direction)}
       >
         {step.question}
       </h2>
@@ -492,6 +493,7 @@ function QuestionStep({
           value={currentSingle}
           onValueChange={handleSingleChange}
           className="flex flex-col gap-2.5"
+          disabled={disabled}
         >
           {step.options.map((opt, i) => {
             const selected = currentSingle === opt.value;
@@ -500,11 +502,15 @@ function QuestionStep({
               <label
                 key={opt.value}
                 htmlFor={id}
+                data-onboarding-selected={
+                  justSelected === opt.value ? "true" : undefined
+                }
                 onClick={() => {
+                  if (disabled) return;
                   if (selected) onAutoNext();
                 }}
-                className={cn(optionCardClass(selected), arrive)}
-                style={arriveDelay(i + 2)}
+                className={cn(optionCardClass(selected))}
+                {...arriveProps(i + 2, direction)}
               >
                 <span className="flex-1 font-medium text-accent-foreground">
                   {opt.label}
@@ -522,6 +528,7 @@ function QuestionStep({
             const arr = (value as string[] | undefined) ?? [];
             const checked = arr.includes(opt.value);
             const toggle = () => {
+              if (disabled) return;
               if (opt.value === "None") {
                 handleMultipleChange(["None"]);
                 return;
@@ -534,8 +541,11 @@ function QuestionStep({
             return (
               <label
                 key={opt.value}
-                className={cn(optionCardClass(checked), arrive)}
-                style={arriveDelay(i + 2)}
+                data-onboarding-selected={
+                  justSelected === opt.value ? "true" : undefined
+                }
+                className={cn(optionCardClass(checked))}
+                {...arriveProps(i + 2, direction)}
               >
                 <span className="flex-1 font-medium text-accent-foreground">
                   {opt.label}
@@ -544,6 +554,7 @@ function QuestionStep({
                   checked={checked}
                   onCheckedChange={toggle}
                   size="md"
+                  disabled={disabled}
                 />
               </label>
             );
@@ -573,20 +584,23 @@ function ConfirmationStep() {
 
   return (
     <div className="flex flex-col text-center">
-      <div className="mb-6 flex justify-center">
-        <div className="flex size-16 items-center justify-center rounded-full bg-green-500/15 motion-safe:animate-in motion-safe:zoom-in-75 motion-safe:fade-in motion-safe:duration-500 motion-reduce:animate-none">
+      <div className="mb-6 flex justify-center" {...arriveProps(0, "next")}>
+        <div className="flex size-16 items-center justify-center rounded-full bg-green-500/15">
           <Check className="size-8 text-green-600 dark:text-green-400" />
         </div>
       </div>
-      <h1 className="mb-2 text-balance text-2xl font-semibold tracking-tight text-accent-foreground">
+      <h1
+        className="mb-2 text-balance text-2xl font-semibold tracking-tight text-accent-foreground"
+        {...arriveProps(1, "next")}
+      >
         Your Personalized Risk Profile is Ready!
       </h1>
       <ul className="mt-8 space-y-2.5 text-left">
         {features.map(({ icon: Icon, label, desc }, i) => (
           <li
             key={label}
-            className="flex items-center gap-3 rounded-2xl border border-border bg-card px-4 py-3 shadow-xs motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-3 motion-safe:duration-500 motion-safe:fill-mode-both motion-reduce:animate-none"
-            style={{ animationDelay: `${100 + i * 70}ms` }}
+            className="flex items-center gap-3 rounded-2xl border border-border bg-card px-4 py-3 shadow-xs"
+            {...arriveProps(i + 2, "next")}
           >
             <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/10">
               <Icon className="size-5 text-primary" />

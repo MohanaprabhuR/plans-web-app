@@ -19,7 +19,14 @@ export type PageLoadingPreset =
 
 type PageLoadingPresetConfig = Pick<
   ScreenLoadingProps,
-  "variant" | "label" | "showHeader" | "rows" | "statCount" | "showStats" | "className"
+  | "variant"
+  | "label"
+  | "showHeader"
+  | "rows"
+  | "statCount"
+  | "showStats"
+  | "rowType"
+  | "className"
 >;
 
 export const PAGE_LOADING_PRESETS: Record<
@@ -36,6 +43,7 @@ export const PAGE_LOADING_PRESETS: Record<
   dashboard: {
     variant: "cards-row",
     rows: 4,
+    showHeader: true,
     label: "Loading dashboard",
     className: "py-2",
   },
@@ -50,6 +58,7 @@ export const PAGE_LOADING_PRESETS: Record<
     showHeader: false,
     statCount: 4,
     rows: 3,
+    rowType: "claim",
     label: "Loading claims",
   },
   renewal: {
@@ -57,12 +66,14 @@ export const PAGE_LOADING_PRESETS: Record<
     showHeader: false,
     statCount: 3,
     rows: 3,
+    rowType: "renewal",
     label: "Loading renewals",
   },
   notifications: {
     variant: "list",
     showHeader: false,
     rows: 5,
+    rowType: "notification",
     label: "Loading notifications",
   },
   plans: {
@@ -84,7 +95,7 @@ export const PAGE_LOADING_PRESETS: Record<
     label: "Loading policy",
   },
   "my-profile": {
-    variant: "detail",
+    variant: "profile",
     showHeader: false,
     label: "Loading profile",
     className: "py-4",
@@ -97,21 +108,22 @@ export const PAGE_LOADING_PRESETS: Record<
     className: "py-2",
   },
   "buy-insurance": {
-    variant: "cards-row",
-    showHeader: true,
-    rows: 3,
+    variant: "form",
+    showHeader: false,
     label: "Loading insurance plans",
     className: "py-2",
   },
   assistant: {
-    variant: "detail",
+    variant: "chat",
     showHeader: false,
     label: "Loading assistant",
     className: "py-4",
   },
   onboarding: {
-    variant: "full",
+    variant: "form",
+    showHeader: false,
     label: "Loading onboarding",
+    className: "py-6",
   },
   session: {
     variant: "full",

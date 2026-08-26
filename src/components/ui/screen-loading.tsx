@@ -9,7 +9,12 @@ export type ScreenLoadingVariant =
   | "list"
   | "summary"
   | "cards-row"
-  | "detail";
+  | "detail"
+  | "form"
+  | "chat"
+  | "profile";
+
+export type ScreenLoadingRowType = "default" | "claim" | "renewal" | "notification";
 
 export interface ScreenLoadingProps extends React.ComponentProps<"div"> {
   variant?: ScreenLoadingVariant;
@@ -21,14 +26,14 @@ export interface ScreenLoadingProps extends React.ComponentProps<"div"> {
   showHeader?: boolean;
   /** Show stat card row (summary/page only; default follows variant) */
   showStats?: boolean;
+  /** Row layout for list/summary variants */
+  rowType?: ScreenLoadingRowType;
   /** Screen reader label */
   label?: string;
 }
 
 function LoadingLabel({ label }: { label: string }) {
-  return (
-    <span className="sr-only">{label}</span>
-  );
+  return <span className="sr-only">{label}</span>;
 }
 
 function HeaderSkeleton({ delay = 0 }: { delay?: number }) {
@@ -36,7 +41,7 @@ function HeaderSkeleton({ delay = 0 }: { delay?: number }) {
     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       <Skeleton className="h-9 w-52 max-w-full rounded-lg sm:h-10" delay={delay} />
       <Skeleton
-        className="h-10 w-32 rounded-lg max-sm:max-w-[140px]"
+        className="h-10 w-32 rounded-lg max-sm:max-w-35"
         delay={delay + 40}
       />
     </div>
@@ -60,7 +65,7 @@ function StatsSkeleton({
       {Array.from({ length: count }).map((_, i) => (
         <Skeleton
           key={`stat-${i}`}
-          className="h-[88px] w-full rounded-xl sm:h-[92px]"
+          className="h-22 w-full rounded-xl sm:h-23"
           delay={baseDelay + i * 50}
         />
       ))}
@@ -87,6 +92,20 @@ function ListRowSkeleton({ index = 0 }: { index?: number }) {
       <div className="hidden shrink-0 flex-col items-end gap-2 sm:flex">
         <Skeleton className="h-6 w-20 rounded-full" delay={delay + 30} />
         <Skeleton className="h-7 w-16" delay={delay + 40} />
+      </div>
+    </div>
+  );
+}
+
+function NotificationRowSkeleton({ index = 0 }: { index?: number }) {
+  const delay = 100 + index * 60;
+  return (
+    <div className="flex items-start gap-3 rounded-xl border border-border/60 bg-card/50 p-4">
+      <Skeleton className="mt-0.5 size-10 shrink-0 rounded-full" delay={delay} />
+      <div className="flex min-w-0 flex-1 flex-col gap-2">
+        <Skeleton className="h-4 w-2/3 max-w-xs" delay={delay + 20} />
+        <Skeleton className="h-3 w-full max-w-md" delay={delay + 35} />
+        <Skeleton className="h-3 w-24" delay={delay + 50} />
       </div>
     </div>
   );
@@ -121,7 +140,7 @@ function CardsRowSkeleton({ count = 3 }: { count?: number }) {
       {Array.from({ length: count }).map((_, i) => (
         <Skeleton
           key={`card-${i}`}
-          className="h-[280px] min-w-[300px] shrink-0 rounded-xl sm:min-w-88.5"
+          className="h-70 min-w-75 shrink-0 rounded-xl sm:min-w-88.5"
           delay={100 + i * 80}
         />
       ))}
@@ -139,6 +158,67 @@ function DetailSkeleton() {
       </div>
       <Skeleton className="h-12 w-full max-w-xl rounded-lg" delay={200} />
       <Skeleton className="h-44 w-full rounded-xl" delay={240} />
+    </div>
+  );
+}
+
+function FormSkeleton() {
+  return (
+    <div className="mx-auto flex w-full max-w-lg flex-col gap-6 py-4">
+      <div className="flex items-center gap-3">
+        <Skeleton className="size-9 rounded-full" delay={40} />
+        <Skeleton className="h-2 flex-1 rounded-full" delay={60} />
+        <Skeleton className="size-9 rounded-full" delay={80} />
+      </div>
+      <Skeleton className="size-12 rounded-full" delay={100} />
+      <Skeleton className="h-8 w-4/5 max-w-sm rounded-lg" delay={140} />
+      <div className="flex flex-col gap-3">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <Skeleton
+            key={`opt-${i}`}
+            className="h-14 w-full rounded-2xl"
+            delay={180 + i * 70}
+          />
+        ))}
+      </div>
+      <Skeleton className="mt-4 h-12 w-full rounded-xl" delay={480} />
+    </div>
+  );
+}
+
+function ChatSkeleton() {
+  return (
+    <div className="flex w-full flex-col gap-6">
+      <Skeleton className="h-40 w-full rounded-2xl border border-dashed" delay={60} />
+      <div className="flex flex-col gap-3">
+        <Skeleton className="h-16 w-3/4 max-w-md rounded-2xl rounded-bl-md" delay={120} />
+        <Skeleton className="ml-auto h-20 w-2/3 max-w-sm rounded-2xl rounded-br-md" delay={180} />
+        <Skeleton className="h-14 w-1/2 max-w-xs rounded-2xl rounded-bl-md" delay={240} />
+      </div>
+      <Skeleton className="h-12 w-full rounded-xl" delay={300} />
+    </div>
+  );
+}
+
+function ProfileSkeleton() {
+  return (
+    <div className="flex w-full flex-col gap-8">
+      <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-start">
+        <Skeleton className="size-24 rounded-full" delay={40} />
+        <div className="flex w-full flex-col gap-3">
+          <Skeleton className="h-7 w-48 rounded-lg" delay={80} />
+          <Skeleton className="h-4 w-64 max-w-full" delay={110} />
+          <Skeleton className="h-9 w-32 rounded-lg" delay={140} />
+        </div>
+      </div>
+      <div className="grid gap-4 sm:grid-cols-2">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div key={`field-${i}`} className="flex flex-col gap-2">
+            <Skeleton className="h-3 w-20" delay={160 + i * 40} />
+            <Skeleton className="h-11 w-full rounded-lg" delay={180 + i * 40} />
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -174,14 +254,16 @@ function ListSkeleton({
   rowType = "default",
 }: {
   rows: number;
-  rowType?: "default" | "claim" | "renewal";
+  rowType?: ScreenLoadingRowType;
 }) {
   const Row =
     rowType === "claim"
       ? ClaimRowSkeleton
       : rowType === "renewal"
         ? RenewalCardSkeleton
-        : ListRowSkeleton;
+        : rowType === "notification"
+          ? NotificationRowSkeleton
+          : ListRowSkeleton;
 
   return (
     <div className="flex flex-col gap-4">
@@ -198,6 +280,7 @@ function ScreenLoading({
   statCount = 4,
   showHeader = true,
   showStats,
+  rowType,
   label = "Loading",
   className,
   ...props
@@ -213,9 +296,7 @@ function ScreenLoading({
         aria-busy="true"
         aria-label={label}
         className={cn(
-          // Sits below the fixed 62px header, so full height must exclude it —
-          // min-h-screen here adds a scrollbar that vanishes once content loads.
-          "flex min-h-[calc(100vh-62px)] flex-col items-center justify-center gap-6 bg-orange-50 dark:bg-background px-4 motion-safe:animate-in motion-safe:fade-in motion-safe:duration-300",
+          "flex min-h-app-screen flex-col items-center justify-center gap-6 bg-orange-50 px-4 dark:bg-background motion-safe:animate-in motion-safe:fade-in motion-safe:duration-300",
           className,
         )}
         {...props}
@@ -243,7 +324,9 @@ function ScreenLoading({
     >
       <LoadingLabel label={label} />
 
-      {showHeader && <HeaderSkeleton />}
+      {showHeader && variant !== "form" && variant !== "chat" && (
+        <HeaderSkeleton />
+      )}
 
       {variant === "cards-row" && (
         <>
@@ -254,19 +337,30 @@ function ScreenLoading({
 
       {variant === "detail" && <DetailSkeleton />}
 
+      {variant === "form" && <FormSkeleton />}
+
+      {variant === "chat" && <ChatSkeleton />}
+
+      {variant === "profile" && <ProfileSkeleton />}
+
       {variant === "summary" && (
         <>
           {includeStats && <StatsSkeleton count={statCount} />}
-          <ListSkeleton rows={contentRows} rowType="renewal" />
+          <ListSkeleton
+            rows={contentRows}
+            rowType={rowType ?? "renewal"}
+          />
         </>
       )}
 
-      {variant === "list" && <ListSkeleton rows={contentRows} />}
+      {variant === "list" && (
+        <ListSkeleton rows={contentRows} rowType={rowType ?? "default"} />
+      )}
 
       {variant === "page" && (
         <>
           {includeStats && <StatsSkeleton count={statCount} />}
-          <ListSkeleton rows={contentRows} rowType="claim" />
+          <ListSkeleton rows={contentRows} rowType={rowType ?? "claim"} />
         </>
       )}
     </div>

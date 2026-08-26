@@ -252,6 +252,48 @@
     0 0 1.5px 0 rgba(0, 0, 0, 0.25), 0 0 10px 2px rgba(0, 0, 0, 0.03),
     0 44px 52px -10px rgba(0, 0, 0, 0.1);
   --shadow-blue-ring: 0 0 0 2px rgba(101, 185, 252, 0.9);
+
+  /* App chrome — fixed header is 62px (3.875rem) */
+  --spacing-header: 3.875rem;
+
+  /* Named background images (replaces bg-[url(...)] arbitrary values) */
+  --background-image-welcome: url("/images/svg/bg-vector.svg");
+  --background-image-offer-health: url("/images/health.png");
+  --background-image-offer-auto: url("/images/auto.png");
+  --background-image-offer-life: url("/images/life.png");
+  --background-image-offer-home: url("/images/home.png");
+
+  /* Header hairline under orange wash */
+  --shadow-header-accent: 0 1px 0 0 rgba(255, 94, 0, 0.1);
+
+  /* Onboarding motion curve */
+  --ease-onboarding: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Logo mark (brand orange used in the Plans SVG) */
+  --color-logo-mark: #ff6e05;
+}
+
+/* Viewport height minus the fixed app header */
+@utility h-app-screen {
+  height: calc(100dvh - var(--spacing-header));
+}
+@utility min-h-app-screen {
+  min-height: calc(100dvh - var(--spacing-header));
+}
+@utility max-h-drawer {
+  max-height: 80vh;
+}
+@utility max-w-dialog {
+  max-width: calc(100% - 2rem);
+}
+@utility pt-safe-top {
+  padding-top: max(1.25rem, env(safe-area-inset-top));
+}
+@utility pb-safe-bottom {
+  padding-bottom: max(1.25rem, env(safe-area-inset-bottom));
+}
+@utility pb-safe-bottom-lg {
+  padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
 }
 
 @utility shadow-focus-light {

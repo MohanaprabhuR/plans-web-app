@@ -6,7 +6,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center gap-[0_8px] w-fit hover:z-1 justify-center whitespace-nowrap transition-all ease-in-out disabled:pointer-events-none pointer-events-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-0",
+  "inline-flex items-center gap-x-2 w-fit hover:z-1 justify-center whitespace-nowrap transition-all ease-in-out disabled:pointer-events-none pointer-events-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-0",
   {
     variants: {
       variant: {
@@ -37,17 +37,17 @@ const buttonVariants = cva(
       },
     },
     compoundVariants: [
-      { size: "sm", iconOnly: false, className: "px-2 py-[6px]" },
+      { size: "sm", iconOnly: false, className: "px-2 py-1.5" },
       { size: "sm", iconOnly: true, className: "p-1.5" },
 
       { size: "md", iconOnly: false, className: "py-1.75 px-2.5" },
-      { size: "md", iconOnly: true, className: "p-[7px]" },
+      { size: "md", iconOnly: true, className: "p-1.75" },
 
       { size: "lg", iconOnly: false, className: "py-2.5 px-3" },
       { size: "lg", iconOnly: true, className: "p-2.5" },
 
       { size: "xl", iconOnly: false, className: "py-2.75 px-3.5" },
-      { size: "xl", iconOnly: true, className: "p-[11px]" },
+      { size: "xl", iconOnly: true, className: "p-2.75" },
 
       { size: "2xl", iconOnly: false, className: "py-3.5 px-4" },
       { size: "2xl", iconOnly: true, className: "p-3.5" },

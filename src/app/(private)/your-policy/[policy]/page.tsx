@@ -515,7 +515,7 @@ const PolicyDetailPage = () => {
                 {coverage.map((item) => (
                   <Card
                     key={item.id}
-                    className="w-full max-w-[228px] min-w-[228px]"
+                    className="w-full max-w-57 min-w-57"
                   >
                     <CardContent className="flex flex-col gap-4">
                       <Blend className="size-8 text-orange-500" />
@@ -537,7 +537,7 @@ const PolicyDetailPage = () => {
                 {notCovered.map((item) => (
                   <Card
                     key={item.id}
-                    className="w-full max-w-[228px] min-w-[228px]"
+                    className="w-full max-w-57 min-w-57"
                   >
                     <CardContent className="flex flex-col gap-4">
                       {/* {item.icon} */}
@@ -589,12 +589,12 @@ const PolicyDetailPage = () => {
               ))}
             </CardContent>
           </Card>
-          <Card className="relative pt-[56px] mt-10">
+          <Card className="relative pt-14 mt-10">
             <CardContent className="flex flex-col gap-y-4 items-center">
               <div className="size-20 rounded-full bg-accent flex items-center justify-center absolute -top-10  left-1/2 -translate-x-1/2 ">
-                <SquareChartGantt className="size-[38px]" />
+                <SquareChartGantt className="size-9.5" />
               </div>
-              <p className="text-foreground text-2xl font-semibold leading-6 tracking-4 text-center w-full max-w-[250px]">
+              <p className="text-foreground text-2xl font-semibold leading-6 tracking-4 text-center w-full max-w-62.5">
                 Need Help? Start Your Claim in Minutes
               </p>
               <Button size="lg">Claim Now</Button>

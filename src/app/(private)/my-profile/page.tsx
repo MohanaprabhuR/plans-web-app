@@ -59,6 +59,7 @@ const MyProfilePage = () => {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [profileLoading, setProfileLoading] = useState(true);
 
   const [isEditing, setIsEditing] = useState(false);
   const [firstName, setFirstName] = useState("");
@@ -98,8 +99,12 @@ const MyProfilePage = () => {
   };
 
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      if (!authLoading) setProfileLoading(false);
+      return;
+    }
     applyUserToForm(null);
+    setProfileLoading(true);
 
     let cancelled = false;
     (async () => {
@@ -110,16 +115,19 @@ const MyProfilePage = () => {
         )
         .eq("id", user.id)
         .maybeSingle();
-      if (cancelled || !data) return;
-      setProfileRow(data);
-      applyUserToForm(data);
+      if (cancelled) return;
+      if (data) {
+        setProfileRow(data);
+        applyUserToForm(data);
+      }
+      setProfileLoading(false);
     })();
 
     return () => {
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps -- hydrate when auth user changes
-  }, [user]);
+  }, [user, authLoading]);
 
   const cancelEditing = () => {
     applyUserToForm(profileRow);
@@ -403,7 +411,7 @@ const MyProfilePage = () => {
     "https://mockmind-api.uifaces.co/content/human/80.jpg";
   const displaySrc = previewUrl || currentAvatarUrl;
 
-  if (authLoading) {
+  if (authLoading || profileLoading) {
     return <RouteLoading preset="my-profile" />;
   }
 

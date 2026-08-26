@@ -305,7 +305,7 @@ export default function PolicyAI() {
               )}
 
               {/* Chat messages */}
-              <div className="min-h-[260px] space-y-5">
+              <div className="min-h-65 space-y-5">
                 {messages.map((m, idx) => (
                   <div
                     key={idx}
@@ -325,7 +325,7 @@ export default function PolicyAI() {
                     {/* Bubble */}
                     <div
                       className={
-                        m.role === "user" ? "max-w-[360px]" : "max-w-[560px]"
+                        m.role === "user" ? "max-w-90" : "max-w-140"
                       }
                     >
                       <div

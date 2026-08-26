@@ -350,7 +350,7 @@ function TabsTrigger({ className, ...props }: TabsTriggerProps) {
   };
 
   const sizeClasses: Record<TabSize, string> = {
-    sm: "px-2 py-[5px]",
+    sm: "px-2 py-1.25",
     md: "px-2.5 py-1.5",
   };
 

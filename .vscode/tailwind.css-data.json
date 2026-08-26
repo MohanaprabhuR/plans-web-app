@@ -1,0 +1,49 @@
+{
+  "version": 1.1,
+  "atDirectives": [
+    {
+      "name": "@tailwind",
+      "description": "Use the `@tailwind` directive to insert Tailwind's `base`, `components`, `utilities` and `screens` styles into your CSS."
+    },
+    {
+      "name": "@apply",
+      "description": "Use the `@apply` directive to inline any existing utility classes into your own custom CSS."
+    },
+    {
+      "name": "@layer",
+      "description": "Use the `@layer` directive to tell Tailwind which “bucket” a set of custom styles belong to."
+    },
+    {
+      "name": "@config",
+      "description": "Use the `@config` directive to specify which config file Tailwind should use."
+    },
+    {
+      "name": "@theme",
+      "description": "Use `@theme` to define design tokens (colors, spacing, fonts, etc.) that Tailwind generates utilities from."
+    },
+    {
+      "name": "@utility",
+      "description": "Use `@utility` to define custom utility classes in Tailwind CSS v4."
+    },
+    {
+      "name": "@custom-variant",
+      "description": "Use `@custom-variant` to define custom variants in Tailwind CSS v4."
+    },
+    {
+      "name": "@variant",
+      "description": "Use `@variant` to apply a Tailwind variant inside custom CSS."
+    },
+    {
+      "name": "@plugin",
+      "description": "Use `@plugin` to load a Tailwind plugin from CSS."
+    },
+    {
+      "name": "@source",
+      "description": "Use `@source` to register additional source files for Tailwind class detection."
+    },
+    {
+      "name": "@reference",
+      "description": "Use `@reference` to import another CSS file for Tailwind without emitting its styles."
+    }
+  ]
+}

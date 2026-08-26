@@ -25,7 +25,7 @@ export type PageLoadStateProps = {
   preset?: PageLoadingPreset;
 } & Pick<
   ScreenLoadingProps,
-  "variant" | "label" | "showHeader" | "rows" | "statCount" | "showStats"
+  "variant" | "label" | "showHeader" | "rows" | "statCount" | "showStats" | "rowType"
 >;
 
 export function PageLoadError({
@@ -76,6 +76,7 @@ export function PageLoadState({
   rows,
   statCount,
   showStats,
+  rowType,
 }: PageLoadStateProps) {
   if (loading) {
     if (preset) {
@@ -88,6 +89,7 @@ export function PageLoadState({
           rows={rows}
           statCount={statCount}
           showStats={showStats}
+          rowType={rowType}
           className={className}
         />
       );
@@ -101,6 +103,7 @@ export function PageLoadState({
         rows={rows}
         statCount={statCount}
         showStats={showStats}
+        rowType={rowType}
         className={cn("py-2", className)}
       />
     );

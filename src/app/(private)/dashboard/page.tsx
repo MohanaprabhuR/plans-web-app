@@ -858,7 +858,7 @@ const DashboardPage = () => {
                             </div>
                           </CardContent>
                           <CardFooter className="flex items-center justify-between bg-muted p-1.5 rounded-b-lg ">
-                            <p className="max-w-[200px] text-base leading-6 font-medium text-muted-foreground">
+                            <p className="max-w-50 text-base leading-6 font-medium text-muted-foreground">
                               Covered by <br />
                               <span className="text-accent-foreground flex-1 font-semibold">
                                 {list.coveredBy}
@@ -944,7 +944,7 @@ const DashboardPage = () => {
                             </div>
                           </CardContent>
                           <CardFooter className="flex items-center justify-between bg-muted p-1.5 rounded-b-lg ">
-                            <p className="max-w-[200px] text-base leading-6 font-medium text-muted-foreground">
+                            <p className="max-w-50 text-base leading-6 font-medium text-muted-foreground">
                               Covered by <br />
                               <span className="text-accent-foreground flex-1 font-semibold">
                                 {list.coveredBy}
@@ -974,7 +974,7 @@ const DashboardPage = () => {
                     <Zap className="size-5" /> Quick Actions
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="flex gap-[15px]">
+                <CardContent className="flex gap-3.75">
                   {quickActions.map((action) => {
                     if (action.type === "drawer") {
                       return (
@@ -986,15 +986,15 @@ const DashboardPage = () => {
                             />
                           </DrawerTrigger>
 
-                          <DrawerContent className="space-y-[36px] p-6">
-                            <DrawerHeader className="flex flex-row items-center justify-between w-full p-0 mb-[44px]">
+                          <DrawerContent className="space-y-9 p-6">
+                            <DrawerHeader className="flex flex-row items-center justify-between w-full p-0 mb-11">
                               <DrawerTitle>Download Health Cards</DrawerTitle>
                               <DrawerClose>
                                 <XIcon className="size-4" />
                               </DrawerClose>
                             </DrawerHeader>
 
-                            <div className="space-y-[36px]">
+                            <div className="space-y-9">
                               {healthCards.map((card) => (
                                 <HealthCard key={card.id} card={card} />
                               ))}
@@ -1039,7 +1039,7 @@ const DashboardPage = () => {
                       </p>
                     </div>
                     <div className="bg-accent size-14 rounded-lg flex items-center justify-center text-center p-2">
-                      <p className="text-[8px] leading-3  font-semibold text-muted-foreground uppercase flex flex-col items-center justify-center">
+                      <p className="text-2 leading-3  font-semibold text-muted-foreground uppercase flex flex-col items-center justify-center">
                         <span className="text-accent-foreground font-medium text-3xl">
                           {
                             apiData?.endpoints?.premiumOverview
@@ -1055,15 +1055,15 @@ const DashboardPage = () => {
                       (item) => (
                         <Card
                           key={item.category}
-                          className={`w-full max-w-[154px] p-4 overflow-hidden bg-no-repeat bg-right ${
+                          className={`w-full max-w-38.5 p-4 overflow-hidden bg-no-repeat bg-right ${
                             item.category === "Health"
-                              ? "bg-[url(/images/health.png)]"
+                              ? "bg-offer-health"
                               : item.category === "Auto"
-                                ? "bg-[url(/images/auto.png)]"
+                                ? "bg-offer-auto"
                                 : item.category === "Life"
-                                  ? "bg-[url(/images/life.png)]"
+                                  ? "bg-offer-life"
                                   : item.category === "Home"
-                                    ? "bg-[url(/images/home.png)]"
+                                    ? "bg-offer-home"
                                     : "bg-accent"
                           }`}
                         >
@@ -1132,7 +1132,7 @@ const DashboardPage = () => {
                             </Badge>
                           </div>
                           <div className="flex items-center justify-between">
-                            <p className="font-medium text-xl leading-6 text-accent-foreground tracking-4 max-w-[140px]">
+                            <p className="font-medium text-xl leading-6 text-accent-foreground tracking-4 max-w-35">
                               {claim.title}
                             </p>
                             <p className="font-medium text-6xl leading-12 text-accent-foreground tracking-4">
@@ -1140,7 +1140,7 @@ const DashboardPage = () => {
                             </p>
                           </div>
                           <div className="flex items-center justify-between bg-accent p-1.5 rounded-lg">
-                            <p className="font-medium text-base leading-5 text-accent-foreground tracking-4 max-w-[130px]">
+                            <p className="font-medium text-base leading-5 text-accent-foreground tracking-4 max-w-32.5">
                               {claim.provider}
                             </p>
                             <p className="font-medium text-base leading-5 text-accent-foreground tracking-4">
@@ -1198,7 +1198,7 @@ const DashboardPage = () => {
                           <p className="text-accent-foreground text-3xl leading-4 font-semibold -tracking-4 max-w-17.5 text-right">
                             ${offer.price}
                             <br />
-                            <span className="text-muted-foreground text-[10px] uppercase font-medium">
+                            <span className="text-muted-foreground text-2.5 uppercase font-medium">
                               {offer.priceType}
                             </span>
                           </p>
