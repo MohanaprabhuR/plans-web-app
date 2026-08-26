@@ -127,13 +127,17 @@ export function RiskScoreGauge({
           strokeLinecap="round"
         />
 
-        {/* Value marker: an upright triangle sitting just inside the band.
-            Deliberately not rotated — the reference keeps its top edge level
-            wherever it lands on the dial. */}
+        {/* Value marker: points outward along the radius, at the band, with a
+            white outline so it stays legible over the colour beneath it. The
+            local apex is (0,+1); rotate(t) maps that to (-sin t, cos t), so
+            markerDeg + 180 aims it away from the centre. */}
         <polygon
-          points="-7,-6 7,-6 0,5"
+          points="-7,-6 7,-6 0,6"
           className="fill-foreground"
-          transform={`translate(${mx} ${my})`}
+          stroke="#ffffff"
+          strokeWidth={1.5}
+          strokeLinejoin="round"
+          transform={`translate(${mx} ${my}) rotate(${markerDeg + 180})`}
         />
 
         <text
