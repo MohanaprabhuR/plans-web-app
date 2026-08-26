@@ -5,8 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import client from "@/api/client";
 import { toast } from "sonner";
 import { useRouter, usePathname } from "next/navigation";
-import Logo from "../../../../public/images/svg/plans-logo.svg";
-import Image from "next/image";
+import { PlansLogo } from "@/components/BaseComponents/common/plans-logo";
 import useAuth from "@/hooks/useAuth";
 import { useEffect, useState } from "react";
 import {
@@ -65,7 +64,7 @@ const HeaderLayout = () => {
       >
         <div className="w-full mx-auto max-w-[1142px] px-4 flex items-center justify-between">
           <Link href="/dashboard">
-            <Image src={Logo} alt="logo" width={78} height={32} priority />
+            <PlansLogo width={78} height={32} />
           </Link>
           <div className="flex items-center gap-x-8">
             <Link
