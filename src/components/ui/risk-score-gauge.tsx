@@ -15,7 +15,7 @@ const CX = 110;
 const CY = 110;
 const R_OUTER = 96;
 const R_INNER = 79;
-const R_GUIDE = 67;
+const R_GUIDE = 73;
 
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 const hexToRgb = (h: string) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
