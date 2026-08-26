@@ -213,7 +213,9 @@ function ScreenLoading({
         aria-busy="true"
         aria-label={label}
         className={cn(
-          "flex min-h-screen flex-col items-center justify-center gap-6 bg-orange-50 px-4 motion-safe:animate-in motion-safe:fade-in motion-safe:duration-300",
+          // Sits below the fixed 62px header, so full height must exclude it —
+          // min-h-screen here adds a scrollbar that vanishes once content loads.
+          "flex min-h-[calc(100vh-62px)] flex-col items-center justify-center gap-6 bg-orange-50 dark:bg-background px-4 motion-safe:animate-in motion-safe:fade-in motion-safe:duration-300",
           className,
         )}
         {...props}
