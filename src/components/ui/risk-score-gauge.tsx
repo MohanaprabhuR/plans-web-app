@@ -111,7 +111,7 @@ export function RiskScoreGauge({
   return (
     <div className={cn("mx-auto w-full max-w-95", className)}>
       <svg
-        viewBox="0 0 220 224"
+        viewBox="0 0 220 206"
         className="w-full"
         role="img"
         aria-label={`Risk score ${score} out of 100, ${label} risk`}
@@ -178,25 +178,6 @@ export function RiskScoreGauge({
           {label}
         </text>
 
-        {/* Scale bounds under the arc ends */}
-        <text
-          x={polar(R_OUTER, START_DEG)[0]}
-          y={216}
-          textAnchor="middle"
-          className="fill-muted-foreground"
-          style={{ fontSize: 11 }}
-        >
-          0
-        </text>
-        <text
-          x={polar(R_OUTER, START_DEG + SWEEP_DEG)[0]}
-          y={216}
-          textAnchor="middle"
-          className="fill-muted-foreground"
-          style={{ fontSize: 11 }}
-        >
-          100
-        </text>
       </svg>
     </div>
   );
