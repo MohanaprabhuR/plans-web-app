@@ -9,13 +9,13 @@ const SWEEP_DEG = 270;
 
 const SEGMENTS = 5;
 const SLICES = 120; // per-slice fill approximates a continuous gradient
-const GAP_SLICES = 3; // blanked slices at each segment boundary
+const GAP_SLICES = 2; // blanked slices at each segment boundary
 
 const CX = 110;
 const CY = 110;
 const R_OUTER = 96;
 const R_INNER = 80;
-const R_GUIDE = 72;
+const R_GUIDE = 68;
 
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 const hexToRgb = (h: string) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
